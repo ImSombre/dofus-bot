@@ -15,12 +15,45 @@ Lancement :
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
-from loguru import logger
 
-from src.config.settings import Settings
+def _redirect_stdout_stderr_if_pythonw() -> None:
+    """Sous pythonw.exe, sys.stdout / sys.stderr sont None → redirige vers
+    un fichier log pour éviter BrokenPipeError / crash silencieux."""
+    if sys.stdout is not None and sys.stderr is not None:
+        return
+    try:
+        here = Path(__file__).resolve().parent.parent
+        log_dir = here / "logs"
+        log_dir.mkdir(exist_ok=True)
+        log_path = log_dir / "bot.log"
+        # Ouvre en append pour conserver l'historique
+        f = open(log_path, "a", encoding="utf-8", buffering=1)
+        if sys.stdout is None:
+            sys.stdout = f
+        if sys.stderr is None:
+            sys.stderr = f
+    except Exception:
+        # Dernier recours : DEVNULL pour éviter les crash de print()
+        try:
+            devnull = open(os.devnull, "w", encoding="utf-8")
+            if sys.stdout is None:
+                sys.stdout = devnull
+            if sys.stderr is None:
+                sys.stderr = devnull
+        except Exception:
+            pass
+
+
+# IMPORTANT : redirect AVANT d'importer loguru qui veut écrire sur stderr
+_redirect_stdout_stderr_if_pythonw()
+
+from loguru import logger  # noqa: E402
+
+from src.config.settings import Settings  # noqa: E402
 
 
 def _enable_dpi_awareness() -> None:
