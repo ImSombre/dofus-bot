@@ -441,26 +441,39 @@ if ($lmstudioInstalled) {
 }
 
 # ------------------------------------------------------------
-# 9) Raccourci Bureau (auto-cree)
+# 9) Raccourcis Bureau + Menu Demarrer (lancement sans console)
 # ------------------------------------------------------------
-Write-Step "Raccourci Bureau"
-$desktop = [Environment]::GetFolderPath("Desktop")
-$lnkPath = Join-Path $desktop "Dofus Bot.lnk"
-$runPath = Join-Path $projectRoot "scripts\run.ps1"
-$psExe = Get-Command pwsh -ErrorAction SilentlyContinue
-if ($psExe) { $shellTarget = $psExe.Source } else { $shellTarget = "powershell.exe" }
-try {
-    $shell = New-Object -ComObject WScript.Shell
-    $sc = $shell.CreateShortcut($lnkPath)
-    $sc.TargetPath = $shellTarget
-    $sc.Arguments = "-ExecutionPolicy Bypass -NoExit -File `"$runPath`""
-    $sc.WorkingDirectory = $projectRoot
-    $sc.IconLocation = $shellTarget + ",0"
-    $sc.Description = "Dofus 2.64 Bot"
-    $sc.Save()
-    Write-OK "Raccourci cree: $lnkPath"
-} catch {
-    Write-Warn ("Creation raccourci echouee (non bloquant) : " + $_.Exception.Message)
+Write-Step "Raccourcis Bureau + Menu Demarrer"
+$pythonwExe = Join-Path $projectRoot ".venv\Scripts\pythonw.exe"
+$iconPath = Join-Path $projectRoot "docs\icon.ico"
+if (-not (Test-Path $pythonwExe)) {
+    Write-Warn "pythonw.exe introuvable dans .venv, raccourcis skip"
+} else {
+    $desktop = [Environment]::GetFolderPath("Desktop")
+    $startMenuPrograms = Join-Path ([Environment]::GetFolderPath("StartMenu")) "Programs"
+    $iconArg = if (Test-Path $iconPath) { $iconPath } else { $pythonwExe }
+
+    foreach ($target in @(
+        (Join-Path $desktop "Dofus Bot.lnk"),
+        (Join-Path $startMenuPrograms "Dofus Bot.lnk")
+    )) {
+        try {
+            $shell = New-Object -ComObject WScript.Shell
+            $sc = $shell.CreateShortcut($target)
+            $sc.TargetPath = $pythonwExe
+            $sc.Arguments = "-m src.main"
+            $sc.WorkingDirectory = $projectRoot
+            $sc.IconLocation = $iconArg
+            $sc.Description = "Dofus 2.64 Bot (IA Gemini)"
+            $sc.WindowStyle = 7   # minimise, pas de console
+            $sc.Save()
+            Write-OK "Raccourci cree: $target"
+        } catch {
+            Write-Warn ("Creation raccourci echouee : " + $_.Exception.Message)
+        }
+    }
+    Write-Host "  Double-clic sur le raccourci Bureau -> Dofus Bot demarre (pas de console)" -ForegroundColor Gray
+    Write-Host "  Ou tape 'Dofus Bot' dans la recherche Windows" -ForegroundColor Gray
 }
 
 # ------------------------------------------------------------
@@ -471,12 +484,14 @@ Write-Host "================================================" -ForegroundColor G
 Write-Host "   Installation terminee !" -ForegroundColor Green
 Write-Host "================================================" -ForegroundColor Green
 Write-Host ""
-Write-Host "  Lancement automatique du bot dans 3s..." -ForegroundColor Cyan
+Write-Host "  Lancement automatique du bot dans 3s (sans console, en arriere-plan)..." -ForegroundColor Cyan
 Start-Sleep -Seconds 3
-$pyExe = Join-Path $projectRoot ".venv\Scripts\python.exe"
-if (Test-Path $pyExe) {
+$pyw = Join-Path $projectRoot ".venv\Scripts\pythonw.exe"
+if (Test-Path $pyw) {
     Set-Location $projectRoot
-    & $pyExe -m src.main
+    # Start-Process avec pythonw = pas de fenetre console visible
+    Start-Process -FilePath $pyw -ArgumentList "-m","src.main" -WorkingDirectory $projectRoot
+    Write-OK "Bot lance en arriere-plan. Pour relancer plus tard : double-clic sur 'Dofus Bot.lnk' du Bureau."
 } else {
-    Write-Warn "python.exe du venv introuvable. Relance .\scripts\install.ps1 ou lance : .\scripts\run.ps1"
+    Write-Warn "pythonw.exe du venv introuvable. Relance .\scripts\install.ps1"
 }
