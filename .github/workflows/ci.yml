@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    # Bot is Windows-specific at runtime, but logic tests run on Linux fine.
+    # Qt + vision deps are installed only so imports don't break during collection.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install system deps for Qt headless
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 \
+            libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0 \
+            libxcb-xinerama0 libxcb-xkb1 libegl1 libglib2.0-0
+
+      - name: Install Python deps
+        run: |
+          python -m pip install --upgrade pip
+          # Install lighter requirements set on CI (skip pyautogui/mss which are Win-only at runtime)
+          pip install -r requirements.txt
+
+      - name: Ruff lint
+        run: ruff check src tests
+
+      - name: Ruff format check
+        run: ruff format --check src tests
+
+      - name: Mypy
+        run: mypy src || echo "mypy warnings (non-blocking for MVP)"
+        continue-on-error: true
+
+      - name: Pytest
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: pytest --cov=src --cov-report=term-missing
+
+      - name: pip-audit
+        run: pip-audit --strict || echo "pip-audit findings reported"
+        continue-on-error: true

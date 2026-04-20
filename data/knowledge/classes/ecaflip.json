@@ -1,0 +1,282 @@
+{
+  "class_id": "ecaflip",
+  "nom_fr": "Ecaflip",
+  "archetype": "guerrier-chance polyvalent (mélée/distance), mécanique chance",
+  "stats_principales": ["Chance", "Agilité"],
+  "philosophie": "L'Ecaflip joue avec le hasard : Pile ou Face et Roulette sont aléatoires mais puissants. Griffe de Ceangal est le sort DPS de référence en mélée. Bond du Félin permet l'engagement ou la fuite. Destin d'Ecaflip et Tout ou Rien sont des paris à haut risque/haute récompense.",
+  "priorites_generales": [
+    "Utiliser Bond du Félin pour s'engager ou fuir selon la situation",
+    "DPS mélée principal : Griffe de Ceangal + Rekop",
+    "DPS distance : Pile ou Face + Bluff",
+    "Chance d'Ecaflip buff un allié au tour 1",
+    "Roue de la Fortune si 2+ ennemis regroupés"
+  ],
+  "sorts": [
+    {
+      "id": "pile_ou_face",
+      "nom": "Pile ou Face",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 6,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Sort de distance aléatoire. Pile : dégâts. Face : dégâts + effet chance. Spammable, bon rendement moyen."
+    },
+    {
+      "id": "chance_d_ecaflip",
+      "nom": "Chance d'Ecaflip",
+      "pa": 2,
+      "po_min": 0,
+      "po_max": 3,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 0,
+      "note": "Donne un bonus de chance à un allié. Lancer sur le DPS principal en tour 1 pour amplifier les dégâts."
+    },
+    {
+      "id": "bond_du_felin",
+      "nom": "Bond du Félin",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "movement",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Téléportation tactique. Engagement ou fuite selon la situation. Fondamental pour la mobilité de l'Ecaflip."
+    },
+    {
+      "id": "bluff",
+      "nom": "Bluff",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 6,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Sort distance alternatif à Pile ou Face. Peut débuffer la cible (réduction de statistiques)."
+    },
+    {
+      "id": "perception",
+      "nom": "Perception",
+      "pa": 2,
+      "po_min": 0,
+      "po_max": 4,
+      "type": "utility",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Révèle les entités invisibles dans une zone. Contre les Srams. Utile en PvP."
+    },
+    {
+      "id": "contrecoup",
+      "nom": "Contrecoup",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "moyens",
+      "cooldown": 1,
+      "note": "Sort mélée/courte portée. Pas de ligne de vue. Bon complément aux sorts mélée de l'Ecaflip."
+    },
+    {
+      "id": "trefle",
+      "nom": "Trèfle",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 5,
+      "type": "heal",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Soin aléatoire (variable selon le résultat). Utiliser si pas d'autre option de survie disponible."
+    },
+    {
+      "id": "tout_ou_rien",
+      "nom": "Tout ou Rien",
+      "pa": 5,
+      "po_min": 1,
+      "po_max": 6,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "très élevés",
+      "cooldown": 3,
+      "note": "Pari maximum : dégâts très élevés OU effet négatif. Réserver pour les moments décisifs où le risque vaut la peine."
+    },
+    {
+      "id": "roulette",
+      "nom": "Roulette",
+      "pa": 4,
+      "po_min": 0,
+      "po_max": 4,
+      "type": "aoe_croix",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 3,
+      "note": "AoE aléatoire en croix. Effets variables selon le résultat (dégâts, soins, buffs/debuffs). Puissant en groupe."
+    },
+    {
+      "id": "topkaj",
+      "nom": "Topkaj",
+      "pa": 5,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "très élevés",
+      "cooldown": 4,
+      "note": "Sort burst mélée/courte portée à très haut potentiel. Réserver pour les cibles prioritaires ou boss."
+    },
+    {
+      "id": "langue_rapeuse",
+      "nom": "Langue Râpeuse",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 2,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Sort mélée de base. Pas de ligne de vue. Finir les tours avec les PA restants en corps-à-corps."
+    },
+    {
+      "id": "roue_de_la_fortune",
+      "nom": "Roue de la Fortune",
+      "pa": 4,
+      "po_min": 0,
+      "po_max": 4,
+      "type": "aoe_croix",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 2,
+      "note": "AoE en croix. Bon potentiel de dégâts sur plusieurs cibles. Utiliser si 2+ ennemis sont regroupés."
+    },
+    {
+      "id": "griffe_invocatrice",
+      "nom": "Griffe Invocatrice",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Invoque un Chacha pour aider au combat. Créature alliée DPS/tank selon le niveau."
+    },
+    {
+      "id": "esprit_felin",
+      "nom": "Esprit Félin",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Buff passif de l'Ecaflip. Augmente les statistiques (esquive, critique) pendant quelques tours."
+    },
+    {
+      "id": "odorat",
+      "nom": "Odorat",
+      "pa": 2,
+      "po_min": 0,
+      "po_max": 3,
+      "type": "utility",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Détecte les pièges et entités cachées à proximité. Contre les Srams en PvP, utile dans les donjons piégés."
+    },
+    {
+      "id": "reflexes",
+      "nom": "Réflexes",
+      "pa": 2,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Augmente l'esquive et les résistances. Lancer si on anticipe une salve d'attaques ennemies."
+    },
+    {
+      "id": "griffe_joueuse",
+      "nom": "Griffe Joueuse",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 2,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Sort mélée économique. Effet aléatoire bonus (peut appliquer un débuff chance). Bon spam en corps-à-corps."
+    },
+    {
+      "id": "griffe_de_ceangal",
+      "nom": "Griffe de Ceangal",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 1,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "élevés",
+      "cooldown": 0,
+      "note": "Sort mélée principal. Corps-à-corps, dégâts élevés, spammable. Sort de référence DPS mélée de l'Ecaflip."
+    },
+    {
+      "id": "rekop",
+      "nom": "Rekop",
+      "pa": 2,
+      "po_min": 1,
+      "po_max": 1,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 0,
+      "note": "Sort de base mélée, coût minimal. Finir les tours avec 2 PA. Léger vol de vie ou effet bonus selon build."
+    },
+    {
+      "id": "destin_d_ecaflip",
+      "nom": "Destin d'Ecaflip",
+      "pa": 5,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 5,
+      "note": "Sort ultime de transformation. Boost massif de toutes les statistiques. Réserver pour les combats décisifs."
+    },
+    {
+      "id": "felination",
+      "nom": "Félintion",
+      "pa": 4,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 5,
+      "note": "Transformation féline : boost considérable des dégâts. Sort signature Retrozia pour le burst ultime."
+    }
+  ],
+  "plan_tour_type": [
+    "Tour 1 : Chance d'Ecaflip sur le DPS allié (2 PA) + Bond du Félin pour s'engager (3 PA) + Griffe de Ceangal (4 PA) si mélée",
+    "Tour 2+ : Griffe de Ceangal x2 si en mélée (8 PA). Si à distance : Pile ou Face x2 ou Roue de la Fortune.",
+    "Rekop pour finir les tours avec 2 PA restants. Tout ou Rien si cible prioritaire à descendre rapidement."
+  ],
+  "gestion_hp": {
+    "seuil_alerte": 40,
+    "seuil_critique": 20,
+    "actions_si_critique": [
+      "Trèfle pour soin d'urgence aléatoire",
+      "Bond du Félin pour fuir vers allié soigneur",
+      "Rekop vol de vie si en mélée pour sustain"
+    ]
+  }
+}

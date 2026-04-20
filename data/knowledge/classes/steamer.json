@@ -1,0 +1,258 @@
+{
+  "class_id": "steamer",
+  "nom_fr": "Steamer",
+  "archetype": "DPS-support intelligence, tourelles mécaniques et vapeur",
+  "stats_principales": ["Intelligence", "Vitalité"],
+  "philosophie": "ATTENTION : le Steamer n'est pas documenté sur le gitbook Retrozia (serveur 12 classes classiques). Ce fichier est basé sur les sorts Dofus 2.x standards. Le Steamer déploie des tourelles mécaniques pour contrôler le terrain. L'économie de méca (charges mécaniques) détermine quelles tourelles poser. Optimiser les angles de tir des tourelles est fondamental.",
+  "priorites_generales": [
+    "Déployer la Tourelle Feu en priorité sur une position de contrôle optimale",
+    "Utiliser Propulsion pour pousser les ennemis vers les tourelles",
+    "Maintenir la distance pour que les tourelles travaillent sans intervention",
+    "Tir à la Vapeur comme DPS direct entre les déploiements",
+    "Réparation si tourelle endommagée mais stratégiquement cruciale"
+  ],
+  "sorts": [
+    {
+      "id": "tourelle_feu",
+      "nom": "Tourelle Feu",
+      "pa": 5,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 4,
+      "note": "Tourelle principale DPS. Placer en hauteur ou en couloir pour couvrir un maximum de cases."
+    },
+    {
+      "id": "tourelle_glace",
+      "nom": "Tourelle Glace",
+      "pa": 5,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 4,
+      "note": "Tourelle de contrôle. Ralentit les PM ennemis pour les garder à portée des autres tourelles."
+    },
+    {
+      "id": "tir_a_la_vapeur",
+      "nom": "Tir à la Vapeur",
+      "pa": 4,
+      "po_min": 2,
+      "po_max": 6,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 0,
+      "note": "Sort de dégâts direct principal. Spammable si pas de déploiement à faire ce tour."
+    },
+    {
+      "id": "propulsion",
+      "nom": "Propulsion",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "movement",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Pousser un ennemi vers une tourelle ou s'échapper d'un encerclement."
+    },
+    {
+      "id": "explosion_mecanique",
+      "nom": "Explosion Mécanique",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "aoe_croix",
+      "ligne_de_vue": true,
+      "degats": "très élevés",
+      "cooldown": 2,
+      "note": "Sacrifie une tourelle pour un burst AoE. Utiliser si la tourelle allait mourir de toute façon."
+    },
+    {
+      "id": "vapeur",
+      "nom": "Vapeur",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 4,
+      "type": "aoe_carre",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Zone de vapeur. Réduit la précision ennemie et inflige des dégâts de zone légers."
+    },
+    {
+      "id": "reparation",
+      "nom": "Réparation",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "heal",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Répare une tourelle endommagée. Maintenir en vie une tourelle bien positionnée plutôt que de la réinvoquer."
+    },
+    {
+      "id": "canonnade",
+      "nom": "Canonnade",
+      "pa": 5,
+      "po_min": 3,
+      "po_max": 9,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "très élevés",
+      "cooldown": 3,
+      "note": "Sort burst à très longue portée. DPS le plus élevé du Steamer sur cible unique."
+    },
+    {
+      "id": "harponnage",
+      "nom": "Harponnage",
+      "pa": 3,
+      "po_min": 2,
+      "po_max": 6,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 2,
+      "note": "Attire l'ennemi vers le Steamer et ses tourelles. Forcer l'engagement sur les zones couvertes."
+    },
+    {
+      "id": "tir_de_barrage",
+      "nom": "Tir de Barrage",
+      "pa": 4,
+      "po_min": 2,
+      "po_max": 7,
+      "type": "aoe_ligne",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 2,
+      "note": "Tir en ligne qui touche tout dans son chemin. Excellent si ennemis alignés avec le Steamer."
+    },
+    {
+      "id": "tir_lourd",
+      "nom": "Tir Lourd",
+      "pa": 5,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "très élevés",
+      "cooldown": 3,
+      "note": "Tir puissant qui repousse la cible. Dégâts + repositionnement ennemi."
+    },
+    {
+      "id": "tir_maladroit",
+      "nom": "Tir Maladroit",
+      "pa": 2,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 0,
+      "note": "Sort économique. Finir les tours avec peu de PA sans gaspiller des ressources."
+    },
+    {
+      "id": "tourelle_aerienne",
+      "nom": "Tourelle Aérienne",
+      "pa": 5,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 4,
+      "note": "Tourelle air à longue portée. Retire des PM aux cibles touchées. Contrôle de mobilité passif."
+    },
+    {
+      "id": "tourelle_terrestre",
+      "nom": "Tourelle Terrestre",
+      "pa": 5,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 4,
+      "note": "Tourelle terre très résistante. Sert de bouclier vivant et inflige des dégâts en zone rapprochée."
+    },
+    {
+      "id": "vapocharge",
+      "nom": "Vapocharge",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "aoe_carre",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 3,
+      "note": "Charge de vapeur en zone. AoE puissante sur ennemis groupés."
+    },
+    {
+      "id": "vent_fort",
+      "nom": "Vent Fort",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "aoe_ligne",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 2,
+      "note": "AoE de poussée en ligne. Repousse les ennemis et crée de la distance pour les tourelles."
+    },
+    {
+      "id": "tir_piege",
+      "nom": "Tir Piégé",
+      "pa": 3,
+      "po_min": 2,
+      "po_max": 6,
+      "type": "piege",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 2,
+      "note": "Pose un piège mécanique sur la case ciblée. Se déclenche au passage ennemi."
+    },
+    {
+      "id": "torpille",
+      "nom": "Torpille",
+      "pa": 5,
+      "po_min": 2,
+      "po_max": 8,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "très élevés",
+      "cooldown": 4,
+      "note": "Projectile à très longue portée. Sort de snipe ultime pour atteindre des cibles éloignées."
+    },
+    {
+      "id": "bombe_en_mer",
+      "nom": "Bombe en Mer",
+      "pa": 4,
+      "po_min": 2,
+      "po_max": 7,
+      "type": "aoe_croix",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 3,
+      "note": "AoE eau à distance. Complément si les ennemis résistent au feu."
+    }
+  ],
+  "plan_tour_type": [
+    "Tour 1 : Tourelle Feu (5 PA) + Tir à la Vapeur (4 PA) si PA restants ou Vapeur pour le contrôle",
+    "Tour 2 : Tourelle Glace (5 PA) + Tir à la Vapeur (4 PA) + Propulsion si ennemi s'approche",
+    "Tour 3+ : Tir à la Vapeur x2 (8 PA) ou Explosion Mécanique si tourelle menacée. Réparation si tourelle clé sous pression."
+  ],
+  "gestion_hp": {
+    "seuil_alerte": 40,
+    "seuil_critique": 20,
+    "actions_si_critique": [
+      "Propulsion pour s'éloigner de l'ennemi adjacent",
+      "Placer une tourelle entre soi et l'ennemi comme bouclier vivant",
+      "Vapeur pour réduire la précision ennemie"
+    ]
+  }
+}

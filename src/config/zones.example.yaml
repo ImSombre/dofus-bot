@@ -1,0 +1,37 @@
+# Exemple de configuration des zones de farm.
+# Copier en `zones.yaml` et remplir avec tes coords réelles.
+# Les coords de cell sont celles du système de grille Dofus (0 → 560).
+
+zones:
+  bonta_forest_sud:
+    display_name: "Bonta — Forêt Sud"
+    job: lumberjack
+    maps:
+      - id: "bonta_forest_sud_-31_-56"
+        coords: [-31, -56]
+        resources:
+          - type: "frene"
+            cells: [142, 187, 213, 256]
+          - type: "chataignier"
+            cells: [301, 342]
+      - id: "bonta_forest_sud_-32_-56"
+        coords: [-32, -56]
+        resources:
+          - type: "frene"
+            cells: [102, 145, 201]
+    nearest_bank:
+      map_id: "bonta_city_-33_-56"
+      cell: 348
+
+  champs_cania:
+    display_name: "Champs de Cania"
+    job: farmer
+    maps:
+      - id: "champs_cania_-2_-1"
+        coords: [-2, -1]
+        resources:
+          - type: "ble"
+            cells: [189, 234, 278, 321, 367]
+    nearest_bank:
+      map_id: "astrub_-4_0"
+      cell: 412

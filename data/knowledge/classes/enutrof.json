@@ -1,0 +1,270 @@
+{
+  "class_id": "enutrof",
+  "nom_fr": "Enutrof",
+  "archetype": "support-chance à distance, pelles et malédictions, invocations",
+  "stats_principales": ["Chance", "Vitalité"],
+  "philosophie": "L'Enutrof contrôle le terrain via ses malédictions et son coffre animé. Il affaiblit les résistances ennemies, invoque son coffre comme allié permanent, et spamme les lancers de pièces et de pelle depuis une distance confortable. Maladresse réduit la précision des ennemis.",
+  "priorites_generales": [
+    "Tour 1 : invoquer Coffre Animé si non présent",
+    "Appliquer Maladresse ou Clé Réductrice sur cibles prioritaires",
+    "DPS principal : Lancer de Pièces + Pelle Massacrante",
+    "Maintenir la distance, éviter le corps-à-corps",
+    "Pelle du Jugement pour burst en mélée courte si forcé"
+  ],
+  "sorts": [
+    {
+      "id": "lancer_de_pieces",
+      "nom": "Lancer de Pièces",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 6,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Sort de dégâts principal chance. Spammable, longue portée. Base de la rotation DPS de l'Enutrof."
+    },
+    {
+      "id": "lancer_de_pelle",
+      "nom": "Lancer de Pelle",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 1,
+      "note": "Dégâts terre corrects. Cooldown court. Alterner avec Lancer de Pièces pour maximiser le DPS."
+    },
+    {
+      "id": "sac_anime",
+      "nom": "Sac Animé",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Invoque un sac animé. Créature utilitaire qui peut bloquer le passage ou attirer les attaques."
+    },
+    {
+      "id": "pelle_fantomatique",
+      "nom": "Pelle Fantomatique",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "élevés",
+      "cooldown": 2,
+      "note": "Sort terre sans ligne de vue. Permet d'attaquer depuis derrière des obstacles. Très précieux tactiquement."
+    },
+    {
+      "id": "chance",
+      "nom": "Chance",
+      "pa": 2,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Boost temporaire de la chance du lanceur. Lancer avant les sorts chance principaux pour amplifier les dégâts."
+    },
+    {
+      "id": "boite_de_pandore",
+      "nom": "Boîte de Pandore",
+      "pa": 4,
+      "po_min": 0,
+      "po_max": 4,
+      "type": "aoe_croix",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 3,
+      "note": "AoE en croix. Effets aléatoires multiples sur les cibles. Peut débuffer ou infliger dégâts variables."
+    },
+    {
+      "id": "remblai",
+      "nom": "Remblai",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "utility",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Modifie le terrain (crée des cases traversables/non-traversables). Bloquer des couloirs ennemis."
+    },
+    {
+      "id": "cle_reductrice",
+      "nom": "Clé Réductrice",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 2,
+      "note": "Réduit les résistances de la cible et retire des PM. Priorité pour synergiser les dégâts de l'équipe."
+    },
+    {
+      "id": "force_de_l_age",
+      "nom": "Force de l'Âge",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Buff de force ou chance selon le niveau. Renforce les prochaines attaques. Lancer avant la rotation DPS."
+    },
+    {
+      "id": "desinvocation",
+      "nom": "Désinvocation",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 5,
+      "type": "utility",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 0,
+      "note": "Retire les invocations ennemies. Contre les Osamodas et Sadidas. Libère les emplacements d'invocation alliés."
+    },
+    {
+      "id": "cupidite",
+      "nom": "Cupidité",
+      "pa": 2,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Augmente les probabilités de drop et booste légèrement les stats. Lancer au début du tour pour l'effet chance."
+    },
+    {
+      "id": "roulage_de_pelle",
+      "nom": "Roulage de Pelle",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "moyens",
+      "cooldown": 2,
+      "note": "Sort mélée d'urgence avec léger recul. Créer de la distance si encerclé par un ennemi mélée."
+    },
+    {
+      "id": "maladresse",
+      "nom": "Maladresse",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Réduit la précision de la cible pendant plusieurs tours. Excellent contre les archers et DPS distance ennemis."
+    },
+    {
+      "id": "maladresse_de_masse",
+      "nom": "Maladresse de Masse",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "aoe_croix",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "AoE de Maladresse sur plusieurs cibles. Réduire la précision de tout un groupe ennemi."
+    },
+    {
+      "id": "acceleration",
+      "nom": "Accélération",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 5,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Donne des PM à un allié ou à soi. Utile pour le repositionnement ou fuir rapidement."
+    },
+    {
+      "id": "pelle_du_jugement",
+      "nom": "Pelle du Jugement",
+      "pa": 5,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "très élevés",
+      "cooldown": 3,
+      "note": "Sort burst ultime de l'Enutrof. Dégâts terre maximaux à courte portée. Réserver pour boss ou cibles prioritaires."
+    },
+    {
+      "id": "pelle_massacrante",
+      "nom": "Pelle Massacrante",
+      "pa": 4,
+      "po_min": 2,
+      "po_max": 6,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 2,
+      "note": "Sort terre à distance correcte. Dégâts solides, constituant principal de la rotation DPS terre."
+    },
+    {
+      "id": "corruption",
+      "nom": "Corruption",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 2,
+      "note": "Poison sur la cible. DoT efficace pour les longues batailles contre des cibles résistantes."
+    },
+    {
+      "id": "pelle_animee",
+      "nom": "Pelle Animée",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Invoque une pelle animée qui attaque les ennemis adjacents. Créature DPS simple pour harceler."
+    },
+    {
+      "id": "coffre_anime",
+      "nom": "Coffre Animé",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 5,
+      "note": "Invocation principale de l'Enutrof. Sortir dès le tour 1. Le coffre peut absorber des attaques et attaquer les ennemis."
+    }
+  ],
+  "plan_tour_type": [
+    "Tour 1 : Coffre Animé (4 PA) + Maladresse sur cible prioritaire (3 PA) + Lancer de Pièces (3 PA)",
+    "Tour 2+ : Clé Réductrice (3 PA) + Pelle Massacrante (4 PA) + Lancer de Pièces (3 PA)",
+    "Si ennemi s'approche : Roulage de Pelle pour créer de la distance + Accélération pour fuir."
+  ],
+  "gestion_hp": {
+    "seuil_alerte": 40,
+    "seuil_critique": 20,
+    "actions_si_critique": [
+      "Roulage de Pelle pour repousser l'ennemi adjacent",
+      "Se replier derrière le Coffre Animé",
+      "Accélération pour fuir rapidement"
+    ]
+  }
+}

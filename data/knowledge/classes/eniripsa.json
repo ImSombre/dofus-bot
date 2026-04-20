@@ -1,0 +1,282 @@
+{
+  "class_id": "eniripsa",
+  "nom_fr": "Eniripsa",
+  "archetype": "soigneur / support (intelligence ou chance)",
+  "stats_principales": ["Intelligence", "Chance", "Sagesse"],
+  "philosophie": "L'Eniripsa est le pilier de soin du groupe. Ses Mots couvrent toutes les situations : soin direct, soin sur la durée, PA bonus, retraits PA ennemis. En solo, Mot d'Épine et Mot Blessant assurent le DPS. Mot Stimulant donne 2 PA à l'équipe en zone. Ne jamais tomber sous 4 PA réservés pour un soin d'urgence.",
+  "priorites_generales": [
+    "Scanner les HP alliés avant chaque action offensive",
+    "Allié < 50% HP : Mot Revitalisant en priorité",
+    "Allié < 25% HP : Mot de Régénération + Mot Revitalisant",
+    "Sinon : Mot d'Épine ou Mot Blessant pour le DPS",
+    "Mot Stimulant au tour 1 pour donner PA à l'équipe"
+  ],
+  "sorts": [
+    {
+      "id": "mot_interdit",
+      "nom": "Mot Interdit",
+      "pa": 4,
+      "po_min": 2,
+      "po_max": 6,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 3,
+      "note": "Sort de dégâts puissant. Retire des PA à la cible. Utile contre les classes à fort APM."
+    },
+    {
+      "id": "mot_de_frayeur",
+      "nom": "Mot de Frayeur",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 2,
+      "note": "Repousse la cible de plusieurs cases. Défense essentielle si un ennemi s'approche de l'Eniripsa."
+    },
+    {
+      "id": "mot_curatif",
+      "nom": "Mot Curatif",
+      "pa": 2,
+      "po_min": 0,
+      "po_max": 5,
+      "type": "heal",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 0,
+      "note": "Soin de base économique. Spammable, excellent pour soigner plusieurs fois par tour."
+    },
+    {
+      "id": "mot_soignant",
+      "nom": "Mot Soignant",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 6,
+      "type": "heal",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 0,
+      "note": "Soin principal de l'Eniripsa. Bon rendement PA/soin. Sort de référence pour maintenir les alliés en vie."
+    },
+    {
+      "id": "mot_blessant",
+      "nom": "Mot Blessant",
+      "pa": 2,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 0,
+      "note": "Sort de dégâts basique et économique. Finir les tours avec PA restants quand tout le monde est bien en vie."
+    },
+    {
+      "id": "mot_stimulant",
+      "nom": "Mot Stimulant",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 5,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Donne 2 PA à la cible pendant plusieurs tours. Sort de soutien majeur. Lancer sur le DPS principal dès le tour 1."
+    },
+    {
+      "id": "mot_de_prevention",
+      "nom": "Mot de Prévention",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 5,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Réduit les dégâts reçus par la cible. Poser préventivement sur le tank avant qu'il subisse des attaques."
+    },
+    {
+      "id": "mot_drainant",
+      "nom": "Mot Drainant",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 2,
+      "note": "Vol de vie à distance. Soigne l'Eniripsa en attaquant. Excellent pour le sustain en solo."
+    },
+    {
+      "id": "mot_revitalisant",
+      "nom": "Mot Revitalisant",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 6,
+      "type": "heal",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 0,
+      "note": "Soin fort, spammable. Sort de référence pour les situations d'urgence. 0 cooldown, toujours disponible."
+    },
+    {
+      "id": "mot_de_regeneration",
+      "nom": "Mot de Régénération",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 5,
+      "type": "heal",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Soin sur plusieurs tours. Lancer sur le tank ou l'allié blessé pour soins passifs. Très efficient en PA."
+    },
+    {
+      "id": "mot_d_epine",
+      "nom": "Mot d'Épine",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Pose une épine sur la cible : les attaquants subissent des dégâts en retour. DPS indirect ET protection."
+    },
+    {
+      "id": "mot_de_jouvence",
+      "nom": "Mot de Jouvence",
+      "pa": 5,
+      "po_min": 0,
+      "po_max": 5,
+      "type": "heal",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Soin AoE en croix. Soigne tous les alliés dans la zone. Utiliser en situation critique ou après une AoE ennemie."
+    },
+    {
+      "id": "mot_vampirique",
+      "nom": "Mot Vampirique",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 3,
+      "note": "Vol de vie puissant. Inflige des dégâts et soigne l'Eniripsa. Meilleur sort DPS/sustain du kit."
+    },
+    {
+      "id": "mot_de_sacrifice",
+      "nom": "Mot de Sacrifice",
+      "pa": 4,
+      "po_min": 0,
+      "po_max": 5,
+      "type": "heal",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Soin puissant ciblé. Coûte des HP à l'Eniripsa. Réserver pour sortir un allié du seuil critique."
+    },
+    {
+      "id": "mot_d_amitie",
+      "nom": "Mot d'Amitié",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 4,
+      "type": "heal",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Soin à portée réduite. Économique et efficace pour maintenir les alliés proches en bonne santé."
+    },
+    {
+      "id": "mot_d_immobilisation",
+      "nom": "Mot d'Immobilisation",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Retire des PM à la cible. Contrôle de mobilité utile pour empêcher les ennemis d'approcher l'Eniripsa."
+    },
+    {
+      "id": "mot_d_envol",
+      "nom": "Mot d'Envol",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 4,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Donne des PM à un allié. Repositionner rapidement un allié bloqué ou faciliter une fuite."
+    },
+    {
+      "id": "mot_de_silence",
+      "nom": "Mot de Silence",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Empêche la cible de lancer des sorts. Contrôle majeur contre les casters ennemis dangereux."
+    },
+    {
+      "id": "mot_d_altruisme",
+      "nom": "Mot d'Altruisme",
+      "pa": 4,
+      "po_min": 0,
+      "po_max": 4,
+      "type": "heal",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Soin massif ciblé. Sort d'urgence pour un allié à très bas HP. Réserver pour les situations critiques."
+    },
+    {
+      "id": "mot_de_reconstitution",
+      "nom": "Mot de Reconstitution",
+      "pa": 4,
+      "po_min": 0,
+      "po_max": 6,
+      "type": "heal",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Soin massif à grande portée. Ultime de soin de l'Eniripsa. Réserver pour les urgences absolues."
+    },
+    {
+      "id": "mot_lotof",
+      "nom": "Mot Lotof",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Sort spécial Retrozia. Boost les soins de l'Eniripsa pendant plusieurs tours. Activer avant une série de soins critiques."
+    }
+  ],
+  "plan_tour_type": [
+    "Tour 1 : Mot Stimulant sur le DPS principal (3 PA) + Mot d'Épine sur la cible prioritaire ennemie (3 PA) + Mot Blessant (2 PA) si PA restants",
+    "Tours suivants : Scanner HP alliés. Si tous >60% : DPS (Mot Drainant + Mot Blessant). Si allié blessé : soins en priorité.",
+    "En urgence (allié <25%) : Mot de Régénération + Mot Revitalisant + Mot de Jouvence si AoE needed."
+  ],
+  "gestion_hp": {
+    "seuil_alerte": 50,
+    "seuil_critique": 25,
+    "actions_si_critique": [
+      "Mot Curatif x2 sur soi immédiatement",
+      "Mot de Frayeur pour repousser l'ennemi adjacent",
+      "Se replier derrière le tank"
+    ]
+  }
+}

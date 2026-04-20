@@ -1,0 +1,270 @@
+{
+  "class_id": "iop",
+  "nom_fr": "Iop",
+  "archetype": "guerrier mélée burst (force/feu/air)",
+  "stats_principales": ["Force", "Vitalité"],
+  "philosophie": "L'Iop est le DPS mélée pur. Bond permet de s'engager immédiatement, puis on spam les épées. Compulsion et Puissance boostent les dégâts avant l'engagement. Concentration et Amplification assurent le burst. Pression en fin de tour pour maximiser le DPS.",
+  "priorites_generales": [
+    "Tour 1 : Compulsion (buff self) + Bond vers ennemi si éloigné",
+    "Puissance en self-buff pour augmenter la force",
+    "Épée de Iop en mélée principale (gros dégâts zone)",
+    "Pression en mélée directe pour le burst instantané",
+    "Colère de Iop si plusieurs ennemis regroupés"
+  ],
+  "sorts": [
+    {
+      "id": "pression",
+      "nom": "Pression",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 1,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "élevés",
+      "cooldown": 0,
+      "note": "Sort mélée de base. Corps-à-corps obligatoire. Spammable, bon rendement PA."
+    },
+    {
+      "id": "bond",
+      "nom": "Bond",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "movement",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 0,
+      "note": "Téléportation sur une case ennemie adjacente. Engagement instantané depuis n'importe quelle distance."
+    },
+    {
+      "id": "intimidation",
+      "nom": "Intimidation",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 2,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 1,
+      "note": "Repousse la cible en ligne. Utile pour pousser un ennemi contre un mur ou hors de portée d'un allié."
+    },
+    {
+      "id": "compulsion",
+      "nom": "Compulsion",
+      "pa": 2,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Boost de dégâts AoE pour l'équipe. Lancer tour 1 avant tout engagement pour amplifier les dégâts."
+    },
+    {
+      "id": "epee_divine",
+      "nom": "Épée Divine",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 1,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Sort air mélée. Dégâts corrects sans cooldown. Alterner avec Pression en mélée."
+    },
+    {
+      "id": "epee_du_destin",
+      "nom": "Épée du Destin",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 1,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "élevés",
+      "cooldown": 2,
+      "note": "Sort feu mélée puissant. Dégâts élevés, cooldown 2 tours. Utiliser en rotation avec Pression."
+    },
+    {
+      "id": "guide_de_bravoure",
+      "nom": "Guide de Bravoure",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Buff de portée sur les sorts. Permet d'attaquer à légèrement plus grande distance temporairement."
+    },
+    {
+      "id": "amplification",
+      "nom": "Amplification",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Augmente les dégâts des prochains sorts. Combiner avec Compulsion pour un burst maximal."
+    },
+    {
+      "id": "epee_destructrice",
+      "nom": "Épée Destructrice",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 2,
+      "note": "Sort feu à portée courte. Plus flexible que les sorts mélée stricte, peut cibler 1-3 cases."
+    },
+    {
+      "id": "couper",
+      "nom": "Couper",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 2,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Sort feu mélée. Retire des PM à la cible. Excellent pour empêcher la fuite d'un ennemi."
+    },
+    {
+      "id": "souffle",
+      "nom": "Souffle",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 6,
+      "type": "aoe_ligne",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 3,
+      "note": "AoE en ligne. Repousse les cibles touchées. Utile pour désorganiser un groupe ennemi."
+    },
+    {
+      "id": "vitalite",
+      "nom": "Vitalité",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Augmente temporairement les HP max du Iop. Lancer en anticipation si on va encaisser beaucoup."
+    },
+    {
+      "id": "epee_du_jugement",
+      "nom": "Épée du Jugement",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "élevés",
+      "cooldown": 2,
+      "note": "Sort air à portée plus large. Pas de ligne de vue requise. Très polyvalent en positionnement."
+    },
+    {
+      "id": "puissance",
+      "nom": "Puissance",
+      "pa": 2,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 0,
+      "note": "Boost de force permanent pour ce tour. Lancer systématiquement en début de chaque tour si PA disponibles."
+    },
+    {
+      "id": "mutilation",
+      "nom": "Mutilation",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 1,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Sort mélée spécial : se coûte des HP au lanceur en bonus de dégâts. Risqué mais puissant en fin de combat."
+    },
+    {
+      "id": "tempete_de_puissance",
+      "nom": "Tempête de Puissance",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "aoe_croix",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 3,
+      "note": "AoE en croix feu. Meilleur sort AoE du Iop. Utiliser sur regroupements ennemis."
+    },
+    {
+      "id": "epee_celeste",
+      "nom": "Épée Céleste",
+      "pa": 5,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "très élevés",
+      "cooldown": 3,
+      "note": "Sort burst air puissant. Dégâts très élevés à courte portée. Réserver pour les cibles prioritaires."
+    },
+    {
+      "id": "concentration",
+      "nom": "Concentration",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 1,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "élevés",
+      "cooldown": 0,
+      "note": "Sort mélée terre efficace. Remplace Pression à haut niveau. Bon rendement PA en corps-à-corps."
+    },
+    {
+      "id": "epee_de_iop",
+      "nom": "Épée de Iop",
+      "pa": 5,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "aoe_croix",
+      "ligne_de_vue": true,
+      "degats": "très élevés",
+      "cooldown": 3,
+      "note": "AoE en croix terre massive. Sort signature du Iop. Dégâts maximaux sur plusieurs ennemis."
+    },
+    {
+      "id": "colere_de_iop",
+      "nom": "Colère de Iop",
+      "pa": 6,
+      "po_min": 1,
+      "po_max": 2,
+      "type": "aoe_croix",
+      "ligne_de_vue": false,
+      "degats": "très élevés",
+      "cooldown": 5,
+      "note": "Sort ultime du Iop. AoE en croix, dégâts dévastateurs. Réserver pour les boss ou regroupements critiques."
+    }
+  ],
+  "plan_tour_type": [
+    "Tour 1 : Puissance (2 PA) + Compulsion (2 PA) + Bond si éloigné (4 PA) ou Pression x2 si déjà adjacent",
+    "Tour 2+ : Épée du Destin + Pression x2 en rotation si en mélée. Tempête de Puissance si 2+ ennemis groupés.",
+    "En cas de fuite ennemie : Bond + Couper pour l'empêcher de s'éloigner."
+  ],
+  "gestion_hp": {
+    "seuil_alerte": 35,
+    "seuil_critique": 15,
+    "actions_si_critique": [
+      "Bond pour s'éloigner d'une cible dangereuse",
+      "Éviter Mutilation (coûte des HP)",
+      "Chercher une case hors ligne de vue ennemie"
+    ]
+  }
+}

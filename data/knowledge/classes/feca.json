@@ -1,0 +1,270 @@
+{
+  "class_id": "feca",
+  "nom_fr": "Féca",
+  "archetype": "tank-support intelligence, glyphes et armures élémentaires",
+  "stats_principales": ["Intelligence", "Vitalité"],
+  "philosophie": "Le Féca protège via ses glyphes posés au sol et ses armures élémentaires. Les glyphes infligent des dégâts ou effets aux ennemis qui marchent dessus. Les armures absorbent les dégâts d'un élément spécifique. Renvoi de Sort renvoie le prochain sort ennemi. Immunité en ultime de protection.",
+  "priorites_generales": [
+    "Tour 1 : Armure de l'élément dominant ennemi + Glyphe Agressif sur position ennemie",
+    "Maintenir une armure élémentaire active en permanence",
+    "Glyphe d'Aveuglement et Glyphe Enflammé sur cases de passage",
+    "Renvoi de Sort avant le tour d'un boss ou caster puissant",
+    "Téléglyph pour se repositionner sur un glyphe posé"
+  ],
+  "sorts": [
+    {
+      "id": "glyphe_agressif",
+      "nom": "Glyphe Agressif",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "aoe_carre",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 4,
+      "note": "Glyphe qui explose sur tout ennemi marchant dessus. Placer sur les cases d'approche obligatoires."
+    },
+    {
+      "id": "armure_terrestre",
+      "nom": "Armure Terrestre",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 3,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Absorbe les dégâts terre. Activer contre les Iops, Enutrofs, Sacrieurs force."
+    },
+    {
+      "id": "attaque_naturelle",
+      "nom": "Attaque Naturelle",
+      "pa": 2,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 0,
+      "note": "Sort de dégâts de base très économique. Finir les tours avec les PA restants."
+    },
+    {
+      "id": "renvoi_de_sort",
+      "nom": "Renvoi de Sort",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Renvoie le prochain sort ennemi vers son lanceur. Contre majeur contre les casters et AoE ennemies."
+    },
+    {
+      "id": "aveuglement",
+      "nom": "Aveuglement",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Réduit la précision de la cible pendant 2-3 tours. Excellent contre les archers et DPS distance."
+    },
+    {
+      "id": "armure_incandescente",
+      "nom": "Armure Incandescente",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 3,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Absorbe les dégâts feu. Activer contre les Xelors intel, Eniripsas feu, et sorts feu ennemis."
+    },
+    {
+      "id": "attaque_nuageuse",
+      "nom": "Attaque Nuageuse",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Sort de dégâts air. Bon rendement PA, aucun cooldown. Rotation DPS de base du Féca intelligence."
+    },
+    {
+      "id": "armure_aqueuse",
+      "nom": "Armure Aqueuse",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 3,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Absorbe les dégâts eau. Activer contre les Eniripsas chance, Pandas eau, Enutrofs chance."
+    },
+    {
+      "id": "immunite",
+      "nom": "Immunité",
+      "pa": 4,
+      "po_min": 0,
+      "po_max": 3,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 5,
+      "note": "Rend une cible temporairement insensible à tous les dégâts. Sort d'urgence ultime pour protéger un allié."
+    },
+    {
+      "id": "armure_venteuse",
+      "nom": "Armure Venteuse",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 3,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Absorbe les dégâts air. Activer contre les Crâs air, Iops air, Sacrieurs agiles."
+    },
+    {
+      "id": "bulle",
+      "nom": "Bulle",
+      "pa": 4,
+      "po_min": 0,
+      "po_max": 4,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Bouclier global absorbant une quantité fixe de dégâts. Protection puissante sur un allié fragile."
+    },
+    {
+      "id": "treve",
+      "nom": "Trêve",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Supprime un envoûtement sur une cible. Retire buffs ennemis ou soigne un allié d'un malus actif."
+    },
+    {
+      "id": "science_du_baton",
+      "nom": "Science du Bâton",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "DPS neutre de base. Aucun cooldown. Compléter la rotation quand les armures et glyphes sont posés."
+    },
+    {
+      "id": "retour_du_baton",
+      "nom": "Retour du Bâton",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "moyens",
+      "cooldown": 1,
+      "note": "Sort sans ligne de vue. Permet d'attaquer depuis derrière un obstacle. Utile dans les configurations de terrain complexes."
+    },
+    {
+      "id": "glyphe_d_aveuglement",
+      "nom": "Glyphe d'Aveuglement",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "utility",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Glyphe qui aveugle les ennemis passant dessus. Réduire la précision de tout ennemi dans la zone."
+    },
+    {
+      "id": "teleportation",
+      "nom": "Téléportation",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "movement",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Téléportation sur une case cible. Se repositionner rapidement, rejoindre un glyphe ou fuir."
+    },
+    {
+      "id": "glyphe_enflammee",
+      "nom": "Glyphe Enflammé",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "aoe_carre",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 4,
+      "note": "Glyphe feu au sol. Inflige des dégâts continus aux ennemis restant dans la zone. Placer sur des cases occupées."
+    },
+    {
+      "id": "bouclier_feca",
+      "nom": "Bouclier Féca",
+      "pa": 4,
+      "po_min": 0,
+      "po_max": 3,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Bouclier puissant absorbant les prochaines attaques. Activer sur le tank ou l'allié sous pression."
+    },
+    {
+      "id": "glyphe_d_immobilisation",
+      "nom": "Glyphe d'Immobilisation",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "utility",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Glyphe qui immobilise (retire PM) les ennemis qui marchent dessus. Bloquer les couloirs d'accès."
+    },
+    {
+      "id": "glyphe_de_silence",
+      "nom": "Glyphe de Silence",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "utility",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Glyphe qui empêche les ennemis de lancer des sorts. Placer devant les casters ennemis."
+    }
+  ],
+  "plan_tour_type": [
+    "Tour 1 : Armure de l'élément dominant (3 PA) + Glyphe Agressif sur case d'approche (4 PA) + Attaque Naturelle (2 PA) ou Attaque Nuageuse (3 PA)",
+    "Tour 2+ : Aveuglement si archer ennemi (3 PA) + Glyphe Enflammé si cases occupées (4 PA) + Science du Bâton (3 PA)",
+    "Si allié critique : Immunité (4 PA) ou Bouclier Féca (4 PA) en priorité absolue."
+  ],
+  "gestion_hp": {
+    "seuil_alerte": 50,
+    "seuil_critique": 25,
+    "actions_si_critique": [
+      "Renvoi de Sort pour contrer le prochain sort ennemi",
+      "Immunité sur soi-même si disponible",
+      "Téléportation vers une case sécurisée hors portée mélée"
+    ]
+  }
+}

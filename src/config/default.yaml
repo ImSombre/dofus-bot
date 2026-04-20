@@ -1,0 +1,32 @@
+# Default tunable constants for the bot (non-secret).
+# Overridable via environment variables where applicable, or edit in place.
+
+vision:
+  template_match_threshold: 0.75
+  scan_region: null  # null = full window; or [x, y, w, h]
+  ocr_whitelist_chars: "0123456789.,/+-%XP"
+
+input:
+  mouse_move_duration_ms: [120, 260]   # uniform(min, max) ms
+  post_click_delay_ms: [80, 180]
+  typing_delay_ms: [40, 120]
+  bezier_jitter_px: 6
+
+state_machine:
+  tick_hz: 10
+  max_error_retries: 3
+  inventory_scan_every_sec: 300
+  reconnect_timeout_sec: 90
+
+combat:
+  flee_hp_percent: 0.25
+  max_turn_duration_sec: 45
+
+persistence:
+  stats_hourly_flush_sec: 60
+  event_sample_rate: 1.0   # 1.0 = record all; lower to reduce DB growth
+
+discord:
+  rate_limit_per_minute: 10
+  notify_on_error: true
+  notify_on_popup: true

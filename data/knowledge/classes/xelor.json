@@ -1,0 +1,270 @@
+{
+  "class_id": "xelor",
+  "nom_fr": "Xelor",
+  "archetype": "mage-contrôle intelligence, manipulation du temps et des PA ennemis",
+  "stats_principales": ["Intelligence", "Sagesse"],
+  "philosophie": "Le Xelor manipule le temps via son Cadran de Xélor pour se repositionner gratuitement. Aiguille et Contre sont les sorts de contrôle fondamentaux. Ralentissement et Démotivation retirent PA et PM. Frappe de Xélor et Horloge pour le burst. Sablier de Xélor pour un tour supplémentaire.",
+  "priorites_generales": [
+    "Utiliser Cadran de Xélor pour le repositionnement gratuit chaque tour",
+    "Contre sur un sort ennemi puissant pour le renvoyer",
+    "Retirer des PA avec Ralentissement et Démotivation",
+    "Frappe de Xélor pour le burst feu principal",
+    "Sablier de Xélor pour l'ultime combo multi-actions"
+  ],
+  "sorts": [
+    {
+      "id": "aiguille",
+      "nom": "Aiguille",
+      "pa": 2,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 0,
+      "note": "Sort économique. Retire un peu de PA à la cible en plus des dégâts. Spam pour contrôle progressif."
+    },
+    {
+      "id": "contre",
+      "nom": "Contre",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Renvoie le prochain sort ennemi vers son lanceur. Contre majeur contre les sorts puissants ou AoE ennemies."
+    },
+    {
+      "id": "ralentissement",
+      "nom": "Ralentissement",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 6,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Retire beaucoup de PM sans dégâts importants. Contrôle pur pour immobiliser les ennemis mobiles."
+    },
+    {
+      "id": "gelure",
+      "nom": "Gélure",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 2,
+      "note": "Dégâts eau et retire PA. Combinaison dégâts + contrôle efficace. Rotation principale en build eau."
+    },
+    {
+      "id": "sablier_de_xelor",
+      "nom": "Sablier de Xélor",
+      "pa": 4,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 5,
+      "note": "Sort ultime. Donne un tour supplémentaire au Xelor. À utiliser pour un combo dévastateur avec tous les sorts burst."
+    },
+    {
+      "id": "rayon_obscur",
+      "nom": "Rayon Obscur",
+      "pa": 4,
+      "po_min": 2,
+      "po_max": 6,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 2,
+      "note": "Sort de dégâts feu puissant. Rotation principale build intelligence avec Frappe de Xélor."
+    },
+    {
+      "id": "teleportation",
+      "nom": "Téléportation",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "movement",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Téléportation contrôlée sur une case cible. Repositionnement précis, plus flexible que Cadran de Xélor."
+    },
+    {
+      "id": "fletrissement",
+      "nom": "Flétrissement",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 2,
+      "note": "Réduit les résistances de la cible. Synergise avec toute la rotation de dégâts pour amplifier l'output."
+    },
+    {
+      "id": "flou",
+      "nom": "Flou",
+      "pa": 2,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Rend le Xelor difficile à cibler pendant 1 tour. Réduction des dégâts reçus. Défense temporaire."
+    },
+    {
+      "id": "poussiere_temporelle",
+      "nom": "Poussière Temporelle",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "aoe_croix",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 2,
+      "note": "AoE en croix. Retire des PM à toutes les cibles touchées. Excellent contrôle de mobilité de zone."
+    },
+    {
+      "id": "vol_du_temps",
+      "nom": "Vol du Temps",
+      "pa": 3,
+      "po_min": 2,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 0,
+      "note": "Vole des PA à la cible et les donne au Xelor. Synergise la rotation : retirer les PA ennemis en gagnant les siens."
+    },
+    {
+      "id": "aiguille_chercheuse",
+      "nom": "Aiguille Chercheuse",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 6,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "élevés",
+      "cooldown": 2,
+      "note": "Sort sans ligne de vue. Attaque la cible quelle que soit la position. Très polyvalent en terrain complexe."
+    },
+    {
+      "id": "devouement",
+      "nom": "Dévouement",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 4,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Donne des PA à un allié. Sort de support clé pour permettre à un DPS allié de lancer un sort supplémentaire."
+    },
+    {
+      "id": "fuite",
+      "nom": "Fuite",
+      "pa": 2,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "movement",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Téléportation d'urgence sur une case du cadran. Échapper à un encerclement rapidement."
+    },
+    {
+      "id": "demotivation",
+      "nom": "Démotivation",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Retire PA et PM à la cible. Contrôle total sur les ennemis mobiles et actifs. Priorité sur les DPS rapides."
+    },
+    {
+      "id": "protection_aveuglante",
+      "nom": "Protection Aveuglante",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 3,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Bouclier qui réduit la précision des attaquants. Protection pour soi ou un allié fragile."
+    },
+    {
+      "id": "momification",
+      "nom": "Momification",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 3,
+      "note": "Inflige des dégâts et immobilise temporairement la cible. Contrôle + dégâts combinés, utile pour bloquer un ennemi clé."
+    },
+    {
+      "id": "horloge",
+      "nom": "Horloge",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "invocation",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Invoque une horloge qui modifie le Cadran de Xélor. Ajoute des cases de déplacement disponibles."
+    },
+    {
+      "id": "frappe_de_xelor",
+      "nom": "Frappe de Xélor",
+      "pa": 5,
+      "po_min": 2,
+      "po_max": 6,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "très élevés",
+      "cooldown": 3,
+      "note": "Sort burst principal du Xelor. Dégâts maximaux feu. Réserver pour les cibles prioritaires ou boss."
+    },
+    {
+      "id": "cadran_de_xelor",
+      "nom": "Cadran de Xélor",
+      "pa": 0,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "movement",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 0,
+      "note": "Déplacement gratuit sur une case du cadran. Utiliser systématiquement en début de tour pour se positionner."
+    }
+  ],
+  "plan_tour_type": [
+    "Tour 1 : Cadran de Xélor (0 PA) pour position optimale + Démotivation sur cible prioritaire (3 PA) + Vol du Temps (3 PA) + Aiguille x1-2",
+    "Tour 2+ : Ralentissement + Frappe de Xélor (5 PA) si disponible + Rayon Obscur (4 PA). Toujours Cadran en début de tour.",
+    "Si ennemi adjacent : Fuite pour se repositionner + Gélure pour le contrôle à distance."
+  ],
+  "gestion_hp": {
+    "seuil_alerte": 45,
+    "seuil_critique": 20,
+    "actions_si_critique": [
+      "Fuite pour fuir vers une case sécurisée",
+      "Cadran de Xélor pour maintenir la distance",
+      "Flou pour réduire les dégâts reçus ce tour"
+    ]
+  }
+}

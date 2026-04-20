@@ -1,0 +1,258 @@
+{
+  "class_id": "roublard",
+  "nom_fr": "Roublard",
+  "archetype": "DPS chance à distance, bombes et combos explosifs",
+  "stats_principales": ["Chance", "Agilité"],
+  "philosophie": "ATTENTION : le Roublard n'est pas documenté sur le gitbook Retrozia (serveur 12 classes classiques). Ce fichier est basé sur les sorts Dofus 2.x standards. Le Roublard pose des bombes pour créer des chaînes d'explosions. Bombe Boum + Bombe Krâ + Bombe Sombre forment le triangle explosif optimal. Détonateur déclenche depuis la sécurité.",
+  "priorites_generales": [
+    "Poser les 3 types de bombes en triangle autour des cibles",
+    "Déclencher via Détonateur quand les bombes sont bien positionnées",
+    "Maintenir la distance pour éviter les dégâts de ses propres explosions",
+    "Ruse de Roublard pour se repositionner si encerclé",
+    "Tir de Sommation pour DPS direct en attendant le setup"
+  ],
+  "sorts": [
+    {
+      "id": "bombe_boum",
+      "nom": "Bombe Boum",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 0,
+      "note": "Bombe principale. Poser en premier autour des cibles. Dégâts élevés à l'explosion."
+    },
+    {
+      "id": "bombe_kra",
+      "nom": "Bombe Krâ",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Bombe de contrôle. Combinée à Boum, amplifie la zone d'effet et ajoute un effet de recul."
+    },
+    {
+      "id": "bombe_sombre",
+      "nom": "Bombe Sombre",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Bombe d'attraction. Attire les cibles vers le centre à l'explosion. Compléter le triangle."
+    },
+    {
+      "id": "detonateur",
+      "nom": "Détonateur",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 8,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "très élevés",
+      "cooldown": 0,
+      "note": "Sort de déclenchement des bombes à distance. Utiliser quand le triangle est en place."
+    },
+    {
+      "id": "tir_de_sommation",
+      "nom": "Tir de Sommation",
+      "pa": 4,
+      "po_min": 2,
+      "po_max": 8,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 0,
+      "note": "Sort de dégâts direct à longue portée. Maintenir la pression en attendant le setup des bombes."
+    },
+    {
+      "id": "ruse_de_roublard",
+      "nom": "Ruse de Roublard",
+      "pa": 2,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "movement",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Repositionnement d'urgence. Fuir le corps-à-corps ou optimiser les angles pour les bombes."
+    },
+    {
+      "id": "casse_noisette",
+      "nom": "Casse-Noisette",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Sort polyvalent distance. Bon finisseur de tour ou sort de harcèlement à distance."
+    },
+    {
+      "id": "attirance",
+      "nom": "Attirance",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 6,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Attire l'ennemi vers une bombe positionnée. Repositionner les cibles sur les bombes."
+    },
+    {
+      "id": "boulet",
+      "nom": "Boulet",
+      "pa": 4,
+      "po_min": 2,
+      "po_max": 7,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 2,
+      "note": "Sort de dégâts lourds à distance. Alternative quand les bombes sont déjà en cooldown."
+    },
+    {
+      "id": "diversion",
+      "nom": "Diversion",
+      "pa": 2,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Crée un leurre. Réduire les dégâts reçus pendant le setup des bombes."
+    },
+    {
+      "id": "mise_a_sac",
+      "nom": "Mise à Sac",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 2,
+      "note": "Réduit les résistances de la cible. Lancer avant l'explosion pour maximiser les dégâts."
+    },
+    {
+      "id": "pichenette",
+      "nom": "Pichenette",
+      "pa": 2,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 0,
+      "note": "Sort économique de remplissage. Finir les tours sans dépenser trop de PA."
+    },
+    {
+      "id": "poussiere_explosive",
+      "nom": "Poussière Explosive",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 6,
+      "type": "aoe_carre",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 3,
+      "note": "AoE explosif direct. Complément aux bombes pour des dégâts de zone immédiats."
+    },
+    {
+      "id": "tir_de_diversion",
+      "nom": "Tir de Diversion",
+      "pa": 3,
+      "po_min": 2,
+      "po_max": 6,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Sort distance alternatif entre deux poses de bombes pour maintenir la pression."
+    },
+    {
+      "id": "botte_roublarde",
+      "nom": "Botte Roublarde",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 2,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "élevés",
+      "cooldown": 2,
+      "note": "Sort mélée défensif. Utiliser si un ennemi s'approche dangereusement. Repousse la cible."
+    },
+    {
+      "id": "bombe_sournoise",
+      "nom": "Bombe Sournoise",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 2,
+      "note": "Bombe invisible posée sans que l'ennemi puisse la voir. Idéale pour les embuscades préparées."
+    },
+    {
+      "id": "roublabot",
+      "nom": "Roublabot",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Invoque un robot qui peut pousser/tirer les bombes et ennemis. Repositionner les bombes sans les déclencher."
+    },
+    {
+      "id": "tir_rapide",
+      "nom": "Tir Rapide",
+      "pa": 3,
+      "po_min": 2,
+      "po_max": 7,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Sort distance économique. Bon rapport PA/dégâts pour les tours de transition entre poses de bombes."
+    },
+    {
+      "id": "concentration",
+      "nom": "Concentration",
+      "pa": 2,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Boost les dégâts du prochain sort. Lancer avant Tir de Sommation ou un Détonateur pour maximiser l'explosion."
+    }
+  ],
+  "plan_tour_type": [
+    "Tour 1 : Bombe Boum (3 PA) + Bombe Krâ (3 PA) + Tir de Sommation (4 PA) pour DPS en attendant",
+    "Tour 2 : Bombe Sombre pour compléter le triangle (3 PA) + Détonateur si position optimale (3 PA) + Tir de Diversion (3 PA)",
+    "Tour 3+ : Réposer les bombes et déclencher. Ruse de Roublard si encerclé."
+  ],
+  "gestion_hp": {
+    "seuil_alerte": 40,
+    "seuil_critique": 20,
+    "actions_si_critique": [
+      "Ruse de Roublard pour s'éloigner immédiatement",
+      "Poser Bombe Sournoise près de soi pour piéger l'ennemi poursuivant",
+      "Éviter de déclencher des bombes proches pour ne pas se blesser"
+    ]
+  }
+}

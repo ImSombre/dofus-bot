@@ -1,0 +1,270 @@
+{
+  "class_id": "cra",
+  "nom_fr": "Crâ",
+  "archetype": "archer distance (agilité/intelligence/chance)",
+  "stats_principales": ["Agilité", "Intelligence", "Chance"],
+  "philosophie": "Le Crâ domine à distance. Il doit maintenir la distance, poser des balises, et exploiter ses flèches élémentaires selon le build. Flèche de Recul et Flèche Immobilisante sont les outils de survie si un ennemi approche. L'Œil de Taupe permet des tirs sans ligne de vue ponctuels.",
+  "priorites_generales": [
+    "Maintenir 5+ cases de distance avec les ennemis mélée",
+    "Si ennemi adjacent : Flèche de Recul pour le pousser hors de portée",
+    "DPS principal : Flèche Empoisonnée + Flèche Enflammée selon élément",
+    "Flèche Explosive sur groupes de 2+ ennemis",
+    "Flèche Harcelante pour retirer PM aux ennemis mobiles"
+  ],
+  "sorts": [
+    {
+      "id": "fleche_empoisonnee",
+      "nom": "Flèche Empoisonnée",
+      "pa": 4,
+      "po_min": 2,
+      "po_max": 7,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 2,
+      "note": "Inflige un poison (DoT). Priorité sur les cibles robustes à longue durée de vie."
+    },
+    {
+      "id": "fleche_de_recul",
+      "nom": "Flèche de Recul",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 6,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 1,
+      "note": "Repousse la cible de 4 cases. Sort anti-mélée essentiel. Utiliser dès qu'un ennemi est adjacent."
+    },
+    {
+      "id": "fleche_magique",
+      "nom": "Flèche Magique",
+      "pa": 3,
+      "po_min": 2,
+      "po_max": 10,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Longue portée, pas de ligne de vue. Sort de base très polyvalent. Permet d'attaquer à travers obstacles."
+    },
+    {
+      "id": "fleche_enflammee",
+      "nom": "Flèche Enflammée",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 8,
+      "type": "aoe_ligne",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 2,
+      "note": "AoE en ligne feu. Excellente contre les ennemis alignés. Rotation principale build intelligence."
+    },
+    {
+      "id": "fleche_explosive",
+      "nom": "Flèche Explosive",
+      "pa": 5,
+      "po_min": 1,
+      "po_max": 8,
+      "type": "aoe_carre",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 2,
+      "note": "AoE en carré autour de l'impact. Meilleur sort de zone du Crâ. Utiliser si 2+ ennemis groupés."
+    },
+    {
+      "id": "fleche_harcelante",
+      "nom": "Flèche Harcelante",
+      "pa": 3,
+      "po_min": 2,
+      "po_max": 9,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 0,
+      "note": "Retire des PM à la cible. Excellent pour ralentir les ennemis mobiles ou pour spam à longue portée."
+    },
+    {
+      "id": "fleche_glacee",
+      "nom": "Flèche Glacée",
+      "pa": 4,
+      "po_min": 2,
+      "po_max": 7,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 2,
+      "note": "Ralentit la cible (retire PM + immobilise). Contrôle de mobilité puissant en build eau/chance."
+    },
+    {
+      "id": "fleche_cinglante",
+      "nom": "Flèche Cinglante",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 7,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 1,
+      "note": "DPS direct solide. Bon rapport PA/dégâts. Rotation principale en build agilité."
+    },
+    {
+      "id": "oeil_de_taupe",
+      "nom": "Œil de Taupe",
+      "pa": 2,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Retire la ligne de vue pour le prochain lancer. Contourner les obstacles ponctuellement."
+    },
+    {
+      "id": "fleche_de_dispersion",
+      "nom": "Flèche de Dispersion",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "aoe_croix",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "AoE en croix. Repousse les cibles dans différentes directions. Désorganiser un groupe ennemi compact."
+    },
+    {
+      "id": "fleche_puissante",
+      "nom": "Flèche Puissante",
+      "pa": 2,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Boost de puissance temporaire. Lancer avant les sorts principaux pour amplifier les dégâts."
+    },
+    {
+      "id": "fleche_immobilisante",
+      "nom": "Flèche Immobilisante",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 7,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Empêche la cible de se déplacer pendant 1-2 tours. Clouer un ennemi sur place pour le burst."
+    },
+    {
+      "id": "fleche_de_chasse",
+      "nom": "Flèche de Chasse",
+      "pa": 4,
+      "po_min": 5,
+      "po_max": 9,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 0,
+      "note": "Portée minimum 5 cases. DPS élevé si bien positionné à grande distance. Idéale pour exploiter la distance."
+    },
+    {
+      "id": "punition_du_cra",
+      "nom": "Punition du Crâ",
+      "pa": 5,
+      "po_min": 2,
+      "po_max": 8,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "très élevés",
+      "cooldown": 3,
+      "note": "Sort burst à gros cooldown. Dégâts maximaux du Crâ sur une cible unique. Réserver pour boss ou cibles prioritaires."
+    },
+    {
+      "id": "fleche_d_huile",
+      "nom": "Flèche d'Huile",
+      "pa": 3,
+      "po_min": 2,
+      "po_max": 6,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 0,
+      "note": "Applique un débuff résistance eau sur la cible. Utile pour synergiser en équipe ou préparer Flèche Glacée."
+    },
+    {
+      "id": "tir_concentre",
+      "nom": "Tir Concentré",
+      "pa": 4,
+      "po_min": 3,
+      "po_max": 9,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 2,
+      "note": "Sort critique garanti ou à très haut taux critique. Excellent en build critique pour des dégâts fiables."
+    },
+    {
+      "id": "oeil_de_cra",
+      "nom": "Œil de Crâ",
+      "pa": 2,
+      "po_min": 1,
+      "po_max": 6,
+      "type": "utility",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Révèle les entités invisibles dans une zone. Contre les Srams et invisibles. Toujours utile en combat PvP."
+    },
+    {
+      "id": "balise_de_cra",
+      "nom": "Balise de Crâ",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 6,
+      "type": "utility",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Pose une balise permettant la téléportation. Repositionnement avancé pour maintenir la distance optimale."
+    },
+    {
+      "id": "fleche_envoutante",
+      "nom": "Flèche Envoûtante",
+      "pa": 4,
+      "po_min": 2,
+      "po_max": 8,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 2,
+      "note": "Retire des PA à la cible en plus des dégâts. Contrôle + dégâts combinés, excellent contre les classes à fort APM."
+    },
+    {
+      "id": "fleche_destructrice",
+      "nom": "Flèche Destructrice",
+      "pa": 5,
+      "po_min": 2,
+      "po_max": 8,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "très élevés",
+      "cooldown": 4,
+      "note": "Sort de destruction à grand cooldown. Réserver pour le burst final sur boss ou cibles à haute résistance."
+    }
+  ],
+  "plan_tour_type": [
+    "Tour 1 : Flèche Puissante (2 PA) + Flèche Explosive si 2+ ennemis groupés (5 PA) sinon Flèche Cinglante (4 PA) + Flèche Harcelante (3 PA)",
+    "Si ennemi adjacent : Flèche de Recul immédiatement, puis repositionnement par PM",
+    "Rotation standard : Flèche Cinglante + Flèche Empoisonnée + Flèche Harcelante selon cible et positionnement"
+  ],
+  "gestion_hp": {
+    "seuil_alerte": 40,
+    "seuil_critique": 20,
+    "actions_si_critique": [
+      "Flèche de Recul pour pousser tout ennemi adjacent",
+      "Fuir à distance maximale avec tous les PM disponibles",
+      "Flèche Immobilisante pour clouer l'ennemi poursuivant"
+    ]
+  }
+}

@@ -1,0 +1,270 @@
+{
+  "class_id": "osamodas",
+  "nom_fr": "Osamodas",
+  "archetype": "invocateur-support agilité/chance, armée de créatures",
+  "stats_principales": ["Agilité", "Vitalité", "Intelligence"],
+  "philosophie": "L'Osamodas construit une armée d'invocations pour submerger les ennemis. Chaque invocation a un rôle précis. Fouet et Griffe Cinglante assurent le DPS direct. Soin Animal maintient les créatures et alliés en vie. La Frappe du Craqueleur est le burst principal direct.",
+  "priorites_generales": [
+    "Tour 1 : Invocation de Dragonnet ou Invocation de Bouftou selon le contexte",
+    "Utiliser Piqûre Motivante pour booster les invocations",
+    "DPS direct : Griffe Cinglante + Fouet en mélée",
+    "Soin Animal si invocation ou allié blessé",
+    "Âme du Craqueleur pour boost de dégâts général"
+  ],
+  "sorts": [
+    {
+      "id": "invocation_de_tofu",
+      "nom": "Invocation de Tofu",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Invocation aérienne légère. DPS rapide à distance, bon pour harceler les cibles éloignées."
+    },
+    {
+      "id": "cri_de_l_ours",
+      "nom": "Cri de l'Ours",
+      "pa": 4,
+      "po_min": 0,
+      "po_max": 4,
+      "type": "aoe_croix",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 3,
+      "note": "AoE en croix puissante. Excellent si plusieurs ennemis regroupés. Meilleure AoE directe de l'Osamodas."
+    },
+    {
+      "id": "griffe_spectrale",
+      "nom": "Griffe Spectrale",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Sort de dégâts distance. Spammable. Base de la rotation DPS de l'Osamodas quand les invocations sont actives."
+    },
+    {
+      "id": "benediction_animale",
+      "nom": "Bénédiction Animale",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 4,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Boost les dégâts de toutes les invocations actives. Lancer quand l'armée est déployée pour amplifier l'impact."
+    },
+    {
+      "id": "deplacement_felin",
+      "nom": "Déplacement Félin",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "movement",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Échange de position avec une invocation alliée. Repositionnement tactique pour se mettre à l'abri."
+    },
+    {
+      "id": "invocation_de_bouftou",
+      "nom": "Invocation de Bouftou",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Invocation tank résistante. Placer devant soi pour absorber les attaques et bloquer les couloirs."
+    },
+    {
+      "id": "crapaud",
+      "nom": "Crapaud",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Sort de dégâts eau/nature. Alternative à Griffe Spectrale selon les résistances de la cible."
+    },
+    {
+      "id": "invocation_de_crapaud",
+      "nom": "Invocation de Crapaud",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Invoque un Crapaud qui empoisonne les ennemis adjacents. Bon pour le contrôle de zone en mélée."
+    },
+    {
+      "id": "fouet",
+      "nom": "Fouet",
+      "pa": 2,
+      "po_min": 1,
+      "po_max": 1,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 0,
+      "note": "Sort mélée d'urgence économique. Finir les tours en corps-à-corps forcé. Coût minimal de 2 PA."
+    },
+    {
+      "id": "piqure_motivante",
+      "nom": "Piqûre Motivante",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 4,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Donne des PM aux invocations ou alliés. Repositionner rapidement le Dragonnet ou une créature bloquée."
+    },
+    {
+      "id": "corbeau",
+      "nom": "Corbeau",
+      "pa": 4,
+      "po_min": 2,
+      "po_max": 6,
+      "type": "aoe_ligne",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 2,
+      "note": "AoE en ligne qui peut attirer les cibles. Bon pour regrouper les ennemis ou créer des complications."
+    },
+    {
+      "id": "griffe_cinglante",
+      "nom": "Griffe Cinglante",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 1,
+      "note": "Sort DPS direct principal. Bon rapport PA/dégâts. Rotation principale entre deux invocations."
+    },
+    {
+      "id": "soin_animal",
+      "nom": "Soin Animal",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "heal",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 0,
+      "note": "Soin ciblé sur invocation ou allié. Maintenir les invocations en vie est prioritaire. Spammable."
+    },
+    {
+      "id": "ame_du_panda",
+      "nom": "Âme du Panda",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Boost les résistances de l'Osamodas. Défense utile si la créature tank a été tuée et l'Osamodas est exposé."
+    },
+    {
+      "id": "frappe_du_craqueleur",
+      "nom": "Frappe du Craqueleur",
+      "pa": 5,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "très élevés",
+      "cooldown": 3,
+      "note": "Sort burst puissant terre. Dégâts maximaux de l'Osamodas. Réserver pour boss ou cibles prioritaires."
+    },
+    {
+      "id": "resistance_naturelle",
+      "nom": "Résistance Naturelle",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 3,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Augmente les résistances d'un allié ou invocation. Protection permanente sur la créature la plus exposée."
+    },
+    {
+      "id": "crocs_du_mulou",
+      "nom": "Crocs du Mulou",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "élevés",
+      "cooldown": 2,
+      "note": "Sort mélée/courte portée sans ligne de vue. Bon DPS en corps-à-corps si l'Osamodas est forcé d'engager."
+    },
+    {
+      "id": "ame_du_bwork_mage",
+      "nom": "Âme du Bwork Mage",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 5,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Boost les dégâts d'une invocation spécifique. Appliquer sur la créature DPS principale pour maximiser l'output."
+    },
+    {
+      "id": "ame_du_craqueleur",
+      "nom": "Âme du Craqueleur",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Boost massif des dégâts terre de l'Osamodas et de ses invocations. Lancer avant Frappe du Craqueleur."
+    },
+    {
+      "id": "invocation_de_dragonnet",
+      "nom": "Invocation de Dragonnet",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Invocation principale de l'Osamodas. DPS/tank équilibré. Priorité absolue tour 1 si le contexte le permet."
+    }
+  ],
+  "plan_tour_type": [
+    "Tour 1 : Invocation de Dragonnet (4 PA) + Bénédiction Animale (3 PA) + Griffe Spectrale (3 PA)",
+    "Tour 2+ : Griffe Cinglante (4 PA) + Griffe Spectrale x2 (6 PA). Soin Animal si invocation menacée.",
+    "Si regroupement : Cri de l'Ours (4 PA) + Griffe Spectrale (3 PA) + Corbeau si alignement possible (4 PA)."
+  ],
+  "gestion_hp": {
+    "seuil_alerte": 45,
+    "seuil_critique": 20,
+    "actions_si_critique": [
+      "Placer le Bouftou ou Dragonnet entre soi et l'ennemi",
+      "Déplacement Félin pour s'échanger avec une invocation en position sûre",
+      "Résistance Naturelle sur soi pour encaisser les dégâts"
+    ]
+  }
+}

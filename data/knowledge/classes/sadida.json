@@ -1,0 +1,270 @@
+{
+  "class_id": "sadida",
+  "nom_fr": "Sadida",
+  "archetype": "invocateur-support intelligence/chance, poupées et altérations de terrain",
+  "stats_principales": ["Intelligence", "Chance", "Vitalité"],
+  "philosophie": "Le Sadida invoque une armée de poupées spécialisées et contrôle le terrain avec les Ronces. Chaque poupée a un rôle : La Sacrifiée tank, La Folle DPS, La Gonflable AoE, La Surpuissante burst. Connaissance des Poupées augmente le nombre d'invocations simultanées.",
+  "priorites_generales": [
+    "Tour 1 : Connaissance des Poupées pour le slot d'invocation supplémentaire",
+    "Invoquer La Sacrifiée comme tank devant soi",
+    "Poison Paralysant sur cibles prioritaires pour contrôle + DoT",
+    "Ronces sur les cases d'approche pour ralentir",
+    "Feu de Brousse si cibles groupées pour DPS de zone"
+  ],
+  "sorts": [
+    {
+      "id": "poison_paralysant",
+      "nom": "Poison Paralysant",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 6,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 2,
+      "note": "Empoisonne et retire des PM à la cible. Contrôle + DoT sur les cibles mobiles. Très efficace."
+    },
+    {
+      "id": "la_bloqueuse",
+      "nom": "La Bloqueuse",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Poupée tank résistante. Bloque le passage aux ennemis et absorbe les attaques. Alternative à La Sacrifiée."
+    },
+    {
+      "id": "ronce",
+      "nom": "Ronce",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "aoe_croix",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 2,
+      "note": "Contrôle de zone. Retire des PM aux ennemis qui se trouvent dans la zone. Placer sur les cases d'approche."
+    },
+    {
+      "id": "sacrifice_poupesque",
+      "nom": "Sacrifice Poupesque",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 4,
+      "type": "utility",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Fait exploser une poupée pour des dégâts AoE. Sacrifier une poupée mourante pour du dégât supplémentaire."
+    },
+    {
+      "id": "larme",
+      "nom": "Larme",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 5,
+      "type": "heal",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Soin ciblé. Maintenir les invocations ou alliés en vie. Sort de sustain équipe."
+    },
+    {
+      "id": "la_folle",
+      "nom": "La Folle",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Poupée DPS agressive. Attaque les ennemis adjacents en priorité. Envoyer sur la cible principale."
+    },
+    {
+      "id": "ronce_apaisante",
+      "nom": "Ronce Apaisante",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 4,
+      "type": "heal",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Soin via ronces. Soigne un allié tout en posant une ronce défensive sur sa case."
+    },
+    {
+      "id": "puissance_sylvestre",
+      "nom": "Puissance Sylvestre",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Boost les dégâts et les soins du Sadida. Lancer quand l'armée est en place pour amplifier l'impact."
+    },
+    {
+      "id": "la_sacrifiee",
+      "nom": "La Sacrifiée",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Poupée tank principale. Placée devant le Sadida pour absorber les attaques. Priorité absolue tour 1."
+    },
+    {
+      "id": "tremblement",
+      "nom": "Tremblement",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "aoe_carre",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 3,
+      "note": "AoE en carré. Dégâts et retrait de PM dans la zone. Excellent pour désorganiser un groupe ennemi compact."
+    },
+    {
+      "id": "connaissance_des_poupees",
+      "nom": "Connaissance des Poupées",
+      "pa": 2,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Augmente le nombre maximum d'invocations simultanées. Lancer avant d'invoquer pour avoir plus de poupées."
+    },
+    {
+      "id": "ronces_multiples",
+      "nom": "Ronces Multiples",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "aoe_ligne",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 3,
+      "note": "Pose plusieurs ronces en ligne. Barrage de zone pour couper l'accès à des couloirs entiers."
+    },
+    {
+      "id": "arbre",
+      "nom": "Arbre",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 5,
+      "note": "Invoque un arbre qui bloque le passage et soigne les alliés adjacents. Positionnement défensif clé."
+    },
+    {
+      "id": "vent_empoisonne",
+      "nom": "Vent Empoisonné",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "aoe_ligne",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 3,
+      "note": "AoE en ligne avec poison. Idéal si cibles alignées avec le Sadida. Bon DPS de zone."
+    },
+    {
+      "id": "la_gonflable",
+      "nom": "La Gonflable",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Poupée AoE qui explose en dégâts de zone à sa mort. Placer stratégiquement pour l'explosion finale."
+    },
+    {
+      "id": "ronces_agressives",
+      "nom": "Ronces Agressives",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 2,
+      "note": "Ronce offensive qui inflige des dégâts directs. Meilleur DPS direct du Sadida sur une cible unique."
+    },
+    {
+      "id": "herbe_folle",
+      "nom": "Herbe Folle",
+      "pa": 3,
+      "po_min": 2,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Sort de dégâts distance sans cooldown. Alternative spam si les invocations et ronces sont en cooldown."
+    },
+    {
+      "id": "feu_de_brousse",
+      "nom": "Feu de Brousse",
+      "pa": 5,
+      "po_min": 2,
+      "po_max": 6,
+      "type": "aoe_carre",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 3,
+      "note": "AoE de zone massive. Meilleure AoE offensive du Sadida. Garder pour les regroupements ennemis importants."
+    },
+    {
+      "id": "ronce_insolente",
+      "nom": "Ronce Insolente",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "aoe_croix",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 3,
+      "note": "AoE de ronces en croix. Immobilise plusieurs ennemis simultanément. Excellent contrôle de groupe."
+    },
+    {
+      "id": "la_surpuissante",
+      "nom": "La Surpuissante",
+      "pa": 5,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "invocation",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 5,
+      "note": "Poupée ultime aux dégâts très élevés. Nécessite de nombreuses invocations actives pour être invoquée. Sort signature."
+    }
+  ],
+  "plan_tour_type": [
+    "Tour 1 : Connaissance des Poupées (2 PA) + La Sacrifiée (4 PA) + Ronce sur case d'approche (3 PA) + Herbe Folle (3 PA)",
+    "Tour 2 : La Folle sur cible principale (4 PA) + Poison Paralysant (4 PA) + Larme si allié blessé (3 PA)",
+    "Tour 3+ : Ronces Agressives comme DPS direct. Feu de Brousse si 2+ ennemis regroupés. Maintenir les ronces sur les passages."
+  ],
+  "gestion_hp": {
+    "seuil_alerte": 45,
+    "seuil_critique": 20,
+    "actions_si_critique": [
+      "Ronce Apaisante pour se soigner via ronce",
+      "Positionner La Sacrifiée entre soi et l'ennemi",
+      "Ronce sur ses propres cases pour ralentir l'attaquant adjacent"
+    ]
+  }
+}

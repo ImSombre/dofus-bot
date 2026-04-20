@@ -1,0 +1,513 @@
+"""Client LLM générique — supporte Ollama ET LM Studio (API OpenAI-compatible).
+
+Usage :
+    # Ollama (format /api/generate)
+    client = LLMClient(provider="ollama", model="gemma3:12b")
+
+    # LM Studio (format /v1/chat/completions, compatible OpenAI)
+    client = LLMClient(provider="lmstudio", model="google/gemma-3-12b",
+                       base_url="http://localhost:1234/v1")
+
+    # Appel avec image (modèle vision)
+    text = client.ask_with_image(system, user, image_bgr)
+    data = client.ask_json(system, user, image_bgr=image_bgr)
+
+Les deux providers acceptent les images base64 (format multimodal).
+"""
+from __future__ import annotations
+
+import base64
+import json
+import time
+from dataclasses import dataclass
+from typing import Literal
+
+from loguru import logger
+
+try:
+    import cv2  # noqa: F401
+    _HAS_CV2 = True
+except ImportError:
+    _HAS_CV2 = False
+
+try:
+    import requests  # noqa: F401
+    _HAS_REQUESTS = True
+except ImportError:
+    _HAS_REQUESTS = False
+
+
+ProviderType = Literal["ollama", "lmstudio", "gemini"]
+
+
+@dataclass
+class LLMResponse:
+    success: bool
+    text: str = ""
+    error: str = ""
+    latency_ms: float = 0.0
+
+
+class LLMClient:
+    """Client unifié Ollama / LM Studio (OpenAI-compatible)."""
+
+    PROVIDERS: dict[str, str] = {
+        "ollama": "http://localhost:11434",
+        "lmstudio": "http://localhost:1234/v1",
+        "gemini": "https://generativelanguage.googleapis.com/v1beta",
+    }
+
+    def __init__(
+        self,
+        provider: ProviderType = "ollama",
+        model: str = "qwen2.5vl:3b",
+        base_url: str | None = None,
+        api_key: str | None = None,
+        temperature: float = 0.2,
+        max_tokens: int = 500,
+        timeout_sec: float = 60.0,
+    ) -> None:
+        self.provider = provider
+        self.model = model
+        self.base_url = (base_url or self.PROVIDERS.get(provider, "")).rstrip("/")
+        self.api_key = api_key or ""
+        self.temperature = temperature
+        self.max_tokens = max_tokens
+        self.timeout_sec = timeout_sec
+
+    # ---------- Disponibilité ----------
+
+    def is_available(self) -> bool:
+        if not _HAS_REQUESTS:
+            return False
+        try:
+            import requests  # noqa: PLC0415
+            if self.provider == "gemini":
+                # Si on a une clé API, on considère disponible (pas de ping gratuit)
+                return bool(self.api_key)
+            url = f"{self.base_url}/api/tags" if self.provider == "ollama" \
+                else f"{self.base_url}/models"
+            r = requests.get(url, timeout=3.0)
+            return r.status_code == 200
+        except Exception:
+            return False
+
+    def list_models(self) -> list[str]:
+        if not _HAS_REQUESTS:
+            return []
+        try:
+            import requests  # noqa: PLC0415
+            if self.provider == "ollama":
+                r = requests.get(f"{self.base_url}/api/tags", timeout=3.0)
+                data = r.json()
+                return [m["name"] for m in data.get("models", [])]
+            elif self.provider == "gemini":
+                if not self.api_key:
+                    return []
+                r = requests.get(
+                    f"{self.base_url}/models?key={self.api_key}",
+                    timeout=5.0,
+                )
+                if r.status_code != 200:
+                    return []
+                data = r.json()
+                # Filtre : seulement les modèles qui supportent generateContent
+                names = []
+                for m in data.get("models", []):
+                    if "generateContent" in m.get("supportedGenerationMethods", []):
+                        # Strip "models/" prefix
+                        n = m.get("name", "").replace("models/", "")
+                        names.append(n)
+                return names
+            else:
+                r = requests.get(f"{self.base_url}/models", timeout=3.0)
+                data = r.json()
+                return [m["id"] for m in data.get("data", [])]
+        except Exception as exc:
+            logger.debug("list_models échec : {}", exc)
+            return []
+
+    def has_model(self) -> bool:
+        models = self.list_models()
+        # Matching souple : on accepte prefix/suffix
+        return any(self.model in m or m in self.model for m in models) if models else False
+
+    # ---------- Ask ----------
+
+    def ask(
+        self,
+        user_prompt: str,
+        system: str | None = None,
+        image_bgr=None,
+    ) -> LLMResponse:
+        """Appel générique. Route vers Ollama ou LM Studio selon provider."""
+        if not _HAS_REQUESTS:
+            return LLMResponse(success=False, error="requests non installé")
+
+        t0 = time.perf_counter()
+        try:
+            if self.provider == "ollama":
+                response = self._ask_ollama(user_prompt, system, image_bgr)
+            elif self.provider == "gemini":
+                response = self._ask_gemini(user_prompt, system, image_bgr)
+            else:
+                response = self._ask_openai(user_prompt, system, image_bgr)
+            response.latency_ms = (time.perf_counter() - t0) * 1000
+            return response
+        except Exception as exc:
+            return LLMResponse(
+                success=False,
+                error=str(exc),
+                latency_ms=(time.perf_counter() - t0) * 1000,
+            )
+
+    def ask_json(
+        self,
+        user_prompt: str,
+        system: str | None = None,
+        image_bgr=None,
+        fallback: dict | None = None,
+    ) -> dict:
+        """Extrait un JSON de la réponse."""
+        response = self.ask(user_prompt, system=system, image_bgr=image_bgr)
+        if not response.success:
+            logger.warning("LLM ask échec : {}", response.error)
+            return fallback or {}
+        return self._extract_json(response.text) or (fallback or {})
+
+    # ---------- Internals ----------
+
+    def _ask_ollama(
+        self,
+        user_prompt: str,
+        system: str | None,
+        image_bgr,
+    ) -> LLMResponse:
+        import requests  # noqa: PLC0415
+        payload: dict = {
+            "model": self.model,
+            "prompt": user_prompt,
+            "stream": False,
+            "options": {
+                "temperature": self.temperature,
+                "num_predict": self.max_tokens,
+            },
+        }
+        if system:
+            payload["system"] = system
+        if image_bgr is not None:
+            b64 = self._encode_image_b64(image_bgr)
+            if b64:
+                payload["images"] = [b64]
+
+        r = requests.post(
+            f"{self.base_url}/api/generate",
+            json=payload,
+            timeout=self.timeout_sec,
+        )
+        if r.status_code != 200:
+            return LLMResponse(
+                success=False,
+                error=f"HTTP {r.status_code}: {r.text[:200]}",
+            )
+        data = r.json()
+        return LLMResponse(success=True, text=data.get("response", "").strip())
+
+    def _ask_openai(
+        self,
+        user_prompt: str,
+        system: str | None,
+        image_bgr,
+    ) -> LLMResponse:
+        """Format OpenAI chat/completions — utilisé par LM Studio, vLLM, etc."""
+        import requests  # noqa: PLC0415
+
+        messages: list[dict] = []
+        if system:
+            messages.append({"role": "system", "content": system})
+
+        if image_bgr is not None:
+            b64 = self._encode_image_b64(image_bgr)
+            if b64:
+                # Format OpenAI vision (multipart content)
+                messages.append({
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": user_prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"data:image/jpeg;base64,{b64}"},
+                        },
+                    ],
+                })
+            else:
+                messages.append({"role": "user", "content": user_prompt})
+        else:
+            messages.append({"role": "user", "content": user_prompt})
+
+        payload = {
+            "model": self.model,
+            "messages": messages,
+            "temperature": self.temperature,
+            "max_tokens": self.max_tokens,
+            "stream": False,
+        }
+
+        r = requests.post(
+            f"{self.base_url}/chat/completions",
+            json=payload,
+            timeout=self.timeout_sec,
+        )
+        if r.status_code != 200:
+            return LLMResponse(
+                success=False,
+                error=f"HTTP {r.status_code}: {r.text[:200]}",
+            )
+        data = r.json()
+        choices = data.get("choices", [])
+        if not choices:
+            return LLMResponse(success=False, error="Pas de réponse")
+        text = choices[0].get("message", {}).get("content", "").strip()
+        return LLMResponse(success=True, text=text)
+
+    # Liste des modèles Gemini à essayer en fallback si le primaire est surchargé (503)
+    # ou timeout. Ordre : plus récent/rapide → plus stable → moins sollicité.
+    # gemini-2.0-flash retiré (404 no longer available).
+    _GEMINI_FALLBACK_CHAIN = [
+        "gemini-flash-latest",
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-lite",   # plus récent, moins chargé
+        "gemini-1.5-flash",        # legacy mais toujours dispo et stable
+        "gemini-2.5-pro",          # dernier recours (quota payant plus cher)
+    ]
+
+    def _ask_gemini(
+        self,
+        user_prompt: str,
+        system: str | None,
+        image_bgr,
+    ) -> LLMResponse:
+        """Google Gemini API avec retry sur 503/timeout + fallback modèle.
+
+        Doc : https://ai.google.dev/api/generate-content
+        Quota gratuit généreux. Retry automatique si serveur surchargé.
+        """
+        import requests  # noqa: PLC0415
+        import time as _time  # noqa: PLC0415
+
+        if not self.api_key:
+            return LLMResponse(
+                success=False,
+                error="Clé API Gemini manquante — obtiens-la sur https://aistudio.google.com/app/apikey",
+            )
+
+        # Structure des "parts" : texte + image(s)
+        parts: list[dict] = []
+        if image_bgr is not None:
+            b64 = self._encode_image_b64(image_bgr)
+            if b64:
+                parts.append({
+                    "inline_data": {
+                        "mime_type": "image/jpeg",
+                        "data": b64,
+                    },
+                })
+        parts.append({"text": user_prompt})
+
+        payload: dict = {
+            "contents": [{"role": "user", "parts": parts}],
+            "generationConfig": {
+                "temperature": self.temperature,
+                "maxOutputTokens": self.max_tokens,
+                "responseMimeType": "application/json",
+                # Désactive le "thinking" interne de Gemini 2.5 (consomme les tokens
+                # avant même d'écrire la réponse visible → JSON tronqué).
+                "thinkingConfig": {
+                    "thinkingBudget": 0,
+                },
+            },
+        }
+        if system:
+            payload["systemInstruction"] = {"parts": [{"text": system}]}
+
+        # Construit la chaîne de modèles à essayer : user's choice d'abord, puis fallbacks
+        models_to_try = [self.model]
+        for fb in self._GEMINI_FALLBACK_CHAIN:
+            if fb != self.model and fb not in models_to_try:
+                models_to_try.append(fb)
+
+        last_error = ""
+        for attempt, model in enumerate(models_to_try):
+            # Retry 3 fois par modèle en cas de 503 / timeout (backoff)
+            for retry in range(3):
+                try:
+                    url = f"{self.base_url}/models/{model}:generateContent?key={self.api_key}"
+                    r = requests.post(url, json=payload, timeout=self.timeout_sec)
+                except requests.exceptions.Timeout:
+                    last_error = f"{model}: timeout {self.timeout_sec}s"
+                    logger.warning("Gemini timeout sur {} (retry {}/3)", model, retry + 1)
+                    _time.sleep(2 + retry * 2)
+                    continue
+                except Exception as exc:
+                    last_error = f"{model}: {exc}"
+                    logger.warning("Gemini erreur {} : {}", model, exc)
+                    break   # essaye le modèle suivant
+
+                if r.status_code == 200:
+                    data = r.json()
+                    candidates = data.get("candidates", [])
+                    if not candidates:
+                        last_error = f"{model}: pas de candidate"
+                        logger.warning("Gemini {} : pas de candidate dans la réponse", model)
+                        break
+                    cand = candidates[0]
+                    content = cand.get("content", {})
+                    content_parts = content.get("parts", [])
+                    finish_reason = cand.get("finishReason", "?")
+                    if not content_parts:
+                        last_error = (
+                            f"{model}: réponse vide (finishReason={finish_reason}). "
+                            f"Probablement safety filter Google — on essaie un autre modèle."
+                        )
+                        logger.warning(
+                            "Gemini {} : réponse vide (finishReason={}) — essai modèle suivant",
+                            model, finish_reason,
+                        )
+                        break
+                    text = content_parts[0].get("text", "").strip()
+                    if not text:
+                        last_error = f"{model}: texte vide"
+                        break
+                    if finish_reason == "MAX_TOKENS":
+                        logger.warning(
+                            "Gemini {} : réponse TRONQUÉE (MAX_TOKENS). Augmente max_tokens.",
+                            model,
+                        )
+                    elif finish_reason not in ("STOP", "?"):
+                        logger.info(
+                            "Gemini {} : finishReason={}", model, finish_reason,
+                        )
+                    if model != self.model:
+                        logger.info("Gemini fallback réussi sur '{}' (demandé : {})", model, self.model)
+                    return LLMResponse(success=True, text=text)
+
+                # HTTP != 200
+                if r.status_code in (503, 429):
+                    # Serveur surchargé ou rate limit : backoff puis retry
+                    wait = 2 + retry * 3
+                    last_error = f"{model}: HTTP {r.status_code}"
+                    logger.warning(
+                        "Gemini {} sur {} — attente {}s (retry {}/3)",
+                        r.status_code, model, wait, retry + 1,
+                    )
+                    _time.sleep(wait)
+                    continue
+                else:
+                    # Autre erreur HTTP : pas de retry, essaye modèle suivant
+                    last_error = f"{model}: HTTP {r.status_code}: {r.text[:200]}"
+                    logger.warning("Gemini HTTP {} sur {} : {}", r.status_code, model, r.text[:200])
+                    break
+
+        return LLMResponse(success=False, error=f"Tous les modèles ont échoué. Dernier : {last_error}")
+
+    @staticmethod
+    def _encode_image_b64(img_bgr, max_side: int = 1280, quality: int = 75) -> str | None:
+        if not _HAS_CV2 or img_bgr is None:
+            return None
+        try:
+            h, w = img_bgr.shape[:2]
+            if max(h, w) > max_side:
+                scale = max_side / max(h, w)
+                img_bgr = cv2.resize(
+                    img_bgr,
+                    (int(w * scale), int(h * scale)),
+                    interpolation=cv2.INTER_AREA,
+                )
+            ok, buf = cv2.imencode(".jpg", img_bgr, [cv2.IMWRITE_JPEG_QUALITY, quality])
+            if not ok:
+                return None
+            return base64.b64encode(buf.tobytes()).decode("ascii")
+        except Exception as exc:
+            logger.debug("encode image échec : {}", exc)
+            return None
+
+    @staticmethod
+    def _extract_json(text: str) -> dict | None:
+        """Extrait le premier bloc JSON {...} d'une réponse LLM.
+
+        Robuste : si le JSON est tronqué (pas de } final), tente de le réparer
+        en fermant automatiquement les accolades/crochets ouverts.
+        """
+        start = text.find("{")
+        if start < 0:
+            logger.warning("Pas de JSON dans la réponse : {}", text[:300])
+            return None
+
+        candidate = text[start:]
+        end = candidate.rfind("}")
+
+        # Cas 1 : JSON bien fermé
+        if end > 0:
+            try:
+                return json.loads(candidate[: end + 1])
+            except json.JSONDecodeError:
+                pass   # fall-through vers la réparation
+
+        # Cas 2 : JSON tronqué → tente de réparer en fermant les brackets ouverts
+        # On parcourt le texte et on compte les {/[/" pour reconstruire la fin.
+        open_braces = 0
+        open_brackets = 0
+        in_string = False
+        escape = False
+        last_valid_end = -1
+        for i, ch in enumerate(candidate):
+            if escape:
+                escape = False
+                continue
+            if ch == "\\" and in_string:
+                escape = True
+                continue
+            if ch == '"':
+                in_string = not in_string
+                continue
+            if in_string:
+                continue
+            if ch == "{":
+                open_braces += 1
+            elif ch == "}":
+                open_braces -= 1
+                if open_braces == 0 and open_brackets == 0:
+                    last_valid_end = i
+            elif ch == "[":
+                open_brackets += 1
+            elif ch == "]":
+                open_brackets -= 1
+
+        # Si on a un JSON complet quelque part, essaie-le
+        if last_valid_end > 0:
+            try:
+                return json.loads(candidate[: last_valid_end + 1])
+            except json.JSONDecodeError:
+                pass
+
+        # Dernière tentative : ajoute les fermetures manquantes à la fin du dernier caractère "sûr"
+        # (avant un éventuel token incomplet, on coupe à la dernière virgule ou accolade valide)
+        truncated = candidate.rstrip(",\n\r\t ")
+        # si on finit dans une string, tronque avant le dernier "
+        if in_string:
+            last_quote = truncated.rfind('"')
+            if last_quote > 0:
+                truncated = truncated[:last_quote]
+        # si on finit avec une virgule / deux points sans valeur, tronque
+        while truncated and truncated[-1] in ",:":
+            truncated = truncated[:-1].rstrip()
+        # ferme les brackets puis les braces
+        truncated += "]" * max(open_brackets, 0)
+        truncated += "}" * max(open_braces, 0)
+        try:
+            parsed = json.loads(truncated)
+            logger.info("JSON tronqué réparé avec succès ({} chars)", len(truncated))
+            return parsed
+        except json.JSONDecodeError as exc:
+            logger.warning("JSON tronqué impossible à réparer ({}) : {}", exc, text[:300])
+            return None

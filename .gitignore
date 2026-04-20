@@ -1,0 +1,117 @@
+# ============================================================
+# Dofus Bot — .gitignore
+# ============================================================
+
+# --- Secrets ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# --- Runtime data ---
+data/
+!data/.gitkeep
+!data/knowledge/
+!data/knowledge/**
+# NE JAMAIS committer : contient la clé API Gemini de l'utilisateur
+data/user_prefs.json
+logs/
+!logs/.gitkeep
+screenshots/
+!screenshots/.gitkeep
+*.sqlite3
+*.sqlite3-journal
+*.db
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# --- Virtual envs ---
+.venv/
+venv/
+ENV/
+env/
+.env.bak/
+
+# --- Testing / coverage ---
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.cover
+.cache/
+.tox/
+.nox/
+.hypothesis/
+
+# --- Type checking ---
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.ruff_cache/
+
+# --- IDE / editors ---
+.vscode/
+!.vscode/settings.json.example
+.idea/
+*.swp
+*.swo
+*~
+.spyderproject
+.spyproject
+
+# --- OS ---
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# --- Qt / PyInstaller build ---
+*.pyc
+*.pyo
+dist/
+build/
+*.spec
+
+# --- Templates / captures privées ---
+data/templates/**/*.png
+data/templates/**/*.jpg
+!data/templates/.gitkeep
+!data/templates/README.md
+
+# --- Claude ---
+.claude/cache/
+
+# --- Misc ---
+*.log
+!logs/.gitkeep
+*.bak
+*.tmp

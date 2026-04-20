@@ -1,0 +1,50 @@
+# Dofus Bot — Python dependencies (pinned for reproducibility)
+# Python 3.11+ required
+
+# Core
+pydantic==2.8.2
+pydantic-settings==2.4.0
+loguru==0.7.2
+PyYAML==6.0.2
+
+# Vision / OCR
+mss==9.0.1
+Pillow==10.4.0
+opencv-python==4.10.0.84
+numpy==2.0.1
+pytesseract==0.3.13
+
+# Input simulation
+pyautogui==0.9.54
+pynput==1.7.7
+# SendInput API bas-niveau — nécessaire pour jeux qui rejettent pyautogui (DirectInput)
+pydirectinput==1.0.4
+
+# GUI
+PyQt6==6.7.1
+pyqtgraph==0.13.7
+
+# Remote control (optional — only needed if DISCORD_ENABLED=true)
+discord.py==2.4.0
+
+# HTTP client (pour Ollama local LLM en combat)
+requests==2.32.3
+
+# HTTP client : compatible avec discord.py et pygetwindow
+pygetwindow==0.0.9
+
+# Secrets storage
+keyring==25.3.0
+
+# ML — YOLO detection (optional — only needed if YOLO_MODEL_PATH is set)
+# Install with: pip install "ultralytics>=8.3.0"
+# ultralytics>=8.3.0
+
+# Dev / test
+pytest==8.3.2
+pytest-qt==4.4.0
+pytest-cov==5.0.0
+pytest-mock==3.14.0
+ruff==0.6.2
+mypy==1.11.1
+pip-audit==2.7.3

@@ -1,0 +1,270 @@
+{
+  "class_id": "sram",
+  "nom_fr": "Sram",
+  "archetype": "DPS agilité mélée/pièges, invisibilité et embuscades",
+  "stats_principales": ["Agilité", "Chance"],
+  "philosophie": "Le Sram opère dans l'ombre. Il pose des pièges sur les cases de passage, s'invisibilise pour se repositionner, et frappe avec un maximum de dégâts depuis l'ombre. Double et Attaque Mortelle sont les sorts burst. Concentration de Chakra + Pulsion de Chakra pour le pic de dégâts.",
+  "priorites_generales": [
+    "Poser Piège Sournois et Piège Empoisonné sur les cases d'approche ennemie",
+    "Invisibilité pour se repositionner sans risque",
+    "Double en mélée si ennemi exposé et isolé",
+    "Concentration de Chakra + Pulsion de Chakra pour burst maximal",
+    "Peur pour orienter les ennemis vers les pièges"
+  ],
+  "sorts": [
+    {
+      "id": "invisibilite",
+      "nom": "Invisibilité",
+      "pa": 4,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 5,
+      "note": "Rend le Sram invisible. Repositionnement sécurisé ou préparation d'une embuscade. Sort fondamental."
+    },
+    {
+      "id": "piege_sournois",
+      "nom": "Piège Sournois",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 6,
+      "type": "piege",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 0,
+      "note": "Piège de dégâts principal. Spammable. Couvrir toutes les cases de passage avant que les ennemis avancent."
+    },
+    {
+      "id": "sournoiserie",
+      "nom": "Sournoiserie",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "élevés",
+      "cooldown": 2,
+      "note": "Sort mélée/courte portée. Pas de ligne de vue. Dégâts bonus si attaque dans le dos. Positionnement clé."
+    },
+    {
+      "id": "poison_insidieux",
+      "nom": "Poison Insidieux",
+      "pa": 3,
+      "po_min": 2,
+      "po_max": 7,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 2,
+      "note": "Poison à longue portée. DoT efficace pour les longues batailles. Compléter avec les pièges."
+    },
+    {
+      "id": "fourvoiement",
+      "nom": "Fourvoiement",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Retire des PM et PA à la cible. Contrôle utile pour ralentir les ennemis rapides et les empêcher de fuir."
+    },
+    {
+      "id": "coup_sournois",
+      "nom": "Coup Sournois",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 2,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "élevés",
+      "cooldown": 1,
+      "note": "Sort mélée avec bonus si attaque dans le flanc ou le dos. Bien se positionner pour maximiser les dégâts."
+    },
+    {
+      "id": "double",
+      "nom": "Double",
+      "pa": 4,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "invocation",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Crée un double du Sram qui attaque les ennemis adjacents. Utile comme leurre ou complément DPS."
+    },
+    {
+      "id": "reperage",
+      "nom": "Repérage",
+      "pa": 2,
+      "po_min": 0,
+      "po_max": 4,
+      "type": "utility",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Révèle les pièges et entités invisibles dans la zone. Contre les autres Srams invisibles en PvP."
+    },
+    {
+      "id": "piege_de_masse",
+      "nom": "Piège de Masse",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "piege",
+      "ligne_de_vue": true,
+      "degats": "très élevés",
+      "cooldown": 3,
+      "note": "Piège AoE qui touche toutes les cibles dans une large zone au déclenchement. Dégâts dévastateurs."
+    },
+    {
+      "id": "invisibilite_d_autrui",
+      "nom": "Invisibilité d'Autrui",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 5,
+      "note": "Rend un allié invisible. Sauver un allié en danger ou permettre une embuscade alliée."
+    },
+    {
+      "id": "piege_empoisonne",
+      "nom": "Piège Empoisonné",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "piege",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Piège qui applique un poison au déclenchement. Couplé au Piège Sournois, crée un combo dégâts + DoT."
+    },
+    {
+      "id": "concentration_de_chakra",
+      "nom": "Concentration de Chakra",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Charge le Chakra. Doit être lancé avant Pulsion de Chakra pour maximiser les dégâts du prochain sort."
+    },
+    {
+      "id": "piege_d_immobilisation",
+      "nom": "Piège d'Immobilisation",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "piege",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Piège qui retire tous les PM au déclenchement. Clouer un ennemi sur place pour le burst."
+    },
+    {
+      "id": "piege_de_silence",
+      "nom": "Piège de Silence",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "piege",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Piège qui empêche le lancement de sorts. Placer devant les casters ennemis dangereux."
+    },
+    {
+      "id": "piege_repulsif",
+      "nom": "Piège Répulsif",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "piege",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Piège qui repousse la cible vers d'autres pièges. Créer des chaînes de pièges."
+    },
+    {
+      "id": "peur",
+      "nom": "Peur",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Repousse l'ennemi de plusieurs cases. Orienter une cible vers les pièges posés stratégiquement."
+    },
+    {
+      "id": "arnaque",
+      "nom": "Arnaque",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Sort de dégâts à distance standard. Spam si pas en position pour les pièges ou la mélée."
+    },
+    {
+      "id": "pulsion_de_chakra",
+      "nom": "Pulsion de Chakra",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "très élevés",
+      "cooldown": 3,
+      "note": "Libère le Chakra chargé. Dégâts maximaux après Concentration de Chakra. Réserver pour les cibles prioritaires."
+    },
+    {
+      "id": "attaque_mortelle",
+      "nom": "Attaque Mortelle",
+      "pa": 5,
+      "po_min": 1,
+      "po_max": 2,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "très élevés",
+      "cooldown": 3,
+      "note": "Burst mélée ultime du Sram. Dégâts maximaux en corps-à-corps. Réserver pour les cibles à bas HP ou exposées."
+    },
+    {
+      "id": "piege_mortel",
+      "nom": "Piège Mortel",
+      "pa": 5,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "piege",
+      "ligne_de_vue": true,
+      "degats": "très élevés",
+      "cooldown": 3,
+      "note": "Piège ultime à dégâts maximaux. Un seul peut tuer une cible non-tank. Réserver pour les ennemis prioritaires."
+    }
+  ],
+  "plan_tour_type": [
+    "Tour 1 : Piège Sournois x2 sur cases d'approche (6 PA) + Arnaque (3 PA) si PA restants",
+    "Tour 2 : Si ennemi dans piège → Coup Sournois (3 PA) + Sournoiserie (3 PA) + Arnaque (3 PA). Sinon : Invisibilité + reposer des pièges.",
+    "Concentration de Chakra (3 PA) + Pulsion de Chakra (4 PA) quand disponibles pour un burst dévastateur."
+  ],
+  "gestion_hp": {
+    "seuil_alerte": 40,
+    "seuil_critique": 20,
+    "actions_si_critique": [
+      "Invisibilité immédiatement pour rompre le combat",
+      "Poser Piège d'Immobilisation entre soi et l'ennemi en fuyant",
+      "Peur pour éloigner l'attaquant adjacent"
+    ]
+  }
+}

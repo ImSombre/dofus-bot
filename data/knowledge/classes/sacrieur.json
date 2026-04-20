@@ -1,0 +1,271 @@
+{
+  "class_id": "sacrieur",
+  "nom_fr": "Sacrieur",
+  "archetype": "tank DPS force/feu/agilité mélée, puissance croissante avec les blessures",
+  "stats_principales": ["Force", "Vitalité", "Agilité"],
+  "philosophie": "Le Sacrieur est plus dangereux quand il est blessé. Les Châtiments accumulent les stacks de douleur qui amplifient les dégâts. Attirance ramène les ennemis au corps-à-corps. Transposition échange les positions pour les engager. Ne pas soigner le Sacrieur trop tôt : il est dans son pic de puissance à bas HP.",
+  "priorites_generales": [
+    "Rester en mélée sur les ennemis : tous les Châtiments sont à portée courte",
+    "Laisser monter les stacks Châtiment avant de lancer les sorts puissants",
+    "Attirance pour ramener un ennemi à soi si il s'éloigne",
+    "Transposition pour s'engager sur une cible éloignée ou sauver un allié",
+    "Si HP < 30% : dégâts au maximum, continuer l'assaut"
+  ],
+  "sorts": [
+    {
+      "id": "attirance",
+      "nom": "Attirance",
+      "pa": 3,
+      "po_min": 2,
+      "po_max": 6,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Attire une cible distante vers le Sacrieur. Forcer l'engagement sans se déplacer."
+    },
+    {
+      "id": "pied_du_sacrieur",
+      "nom": "Pied du Sacrieur",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Sort mélée rapide à courte portée. Spam avec les Châtiments pour épuiser les PA efficacement."
+    },
+    {
+      "id": "chatiment_force",
+      "nom": "Châtiment Forcé",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 2,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "élevés",
+      "cooldown": 0,
+      "note": "Châtiment force. DPS mélée principal. Dégâts croissants avec les stacks. Rotation de base."
+    },
+    {
+      "id": "derobade",
+      "nom": "Dérobade",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "movement",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Téléportation libre sur une case non-occupée. Repositionnement offensif pour s'engager ou défensif pour fuir."
+    },
+    {
+      "id": "detour",
+      "nom": "Détour",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Sort sans ligne de vue. Bon pour attaquer depuis derrière un obstacle ou dans un couloir étroit."
+    },
+    {
+      "id": "assaut",
+      "nom": "Assaut",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "aoe_croix",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 3,
+      "note": "AoE en croix. Excellent si plusieurs ennemis regroupés autour du Sacrieur."
+    },
+    {
+      "id": "chatiment_agile",
+      "nom": "Châtiment Agile",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 1,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Châtiment agilité en corps-à-corps. Alternative si les ennemis ont de hautes résistances force."
+    },
+    {
+      "id": "dissolution",
+      "nom": "Dissolution",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "élevés",
+      "cooldown": 2,
+      "note": "Retire les armures et boucliers ennemis. Essentiel contre les Fécas et tanks protégés."
+    },
+    {
+      "id": "chatiment_ose",
+      "nom": "Châtiment Osé",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 2,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "élevés",
+      "cooldown": 2,
+      "note": "Gros dégâts mélée chance. Utiliser avec des stacks Châtiment élevés pour un burst important."
+    },
+    {
+      "id": "chatiment_spirituel",
+      "nom": "Châtiment Spirituel",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 2,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Châtiment intelligence. Variante pour les builds mixtes ou contre ennemis résistants force."
+    },
+    {
+      "id": "sacrifice",
+      "nom": "Sacrifice",
+      "pa": 2,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Sort de tank : absorbe les dégâts destinés à un allié. Les dégâts reçus amplifient les stacks Châtiment."
+    },
+    {
+      "id": "absorption",
+      "nom": "Absorption",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 2,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Vol de vie en mélée. Récupérer des HP tout en infligeant des dégâts. Excellent pour le sustain."
+    },
+    {
+      "id": "chatiment_vitalesque",
+      "nom": "Châtiment Vitalesque",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 2,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Monte les stacks Châtiment rapidement. Sort de base pour accumuler les charges en début de combat."
+    },
+    {
+      "id": "cooperation",
+      "nom": "Coopération",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 4,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Transfère une partie des dégâts reçus par un allié au Sacrieur. Protège l'équipe tout en montant les stacks."
+    },
+    {
+      "id": "transposition",
+      "nom": "Transposition",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "movement",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Échange de position avec une cible. Engager un ennemi distant, ou sauver un allié en danger."
+    },
+    {
+      "id": "punition",
+      "nom": "Punition",
+      "pa": 5,
+      "po_min": 1,
+      "po_max": 3,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "très élevés",
+      "cooldown": 3,
+      "note": "Sort burst ultime du Sacrieur. Dégâts maximaux quand HP < 50%. Garder pour les moments critiques."
+    },
+    {
+      "id": "furie",
+      "nom": "Furie",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 2,
+      "type": "aoe_ligne",
+      "ligne_de_vue": false,
+      "degats": "élevés",
+      "cooldown": 3,
+      "note": "AoE en ligne depuis le Sacrieur. Repousse les ennemis alignés devant soi."
+    },
+    {
+      "id": "epee_volante",
+      "nom": "Épée volante",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 6,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 2,
+      "note": "Sort à distance du Sacrieur. Utile pour finir une cible éloignée ou avant de s'engager."
+    },
+    {
+      "id": "transfert_de_vie",
+      "nom": "Transfert de Vie",
+      "pa": 4,
+      "po_min": 0,
+      "po_max": 4,
+      "type": "heal",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Donne des HP à un allié en en perdant soi-même. Aide l'allié tout en montant les stacks Châtiment."
+    },
+    {
+      "id": "folie_sanguinaire",
+      "nom": "Folie sanguinaire",
+      "pa": 4,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 5,
+      "note": "Mode berserk ultime : boost massif des dégâts pendant plusieurs tours. Sort signature pour le pic de puissance."
+    }
+  ],
+  "plan_tour_type": [
+    "Tour 1 : Attirance si ennemi éloigné (3 PA) + Transposition si très loin (4 PA) + Châtiment Vitalesque x2 pour les stacks",
+    "Tour 2+ : Châtiment Forcé x2 (8 PA) si HP > 50%. Punition + Châtiment Forcé si HP < 50%.",
+    "Sacrifice sur allié soigneur si menacé. Coopération pour le tank rôle."
+  ],
+  "gestion_hp": {
+    "seuil_alerte": 50,
+    "seuil_critique": 25,
+    "actions_si_critique": [
+      "NE PAS fuir : c'est le pic de puissance du Sacrieur",
+      "Lancer Punition immédiatement pour des dégâts maximaux",
+      "Folie Sanguinaire pour exploiter le bonus HP bas",
+      "Demander Transfert de Vie uniquement après l'exploitation du burst"
+    ]
+  }
+}

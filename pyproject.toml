@@ -1,0 +1,75 @@
+[project]
+name = "dofus-bot"
+version = "0.1.0"
+description = "Dofus 2.64 automation bot — farm métiers + combat PvM (private server, staff-approved use only)"
+requires-python = ">=3.11"
+authors = [{ name = "ImSombre" }]
+readme = "README.md"
+license = { text = "Proprietary" }
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+# ---------- Linting / formatting ----------
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+exclude = ["data", "logs", "screenshots", ".venv"]
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W",     # pycodestyle / pyflakes
+    "I",               # isort
+    "N",               # pep8-naming
+    "UP",              # pyupgrade
+    "B",               # bugbear
+    "SIM",             # simplify
+    "RUF",             # ruff-specific
+]
+ignore = [
+    "E501",   # line length handled by formatter
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+# ---------- Type checking ----------
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unused_ignores = true
+warn_return_any = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+plugins = ["pydantic.mypy"]
+exclude = ["tests/"]
+
+[[tool.mypy.overrides]]
+module = [
+    "mss.*", "pyautogui.*", "pynput.*", "cv2.*", "pytesseract.*",
+    "pyqtgraph.*", "keyring.*",
+]
+ignore_missing_imports = true
+
+# ---------- Testing ----------
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=src",
+    "--cov-report=term-missing",
+]
+markers = [
+    "slow: marks tests as slow",
+    "e2e: end-to-end tests requiring Dofus client running",
+    "qt: requires a QApplication",
+]

@@ -1,0 +1,270 @@
+{
+  "class_id": "pandawa",
+  "nom_fr": "Pandawa",
+  "archetype": "tank-support chance/force/feu, contrôle via ivresse et lancers",
+  "stats_principales": ["Force", "Chance", "Vitalité"],
+  "philosophie": "Le Pandawa enivre ses ennemis pour les projeter dans le décor ou sur d'autres. Karcham permet de porter une cible ivre, puis de la lancer via Chamrak sur d'autres ennemis. Les Vulnérabilités débuffent les résistances élémentaires des ennemis pour amplifier les dégâts de l'équipe.",
+  "priorites_generales": [
+    "Monter l'ivresse d'une cible via Lait de Bambou ou Poing Enflammé",
+    "Karcham (porter) la cible ivre, puis Chamrak pour la projeter sur d'autres ennemis",
+    "Appliquer la Vulnérabilité correspondant à l'élément dominant de l'équipe",
+    "Picole pour monter sa propre ivresse et bénéficier des bonus",
+    "Lien Spiritueux pour la synergie de groupe en fin de tour"
+  ],
+  "sorts": [
+    {
+      "id": "picole",
+      "nom": "Picole",
+      "pa": 2,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Monte l'ivresse personnelle rapidement. Très économique (2 PA). Lancer pour bénéficier des bonus d'ivresse."
+    },
+    {
+      "id": "poing_enflamme",
+      "nom": "Poing Enflammé",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Sort feu de base. Monte l'ivresse de la cible et inflige des dégâts. Spammable."
+    },
+    {
+      "id": "gueule_de_bois",
+      "nom": "Gueule de Bois",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 2,
+      "note": "Retire de l'ivresse accumulée à la cible et inflige des dégâts en fonction de l'ivresse retirée."
+    },
+    {
+      "id": "epouvante",
+      "nom": "Épouvante",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Repousse la cible de plusieurs cases. Contrôle de positionnement pour orienter un ennemi vers un allié."
+    },
+    {
+      "id": "souffle_alcoolise",
+      "nom": "Souffle Alcoolisé",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "aoe_carre",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 3,
+      "note": "AoE de zone. Monte l'ivresse de tous les ennemis dans la zone. Bon pour préparer un lancer de masse."
+    },
+    {
+      "id": "vulnerabilite_aqueuse",
+      "nom": "Vulnérabilité Aqueuse",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Réduit les résistances eau de la cible. Synergie avec alliés Eniripsa chance ou Enutrof chance."
+    },
+    {
+      "id": "vulnerabilite_incandescente",
+      "nom": "Vulnérabilité Incandescente",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Réduit les résistances feu de la cible. Synergie avec alliés Xelor intel ou Eniripsa intel."
+    },
+    {
+      "id": "karcham",
+      "nom": "Karcham",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 1,
+      "type": "utility",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 0,
+      "note": "Saisit une cible adjacente. Mécanisme central du Pandawa. Utiliser sur une cible ivre pour la porter."
+    },
+    {
+      "id": "vulnerabilite_venteuse",
+      "nom": "Vulnérabilité Venteuse",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Réduit les résistances air de la cible. Synergie avec alliés Crâ air ou Iop air."
+    },
+    {
+      "id": "stabilisation",
+      "nom": "Stabilisation",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 4,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Empêche la cible d'être déplacée. Utile pour protéger un allié des lancers ou poussées ennemies."
+    },
+    {
+      "id": "chamrak",
+      "nom": "Chamrak",
+      "pa": 2,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 0,
+      "note": "Lance la cible portée via Karcham. Dégâts selon la distance parcourue. Utiliser après Karcham pour projeter."
+    },
+    {
+      "id": "vulnerabilite_terrestre",
+      "nom": "Vulnérabilité Terrestre",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 2,
+      "note": "Réduit les résistances terre de la cible. Synergie avec alliés Iop force, Enutrof force."
+    },
+    {
+      "id": "souillure",
+      "nom": "Souillure",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 2,
+      "note": "Applique un poison et réduit les soins reçus par la cible. Anti-heal efficace contre les tanks bien soignés."
+    },
+    {
+      "id": "lait_de_bambou",
+      "nom": "Lait de Bambou",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "mono-cible",
+      "ligne_de_vue": true,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Sort eau principal. Monte l'ivresse et inflige des dégâts eau. Spammable, base de la rotation offensive."
+    },
+    {
+      "id": "vague_a_lame",
+      "nom": "Vague à Lame",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 5,
+      "type": "aoe_ligne",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 3,
+      "note": "AoE en ligne d'eau puissante. Repousse les ennemis dans la ligne. Excellent pour aligner des cibles vers un mur."
+    },
+    {
+      "id": "colere_de_zatoishan",
+      "nom": "Colère de Zatoïshwan",
+      "pa": 5,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "aoe_croix",
+      "ligne_de_vue": true,
+      "degats": "très élevés",
+      "cooldown": 4,
+      "note": "Sort AoE ultime du Pandawa. Dégâts massifs en croix. Réserver pour les groupes d'ennemis avec ivresse élevée."
+    },
+    {
+      "id": "flasque_explosive",
+      "nom": "Flasque Explosive",
+      "pa": 4,
+      "po_min": 1,
+      "po_max": 4,
+      "type": "aoe_carre",
+      "ligne_de_vue": true,
+      "degats": "élevés",
+      "cooldown": 3,
+      "note": "AoE en carré. Explose en zone et monte l'ivresse des cibles touchées. Excellent avant un Karcham."
+    },
+    {
+      "id": "pandatak",
+      "nom": "Pandatak",
+      "pa": 3,
+      "po_min": 1,
+      "po_max": 2,
+      "type": "mono-cible",
+      "ligne_de_vue": false,
+      "degats": "moyens",
+      "cooldown": 0,
+      "note": "Sort mélée courte portée. Pas de ligne de vue. Sort de base pour finaliser les tours avec PA restants."
+    },
+    {
+      "id": "pandanlku",
+      "nom": "Pandanlku",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 0,
+      "type": "self_buff",
+      "ligne_de_vue": false,
+      "degats": "faibles",
+      "cooldown": 4,
+      "note": "Sort spécial Retrozia. Boost les dégâts du Pandawa selon son ivresse actuelle. Lancer à ivresse maximale."
+    },
+    {
+      "id": "lien_spiritueux",
+      "nom": "Lien Spiritueux",
+      "pa": 3,
+      "po_min": 0,
+      "po_max": 4,
+      "type": "buff",
+      "ligne_de_vue": true,
+      "degats": "faibles",
+      "cooldown": 3,
+      "note": "Crée un lien de synergie entre le Pandawa et un allié. Les dégâts ou soins sont partagés entre les deux."
+    }
+  ],
+  "plan_tour_type": [
+    "Tour 1 : Picole (2 PA) + Vulnérabilité de l'élément allié dominant (3 PA) + Lait de Bambou sur cible principale (3 PA) + Poing Enflammé (2 PA restants si 10 PA)",
+    "Tour 2 : Karcham si cible ivre adjacente (3 PA) + Chamrak vers groupe ennemi (2 PA) + Lait de Bambou x2",
+    "Tour 3+ : Colère de Zatoïshwan si groupes ivres (5 PA) ou rotation Lait + Poing Enflammé + Vulnérabilités."
+  ],
+  "gestion_hp": {
+    "seuil_alerte": 45,
+    "seuil_critique": 20,
+    "actions_si_critique": [
+      "Karcham l'ennemi adjacent et le Chamrak loin de soi",
+      "Épouvante pour repousser un ennemi dangereux",
+      "Se replier derrière les alliés en utilisant les PM"
+    ]
+  }
+}
