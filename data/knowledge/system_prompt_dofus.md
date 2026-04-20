@@ -143,9 +143,56 @@ Capture : bouton TERMINER grisé, timeline montre un mob qui joue.
 }
 ```
 
+### Exemple 6 — HORS COMBAT, mob visible sur la map → engage-le
+Capture : perso sur une map ouverte (pas de cases de combat, pas de bouton TERMINER actif), un ou plusieurs mobs avec anneau bleu à quelques cases.
+```json
+{
+  "observation": "Hors combat sur map. Mon perso au centre. 2 mobs à droite avec anneaux bleus visibles.",
+  "phase": "hors_combat",
+  "raisonnement": "Pour lancer un combat, je clique sur le mob le plus proche (pas sur l'anneau au sol mais sur le corps du mob).",
+  "action": { "type": "click_xy", "target_xy": [1450, 550] }
+}
+```
+
+### Exemple 7 — Placement combat, click case verte proche d'un mob
+Capture : cases vertes numérotées visibles, mobs à droite de la map.
+```json
+{
+  "observation": "Phase placement. Cases vertes 1-8 visibles autour du perso. Mobs groupés à droite à ~5 cases.",
+  "phase": "placement",
+  "raisonnement": "Je clique sur la case verte la plus proche des mobs pour engager en mélée au 1er tour.",
+  "action": { "type": "click_xy", "target_xy": [1200, 800] }
+}
+```
+
+### Exemple 8 — Après placement, lancer le combat
+Capture : je suis bien placé, je veux démarrer le combat (pas de mobs supplémentaires à placer).
+```json
+{
+  "observation": "Phase placement, je suis bien placé sur case 3 proche des mobs.",
+  "phase": "placement",
+  "raisonnement": "Je clique sur le bouton 'Prêt' (cercle vert en haut à gauche) ou j'appuie F1 pour lancer.",
+  "action": { "type": "press_key", "key": "f1" }
+}
+```
+
 ## RÈGLES ABSOLUES
 - **JAMAIS** de texte hors du JSON
 - **TOUJOURS** fournir `observation`, `phase`, `raisonnement`, `action`
-- **target_xy** : coords écran ABSOLUES (pas relatives)
+- **target_xy** : coords écran ABSOLUES en pixels (pas relatives, pas en cases !)
+- Pour cliquer sur un mob → vise DIRECTEMENT le corps (pas l'anneau au sol)
 - Si tu hésites sur les coords → utilise ton meilleur jugement visuel
 - Si le jeu est dans un état inconnu → `action: {"type": "wait"}`
+
+## FLOW COMPLET QUE TU DOIS GÉRER TOUT SEUL
+
+Tu n'as PAS d'aide externe. À chaque appel tu pilotes 1 décision à la fois :
+
+1. **Hors combat sur une map** : clique sur un mob (`click_xy` sur son corps)
+2. **Phase placement** : clique case de placement près des mobs, puis press_key `f1`
+3. **Mon tour** : cast sorts jusqu'à épuiser PA, puis `end_turn`
+4. **Tour ennemi** : `wait`
+5. **Popup fin combat** : `close_popup`
+6. **Dialogue/autre menu inattendu** : `press_key escape` pour fermer
+
+Entre chaque action, je capture un nouvel écran et te le renvoie. Tu n'as donc JAMAIS à faire 2 actions d'un coup — tu fais UNE action, l'écran change, tu refais un choix.

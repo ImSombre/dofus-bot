@@ -1940,10 +1940,11 @@ class SimpleDashboardWidget(QWidget):
         self._combat_worker = worker
         worker.start()
 
-        # Si mode Aggro : lance aussi le HuntWorker qui scanne les mobs en world
-        # et les engage. Les 2 workers sont disjoints par construction :
-        # HuntWorker agit quand hors combat, CombatRunnerWorker quand en combat.
-        if self._chk_aggro_mode.isChecked():
+        # HuntWorker (scan + engage) : UNIQUEMENT en mode heuristique (pas Vision IA).
+        # En Vision IA, le LLM gère tout le cycle : scan mob → engage → combat → rinse.
+        # Lancer les 2 en parallèle crée des conflits (HuntWorker re-engage pendant un tour).
+        is_vision_ai = self._chk_combat_vision.isChecked()
+        if self._chk_aggro_mode.isChecked() and not is_vision_ai:
             from src.services.hunt_worker import HuntConfig, HuntWorker  # noqa: PLC0415
             hunt_cfg = HuntConfig()
             hunt = HuntWorker(
@@ -1954,7 +1955,13 @@ class SimpleDashboardWidget(QWidget):
             hunt.stopped.connect(self._on_hunt_stopped)
             self._hunt_worker = hunt
             hunt.start()
-            self._on_farm_log("🏹 Mode Aggro activé : le bot va scanner + engager les mobs", "info")
+            self._on_farm_log("🏹 Mode Aggro (heuristique) : scan + engage via HSV", "info")
+        elif self._chk_aggro_mode.isChecked() and is_vision_ai:
+            self._on_farm_log(
+                "🏹 Mode Aggro via IA Vision : le LLM scanne et engage directement "
+                "(pas de HuntWorker en parallèle)",
+                "info",
+            )
 
         self._go_to(3)
         self._log_lines.clear()
