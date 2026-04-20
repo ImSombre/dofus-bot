@@ -44,9 +44,13 @@ class VisionCombatConfig:
     llm_model: str = "gemini-flash-latest"  # alias toujours pointé vers la version stable
     llm_url: str = ""                    # override optionnel (défaut : selon provider)
     llm_api_key: str = ""                # clé API Gemini (obligatoire pour provider=gemini)
-    scan_interval_sec: float = 1.5
-    post_action_delay_sec: float = 2.0    # animation Dofus + re-observation
-    key_to_click_delay_sec: float = 0.45
+    # Timings optimisés pour vitesse (v0.1.8) :
+    #   - scan 0.3s entre cycles (avant 1.5s = 80% de temps perdu)
+    #   - post_action 1.0s (avant 2.0s ; animation sort < 1s en général)
+    #   - key_to_click 0.25s (avant 0.45s)
+    scan_interval_sec: float = 0.3
+    post_action_delay_sec: float = 1.0
+    key_to_click_delay_sec: float = 0.25
     starting_pa: int = 6
     starting_pm: int = 3
     max_actions_per_turn: int = 6
