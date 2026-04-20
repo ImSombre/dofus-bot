@@ -65,31 +65,31 @@ $installTxt = @"
    Dofus Bot - Installation (Windows)
 ========================================
 
-INSTALLATION 100% AUTOMATIQUE - Tu n'as RIEN a faire manuellement.
+INSTALLATION EN 2 ETAPES - AUCUNE COMMANDE A TAPER
 
 1. Dezippe tout le contenu de ce zip dans un dossier stable
    (ex: C:\DofusBot\).
 
-2. Lance Dofus 2.64 en mode fenetre ou plein ecran.
+2. DOUBLE-CLIC sur INSTALLER.bat (a la racine).
 
-3. Clic droit sur scripts\install.ps1 -> 'Executer avec PowerShell'
+   Windows va demander les droits admin (fenetre UAC bleue).
+   Clique "Oui".
 
-   (Si Windows bloque : ouvre PowerShell en admin et tape
-    Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
-    puis relance le script.)
+C'est tout. Le script fait le reste :
+   - Installe Python 3.12 si besoin
+   - Installe Tesseract OCR
+   - Installe LM Studio + Ollama en arriere-plan
+   - Cree le venv + les dependances
+   - Cree des raccourcis Bureau et Menu Demarrer
+   - LANCE le bot automatiquement a la fin
 
-Le script va faire TOUT tout seul :
-   - Installer Python 3.12 si besoin (3.11-3.13 OK, 3.14 PAS supporte)
-   - Installer Tesseract OCR + packs fra/eng
-   - Creer le venv et installer les dependances Python
-   - Installer Ollama silencieusement en arriere-plan (IA combat, optionnel)
-   - Telecharger le modele phi3:mini en fond (~2.3 GB)
-   - Creer un raccourci 'Dofus Bot' sur le Bureau
-   - LANCER le bot automatiquement a la fin
+Apres l'install, pour relancer le bot :
+   - Double-clic sur "Dofus Bot" sur ton Bureau
+   - OU tape "Dofus Bot" dans la recherche Windows
 
-4. Le bot s'ouvre. Choisis ton metier / classe / options et clique Demarrer.
-
-F1 = arret d'urgence a tout moment.
+Raccourcis en jeu :
+   - F1 = arret d'urgence
+   - Echap = fermer popup
 
 En cas de probleme, consulte docs\DEPLOYMENT.md.
 "@
