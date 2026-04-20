@@ -232,6 +232,36 @@ class VisionCombatWorker(QThread):
         self.state_changed.emit("stopped")
         self.stopped.emit()
 
+    def _ensure_dofus_focus(self) -> None:
+        """Active la fenêtre Dofus AVANT chaque action pour que keys/clics arrivent bien.
+
+        Sans ça, press_key('2') envoie la touche à la fenêtre active (PowerShell, IDE...)
+        au lieu de Dofus → le sort n'est jamais lancé.
+        """
+        try:
+            import pygetwindow as gw  # noqa: PLC0415
+        except ImportError:
+            return
+        title_substring = (self._config.dofus_window_title or "dofus").lower()
+        try:
+            for w in gw.getAllWindows():
+                if not w.title:
+                    continue
+                if title_substring in w.title.lower():
+                    if not w.isActive:
+                        try:
+                            w.activate()
+                        except Exception:
+                            # Windows parfois refuse activate → minimize/restore
+                            try:
+                                w.minimize()
+                                w.restore()
+                            except Exception:
+                                pass
+                    return
+        except Exception:
+            pass
+
     def _tick(self) -> None:
         """Un cycle : capture → LLM → action."""
         try:
@@ -320,6 +350,12 @@ class VisionCombatWorker(QThread):
     def _execute_action(self, action: dict, phase: str) -> None:
         atype = str(action.get("type", "")).lower()
         self.state_changed.emit("playing")
+
+        # Active la fenêtre Dofus avant TOUTE action (sinon keys/clics partent ailleurs)
+        if atype in ("cast_spell", "spell", "click_xy", "press_key", "end_turn", "close_popup"):
+            self._ensure_dofus_focus()
+            # Court délai pour laisser Windows prendre le focus
+            self.msleep(80)
 
         if atype in ("cast_spell", "spell"):
             key = action.get("spell_key") or action.get("key")
