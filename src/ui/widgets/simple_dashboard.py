@@ -430,6 +430,13 @@ class SimpleDashboardWidget(QWidget):
         # Populate status badges after widget tree is built
         QTimer.singleShot(0, self._update_home_status_badges)
 
+        # Check périodique des MAJ (toutes les 5 min tant que le bot tourne)
+        # Si une maj est détectée ET qu'aucun combat n'est actif, elle s'installe auto.
+        self._update_check_timer = QTimer(self)
+        self._update_check_timer.setInterval(5 * 60 * 1000)  # 5 minutes
+        self._update_check_timer.timeout.connect(self._periodic_update_check)
+        self._update_check_timer.start()
+
         return page
 
     def _update_home_status_badges(self) -> None:
@@ -504,23 +511,113 @@ class SimpleDashboardWidget(QWidget):
             if info is None or not info.has_update:
                 return  # reste sur "A jour"
             self._latest_update_info = info
-            html = (
-                f"<span style='background:#2a1f0a; color:#ffa726; border-radius:4px;"
-                f" padding:2px 10px; border:1px solid #5a3a10; font-weight: 600;'>"
-                f" Maj dispo v{info.latest_version} — clique pour installer</span>"
+            # Auto-install au démarrage si pas de combat actif
+            no_combat = (
+                self._combat_worker is None
+                and self._farm_worker is None
+                and self._hunt_worker is None
             )
-            self._badge_update.setText(html)
-            # Permet le clic pour installer
-            try:
-                self._badge_update.mousePressEvent = lambda e: self._install_update_from_home()  # type: ignore
-                from PyQt6.QtCore import Qt  # noqa: PLC0415
-                self._badge_update.setCursor(Qt.CursorShape.PointingHandCursor)
-            except Exception:
-                pass
+            if no_combat:
+                # Installation automatique (sans confirmation) — le bot redémarrera seul
+                self._auto_install_update(info)
+            else:
+                # En combat : affiche juste le badge (installation à la fin du combat)
+                html = (
+                    f"<span style='background:#2a1f0a; color:#ffa726; border-radius:4px;"
+                    f" padding:2px 10px; border:1px solid #5a3a10; font-weight: 600;'>"
+                    f" Maj v{info.latest_version} — installation apres ce combat</span>"
+                )
+                self._badge_update.setText(html)
+                try:
+                    self._badge_update.mousePressEvent = lambda e: self._install_update_from_home()  # type: ignore
+                    from PyQt6.QtCore import Qt  # noqa: PLC0415
+                    self._badge_update.setCursor(Qt.CursorShape.PointingHandCursor)
+                except Exception:
+                    pass
 
         job = _UpdCheckJob()
         job.sig.done.connect(_on_update_checked)
         QThreadPool.globalInstance().start(job)
+
+    def _periodic_update_check(self) -> None:
+        """Check périodique des MAJ (appelé toutes les 5 min par QTimer).
+
+        Si nouvelle version disponible ET aucun combat actif :
+          - télécharge auto
+          - applique auto
+          - relance le bot auto
+        Si un combat est en cours : attend la prochaine itération.
+        """
+        # Skip si un combat est actif (on ne veut pas couper un combat en cours)
+        if self._combat_worker is not None or self._farm_worker is not None or self._hunt_worker is not None:
+            return
+
+        from PyQt6.QtCore import QThreadPool, QRunnable, QObject  # noqa: PLC0415
+        from PyQt6.QtCore import pyqtSignal as _Sig  # noqa: PLC0415
+
+        class _UpdSig(QObject):
+            done = _Sig(object)
+
+        class _UpdJob(QRunnable):
+            def __init__(self_j) -> None:
+                super().__init__()
+                self_j.sig = _UpdSig()
+
+            def run(self_j) -> None:
+                try:
+                    from src.services.auto_updater import check_for_update  # noqa: PLC0415
+                    info = check_for_update()
+                    self_j.sig.done.emit(info)
+                except Exception:
+                    self_j.sig.done.emit(None)
+
+        def _on_checked(info) -> None:
+            if info is None or not info.has_update:
+                return
+            # Une maj est dispo ET on n'est pas en combat → install auto
+            self._latest_update_info = info
+            self._auto_install_update(info)
+
+        job = _UpdJob()
+        job.sig.done.connect(_on_checked)
+        QThreadPool.globalInstance().start(job)
+
+    def _auto_install_update(self, info) -> None:
+        """Télécharge + installe la maj + redémarre le bot, sans confirmation."""
+        logger.info("Auto-update : téléchargement v{}", info.latest_version)
+        try:
+            self._badge_update.setText(
+                f"<span style='background:#1a2030; color:#4fc3f7; border-radius:4px;"
+                f" padding:2px 10px; border:1px solid #2a3a50; font-weight: 600;'>"
+                f" Telechargement v{info.latest_version}...</span>"
+            )
+        except Exception:
+            pass
+
+        from src.services.auto_updater import download_and_apply_update, restart_bot  # noqa: PLC0415
+        ok, msg = download_and_apply_update(info, auto_restart=False)
+        if ok:
+            logger.info("Auto-update : {} — redémarrage", msg)
+            try:
+                self._badge_update.setText(
+                    f"<span style='background:#1a2a1a; color:#66bb6a; border-radius:4px;"
+                    f" padding:2px 10px; border:1px solid #2a4a2a;'>"
+                    f" v{info.latest_version} installee, redemarrage auto...</span>"
+                )
+            except Exception:
+                pass
+            # Court délai pour que l'utilisateur voie le badge puis redémarre
+            QTimer.singleShot(1500, lambda: restart_bot())
+        else:
+            logger.warning("Auto-update échoué : {}", msg)
+            try:
+                self._badge_update.setText(
+                    f"<span style='background:#2a1f0a; color:#ffa726; border-radius:4px;"
+                    f" padding:2px 10px; border:1px solid #5a3a10;'>"
+                    f" Maj v{info.latest_version} echouee (clique pour reessayer)</span>"
+                )
+            except Exception:
+                pass
 
     def _install_update_from_home(self) -> None:
         """Télécharge et applique la mise à jour affichée dans le badge."""
