@@ -546,18 +546,31 @@ class SimpleDashboardWidget(QWidget):
             " padding:2px 10px; border:1px solid #2a3a50;'>"
             " Téléchargement...</span>"
         )
-        ok, msg = download_and_apply_update(info)
+        # Télécharge ET applique SANS redémarrer tout de suite, on veut afficher le msg
+        ok, msg = download_and_apply_update(info, auto_restart=False)
         if ok:
+            # Montre confirmation courte puis relance auto
             QMessageBox.information(
                 self,
-                "Mise à jour appliquée",
-                f"{msg}\n\nFerme et relance le bot pour activer la nouvelle version.",
+                "Mise à jour appliquée ✓",
+                f"{msg}\n\nLe bot va redémarrer automatiquement dans 2 secondes.",
             )
             self._badge_update.setText(
                 f"<span style='background:#1a2a1a; color:#66bb6a; border-radius:4px;"
                 f" padding:2px 10px; border:1px solid #2a4a2a;'>"
-                f" v{info.latest_version} installee — redemarre</span>"
+                f" v{info.latest_version} OK — redémarrage...</span>"
             )
+            # Lance le redémarrage (tue le processus actuel)
+            try:
+                from src.services.auto_updater import restart_bot  # noqa: PLC0415
+                restart_bot()
+            except Exception as exc:
+                QMessageBox.warning(
+                    self,
+                    "Redémarrage manuel requis",
+                    f"Impossible de redémarrer auto : {exc}\n"
+                    f"Ferme le bot et relance-le manuellement.",
+                )
         else:
             QMessageBox.warning(self, "Mise à jour échouée", msg)
             self._update_home_status_badges()

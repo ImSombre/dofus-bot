@@ -42,14 +42,23 @@ Tous les champs `action.*` sauf `type` sont optionnels selon le type.
 - **Zone de portée d'un sort** : halo bleu translucide sur plusieurs cases autour du perso quand un sort est sélectionné
 
 ### Phases à reconnaître impérativement
+
+⚠️ **SERVEUR RETROZIA : IL N'Y A PAS DE PHASE PLACEMENT**.
+Quand tu engages un mob, le combat commence **directement en phase `mon_tour`**.
+
+**RÈGLE D'OR POUR RETROZIA** :
+- Si tu vois un **perso (anneau rouge) + mobs (anneaux bleus) dans la même scène** = combat actif
+- Les **cases vertes numérotées 1-2-3…** que tu vois pendant le combat sont les **cases de déplacement (PM)** — pas du placement !
+- Donc : **jamais de phase `placement`**, jamais de `press_key f1`
+- Soit tu es en `mon_tour` (bouton TERMINER LE TOUR visible en bas-droite) soit en `tour_ennemi`
+
 | Phase | Indicateur visuel |
 |-------|-------------------|
-| `placement` | Cases vertes numérotées 1-8 visibles, timeline vide ou naissante |
-| `mon_tour` | Bouton TERMINER jaune-vif + timeline avec MON portrait en 1er |
-| `tour_ennemi` | Bouton TERMINER grisé + portrait ennemi en cours sur timeline |
+| `mon_tour` | Bouton "TERMINER LE TOUR" visible en bas-droite + cases vertes (PM) autour du perso |
+| `tour_ennemi` | Bouton TERMINER grisé ou disparu + portrait ennemi qui s'anime |
 | `popup_victoire` | Fenêtre modale au centre avec "Vous avez vaincu" ou liste butin |
 | `popup_defaite` | Fenêtre "Vous avez perdu" |
-| `hors_combat` | Pas de timeline, pas de bouton TERMINER vif, minimap visible |
+| `hors_combat` | Perso tout seul sur la map, pas de bouton TERMINER, minimap visible, mouvements libres |
 | `dialogue` | Fenêtre de PNJ avec options de texte |
 
 ## RÈGLES DOFUS 2.64 IMPORTANTES
@@ -88,14 +97,14 @@ L'écran fait environ {width}x{height} pixels. (0,0) = haut-gauche, x→droite, 
 
 ## EXEMPLES DE DÉCISIONS ATTENDUES
 
-### Exemple 1 — Début de combat, phase placement
-Capture : cases vertes 1-8 visibles, perso avec cercle rouge sur case 1, mobs sur cases vertes ennemies au loin.
+### Exemple 1 — Début de combat (pas de placement sur Retrozia, tu joues direct)
+Capture : cases vertes numérotées 1-2-3 visibles autour du perso, mobs (anneaux bleus) à quelques cases, bouton TERMINER LE TOUR visible en bas-droite.
 ```json
 {
-  "observation": "Phase placement : cases vertes numérotées autour du perso, ennemis à 5-7 cases sur la droite",
-  "phase": "placement",
-  "raisonnement": "Je veux être proche pour engager mélée. Je reste case 1 et lance le combat via F1 ou le bouton Prêt.",
-  "action": { "type": "press_key", "key": "f1" }
+  "observation": "C'est mon tour. Cases de déplacement vertes autour. 3 mobs à droite, dont 1 à 2 cases de moi.",
+  "phase": "mon_tour",
+  "raisonnement": "Je cast un sort offensif sur le mob le plus proche (touche X pour le sort configuré).",
+  "action": { "type": "cast_spell", "spell_key": 1, "target_xy": [1400, 580] }
 }
 ```
 
@@ -154,27 +163,18 @@ Capture : perso sur une map ouverte (pas de cases de combat, pas de bouton TERMI
 }
 ```
 
-### Exemple 7 — Placement combat, click case verte proche d'un mob
-Capture : cases vertes numérotées visibles, mobs à droite de la map.
+### Exemple 7 — Mon tour, dépl PM puis cast (cases vertes = mouvement, pas placement)
+Capture : cases vertes numérotées visibles, mob à 5 cases.
 ```json
 {
-  "observation": "Phase placement. Cases vertes 1-8 visibles autour du perso. Mobs groupés à droite à ~5 cases.",
-  "phase": "placement",
-  "raisonnement": "Je clique sur la case verte la plus proche des mobs pour engager en mélée au 1er tour.",
-  "action": { "type": "click_xy", "target_xy": [1200, 800] }
+  "observation": "Mon tour. J'ai 3-5 PM (cases vertes autour), mob à 5 cases à droite. Je dois m'approcher avant de caster mélée.",
+  "phase": "mon_tour",
+  "raisonnement": "Je clique sur la case verte la plus proche du mob pour me déplacer (ça consomme mes PM).",
+  "action": { "type": "click_xy", "target_xy": [1200, 600] }
 }
 ```
 
-### Exemple 8 — Après placement, lancer le combat
-Capture : je suis bien placé, je veux démarrer le combat (pas de mobs supplémentaires à placer).
-```json
-{
-  "observation": "Phase placement, je suis bien placé sur case 3 proche des mobs.",
-  "phase": "placement",
-  "raisonnement": "Je clique sur le bouton 'Prêt' (cercle vert en haut à gauche) ou j'appuie F1 pour lancer.",
-  "action": { "type": "press_key", "key": "f1" }
-}
-```
+⚠️ **Ne JAMAIS utiliser `press_key f1` sur Retrozia** — ça ne fait rien. Sur ce serveur, le combat commence **directement en phase mon_tour**. Pas de bouton "Prêt" à cliquer au début du combat.
 
 ## RÈGLES ABSOLUES
 - **JAMAIS** de texte hors du JSON

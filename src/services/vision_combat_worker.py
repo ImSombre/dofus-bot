@@ -132,8 +132,12 @@ class VisionCombatWorker(QThread):
         self._system_prompt: str = ""
         self._debug_dir = Path("data/vision_debug")
         self._consecutive_errors = 0
-        self._max_consecutive_errors = 5  # stop auto après N erreurs
-        self._latencies: list[float] = []  # rolling pour latence moyenne
+        self._max_consecutive_errors = 5
+        self._latencies: list[float] = []
+        # Anti-boucle : détecte si le LLM répète la même action sans changement
+        self._last_action_key: str = ""
+        self._same_action_count: int = 0
+        self._last_phase: str = ""
 
     def request_stop(self) -> None:
         self._stop_requested = True

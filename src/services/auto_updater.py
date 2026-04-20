@@ -155,14 +155,58 @@ def check_for_update(repo: str | None = None) -> UpdateInfo:
     )
 
 
+def restart_bot(project_root: Path | None = None) -> None:
+    """Relance le bot via pythonw.exe et ferme le processus actuel.
+
+    Appelé après une mise à jour pour redémarrer automatiquement.
+    """
+    import subprocess  # noqa: PLC0415
+    import sys  # noqa: PLC0415
+
+    if project_root is None:
+        project_root = Path(__file__).resolve().parent.parent.parent
+
+    pythonw = project_root / ".venv" / "Scripts" / "pythonw.exe"
+    if not pythonw.exists():
+        # Fallback : utilise le python courant
+        pythonw = Path(sys.executable)
+
+    try:
+        # DETACHED_PROCESS (0x08000000) : détache le nouveau processus, pas d'héritage
+        DETACHED_PROCESS = 0x00000008
+        subprocess.Popen(
+            [str(pythonw), "-m", "src.main"],
+            cwd=str(project_root),
+            creationflags=DETACHED_PROCESS if sys.platform == "win32" else 0,
+            close_fds=True,
+        )
+        logger.info("Nouveau processus bot lancé — fermeture du processus actuel")
+    except Exception as exc:
+        logger.error("Impossible de redémarrer : {}", exc)
+        return
+
+    # Ferme le processus actuel après un court délai pour laisser le temps
+    # au nouveau processus de démarrer
+    import threading  # noqa: PLC0415
+
+    def _delayed_exit():
+        import time  # noqa: PLC0415
+        time.sleep(1.5)
+        os._exit(0)   # hard exit, skip Qt cleanup
+
+    threading.Thread(target=_delayed_exit, daemon=True).start()
+
+
 def download_and_apply_update(
     info: UpdateInfo,
     project_root: Path | None = None,
     progress_cb=None,
+    auto_restart: bool = False,
 ) -> tuple[bool, str]:
     """Télécharge le zip et remplace les fichiers du projet.
 
     Préserve les fichiers listés dans PRESERVE_PATHS.
+    Si auto_restart=True, relance le bot automatiquement après succès.
     Retourne (success, message).
     """
     if not info.has_update or not info.zip_url:
@@ -254,6 +298,9 @@ def download_and_apply_update(
     except Exception:
         pass
 
+    if auto_restart:
+        restart_bot(project_root)
+        return True, f"Mis à jour vers v{info.latest_version}. Redémarrage en cours..."
     return True, f"Mis à jour vers v{info.latest_version}. Redémarre le bot."
 
 
