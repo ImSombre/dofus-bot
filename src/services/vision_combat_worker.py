@@ -232,6 +232,31 @@ class VisionCombatWorker(QThread):
         self.state_changed.emit("stopped")
         self.stopped.emit()
 
+    @staticmethod
+    def _scale_action_coords(action: dict, img_scale: float) -> dict:
+        """Convertit les coords LLM (dans l'espace de l'image envoyée) en coords écran.
+
+        `img_scale` = ratio de redimensionnement (ex: 0.5 si image 1280 / écran 2560).
+        Pour retrouver pixels écran : coord_écran = coord_llm / img_scale.
+
+        Retourne une copie du dict avec `target_xy` mise à l'échelle.
+        """
+        if img_scale == 1.0 or img_scale == 0:
+            return action
+        out = dict(action)
+        xy = out.get("target_xy") or out.get("xy")
+        if xy and len(xy) == 2:
+            try:
+                x = int(round(xy[0] / img_scale))
+                y = int(round(xy[1] / img_scale))
+                if "target_xy" in out:
+                    out["target_xy"] = [x, y]
+                elif "xy" in out:
+                    out["xy"] = [x, y]
+            except (TypeError, ValueError):
+                pass
+        return out
+
     def _ensure_dofus_focus(self) -> None:
         """Active la fenêtre Dofus AVANT chaque action pour que keys/clics arrivent bien.
 
@@ -319,6 +344,20 @@ class VisionCombatWorker(QThread):
         reasoning = decision.get("raisonnement") or decision.get("reasoning", "")
         action = decision.get("action", {}) or {}
 
+        # Scale factor de l'image envoyée au LLM.
+        # Si le LLM a vu une image 1280×720 mais l'écran fait 2560×1440, scale=0.5.
+        # On doit diviser les coords LLM par ce scale pour retrouver les pixels écran.
+        img_scale = float(decision.get("_image_scale", 1.0)) or 1.0
+        if action and img_scale != 1.0:
+            scaled = self._scale_action_coords(action, img_scale)
+            if scaled != action:
+                self.log_event.emit(
+                    f"   📐 Scale {img_scale:.2f} : coords LLM {action.get('target_xy')} "
+                    f"→ écran {scaled.get('target_xy')}",
+                    "info",
+                )
+                action = scaled
+
         self.log_event.emit(
             f"🧠 [{elapsed:.1f}s] phase={phase} | 👁 {observation[:80]}",
             "info",
@@ -343,6 +382,9 @@ class VisionCombatWorker(QThread):
             f"Observe attentivement l'image (phase de jeu, position de mon perso à l'anneau rouge, "
             f"position des ennemis à l'anneau bleu, état des boutons UI, popups éventuels) "
             f"puis décide UNE action à exécuter MAINTENANT.\n\n"
+            f"**IMPORTANT — COORDONNÉES** : donne `target_xy` en pixels DANS L'IMAGE QUE TU REÇOIS. "
+            f"Mon code se charge de convertir en pixels écran automatiquement. "
+            f"Ne te pose pas de question sur la résolution de mon écran, vise juste dans l'image que tu vois.\n\n"
             f"Rappel : réponds UNIQUEMENT en JSON valide avec les champs "
             f"observation/phase/raisonnement/action. Aucun texte avant ou après."
         )

@@ -46,6 +46,12 @@ class LLMResponse:
     text: str = ""
     error: str = ""
     latency_ms: float = 0.0
+    # Scale factor appliqué à l'image envoyée au LLM.
+    # Ex: si écran 2560×1440 et image envoyée à 1280×720 → image_scale = 0.5
+    # Pour retrouver les coords écran : coord_ecran = coord_llm / image_scale
+    image_scale: float = 1.0
+    image_width: int = 0
+    image_height: int = 0
 
 
 class LLMClient:
@@ -168,12 +174,28 @@ class LLMClient:
         image_bgr=None,
         fallback: dict | None = None,
     ) -> dict:
-        """Extrait un JSON de la réponse."""
+        """Extrait un JSON de la réponse. Injecte `_image_scale` si image fournie.
+
+        Le dict retourné contient des métadonnées techniques (clés commençant par `_`) :
+          - `_image_scale` : facteur de redimensionnement appliqué à l'image (1.0 si pas)
+          - `_image_width`, `_image_height` : taille réelle envoyée au LLM
+        Le caller peut diviser ses coords par `_image_scale` pour retrouver les pixels écran.
+        """
         response = self.ask(user_prompt, system=system, image_bgr=image_bgr)
         if not response.success:
             logger.warning("LLM ask échec : {}", response.error)
-            return fallback or {}
-        return self._extract_json(response.text) or (fallback or {})
+            out = dict(fallback or {})
+            out["_image_scale"] = response.image_scale
+            out["_image_width"] = response.image_width
+            out["_image_height"] = response.image_height
+            return out
+        parsed = self._extract_json(response.text)
+        if parsed is None:
+            parsed = dict(fallback or {})
+        parsed["_image_scale"] = response.image_scale
+        parsed["_image_width"] = response.image_width
+        parsed["_image_height"] = response.image_height
+        return parsed
 
     # ---------- Internals ----------
 
@@ -195,8 +217,9 @@ class LLMClient:
         }
         if system:
             payload["system"] = system
+        scale, img_w, img_h = 1.0, 0, 0
         if image_bgr is not None:
-            b64 = self._encode_image_b64(image_bgr)
+            b64, scale, img_w, img_h = self._encode_image_b64(image_bgr)
             if b64:
                 payload["images"] = [b64]
 
@@ -209,9 +232,13 @@ class LLMClient:
             return LLMResponse(
                 success=False,
                 error=f"HTTP {r.status_code}: {r.text[:200]}",
+                image_scale=scale, image_width=img_w, image_height=img_h,
             )
         data = r.json()
-        return LLMResponse(success=True, text=data.get("response", "").strip())
+        return LLMResponse(
+            success=True, text=data.get("response", "").strip(),
+            image_scale=scale, image_width=img_w, image_height=img_h,
+        )
 
     def _ask_openai(
         self,
@@ -226,10 +253,10 @@ class LLMClient:
         if system:
             messages.append({"role": "system", "content": system})
 
+        scale, img_w, img_h = 1.0, 0, 0
         if image_bgr is not None:
-            b64 = self._encode_image_b64(image_bgr)
+            b64, scale, img_w, img_h = self._encode_image_b64(image_bgr)
             if b64:
-                # Format OpenAI vision (multipart content)
                 messages.append({
                     "role": "user",
                     "content": [
@@ -262,13 +289,20 @@ class LLMClient:
             return LLMResponse(
                 success=False,
                 error=f"HTTP {r.status_code}: {r.text[:200]}",
+                image_scale=scale, image_width=img_w, image_height=img_h,
             )
         data = r.json()
         choices = data.get("choices", [])
         if not choices:
-            return LLMResponse(success=False, error="Pas de réponse")
+            return LLMResponse(
+                success=False, error="Pas de réponse",
+                image_scale=scale, image_width=img_w, image_height=img_h,
+            )
         text = choices[0].get("message", {}).get("content", "").strip()
-        return LLMResponse(success=True, text=text)
+        return LLMResponse(
+            success=True, text=text,
+            image_scale=scale, image_width=img_w, image_height=img_h,
+        )
 
     # Liste des modèles Gemini à essayer en fallback si le primaire est surchargé (503)
     # ou timeout. Ordre : plus récent/rapide → plus stable → moins sollicité.
@@ -303,8 +337,9 @@ class LLMClient:
 
         # Structure des "parts" : texte + image(s)
         parts: list[dict] = []
+        img_scale, img_w, img_h = 1.0, 0, 0
         if image_bgr is not None:
-            b64 = self._encode_image_b64(image_bgr)
+            b64, img_scale, img_w, img_h = self._encode_image_b64(image_bgr)
             if b64:
                 parts.append({
                     "inline_data": {
@@ -389,7 +424,10 @@ class LLMClient:
                         )
                     if model != self.model:
                         logger.info("Gemini fallback réussi sur '{}' (demandé : {})", model, self.model)
-                    return LLMResponse(success=True, text=text)
+                    return LLMResponse(
+                        success=True, text=text,
+                        image_scale=img_scale, image_width=img_w, image_height=img_h,
+                    )
 
                 # HTTP != 200
                 if r.status_code in (503, 429):
@@ -408,28 +446,46 @@ class LLMClient:
                     logger.warning("Gemini HTTP {} sur {} : {}", r.status_code, model, r.text[:200])
                     break
 
-        return LLMResponse(success=False, error=f"Tous les modèles ont échoué. Dernier : {last_error}")
+        return LLMResponse(
+            success=False, error=f"Tous les modèles ont échoué. Dernier : {last_error}",
+            image_scale=img_scale, image_width=img_w, image_height=img_h,
+        )
 
     @staticmethod
-    def _encode_image_b64(img_bgr, max_side: int = 1280, quality: int = 75) -> str | None:
+    def _encode_image_b64(
+        img_bgr,
+        max_side: int = 2048,
+        quality: int = 80,
+    ) -> tuple[str | None, float, int, int]:
+        """Encode une image BGR en JPEG base64, en traçant le scale factor.
+
+        Retourne (b64_string, scale, final_width, final_height).
+        Si on ne peut pas encoder, retourne (None, 1.0, 0, 0).
+
+        `scale` = ratio appliqué (ex: 0.5 si on a divisé par 2).
+        Pour retrouver les coords écran : coord_ecran = coord_image / scale.
+        """
         if not _HAS_CV2 or img_bgr is None:
-            return None
+            return (None, 1.0, 0, 0)
         try:
             h, w = img_bgr.shape[:2]
+            scale = 1.0
             if max(h, w) > max_side:
                 scale = max_side / max(h, w)
+                new_w = int(w * scale)
+                new_h = int(h * scale)
                 img_bgr = cv2.resize(
-                    img_bgr,
-                    (int(w * scale), int(h * scale)),
-                    interpolation=cv2.INTER_AREA,
+                    img_bgr, (new_w, new_h), interpolation=cv2.INTER_AREA,
                 )
+                h, w = new_h, new_w
             ok, buf = cv2.imencode(".jpg", img_bgr, [cv2.IMWRITE_JPEG_QUALITY, quality])
             if not ok:
-                return None
-            return base64.b64encode(buf.tobytes()).decode("ascii")
+                return (None, scale, 0, 0)
+            b64 = base64.b64encode(buf.tobytes()).decode("ascii")
+            return (b64, scale, w, h)
         except Exception as exc:
             logger.debug("encode image échec : {}", exc)
-            return None
+            return (None, 1.0, 0, 0)
 
     @staticmethod
     def _extract_json(text: str) -> dict | None:
