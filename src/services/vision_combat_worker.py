@@ -453,18 +453,36 @@ class VisionCombatWorker(QThread):
     }
 
     def _send_spell_hotkey(self, slot: str) -> bool:
-        """Presse la touche correspondant au slot 1-9 en gérant l'AZERTY.
+        """Presse la touche correspondant au slot 1-9.
 
-        Essaye dans l'ordre :
-          1. pyautogui.typewrite(char_azerty) — envoie le caractère Unicode (SendInput)
-          2. pyautogui.write(char_azerty)
-          3. press_key(char_azerty) — fallback direct
-          4. press_key(slot) — dernière option (scan code, peut marcher en AZERTY via Windows)
-        Retourne True si une tentative a abouti sans exception.
+        IMPORTANT : Dofus utilise DirectInput (jeu bas-niveau). Il n'attrape PAS
+        les événements SendInput Unicode (typewrite) — il n'attrape QUE les scan codes
+        hardware. Donc on utilise pydirectinput.press(chiffre) qui envoie le scan code
+        physique de la touche chiffre 1-9, et Windows + clavier AZERTY produisent
+        naturellement &éç… pour Dofus.
+
+        Ordre :
+          1. pydirectinput.press(slot) — scan code physique VK_1..VK_9 → DirectInput OK
+          2. ctypes SendInput scan code direct (fallback ultra bas-niveau)
+          3. typewrite AZERTY char — dernière chance (pas fiable pour Dofus)
         """
-        azerty = self._AZERTY_SLOT_KEYS.get(str(slot), str(slot))
+        # Tentative 1 : pydirectinput scan code (LE fix pour Dofus)
+        try:
+            import pydirectinput as _pdi  # noqa: PLC0415
+            _pdi.press(str(slot))
+            return True
+        except Exception as exc:
+            logger.debug("pydirectinput scan code échec ({}) : {}", slot, exc)
 
-        # Tentative 1 : typewrite via pyautogui (Unicode SendInput)
+        # Tentative 2 : ctypes SendInput avec scan code bas-niveau
+        try:
+            if self._send_raw_scancode(str(slot)):
+                return True
+        except Exception as exc:
+            logger.debug("ctypes SendInput échec : {}", exc)
+
+        # Tentative 3 : typewrite Unicode (ne marche pas pour Dofus DirectInput, mais on essaye)
+        azerty = self._AZERTY_SLOT_KEYS.get(str(slot), str(slot))
         try:
             import pyautogui as _pg  # noqa: PLC0415
             _pg.typewrite(azerty, interval=0)
@@ -472,19 +490,68 @@ class VisionCombatWorker(QThread):
         except Exception as exc:
             logger.debug("typewrite AZERTY échec ({}) : {}", azerty, exc)
 
-        # Tentative 2 : press_key classique avec le char AZERTY
-        try:
-            self._input.press_key(azerty)
-            return True
-        except Exception as exc:
-            logger.debug("press_key AZERTY échec ({}) : {}", azerty, exc)
+        return False
 
-        # Tentative 3 : press_key avec le chiffre (pydirectinput scan code)
+    @staticmethod
+    def _send_raw_scancode(digit: str) -> bool:
+        """Envoie le scan code hardware d'une touche chiffre via ctypes SendInput.
+
+        Les scan codes AZERTY/QWERTY sont les MÊMES pour la rangée du haut :
+          1 = 0x02, 2 = 0x03, 3 = 0x04, ..., 9 = 0x0A, 0 = 0x0B
+
+        Ça bypass complètement Windows/pyautogui/pydirectinput et envoie directement
+        au driver clavier — c'est le seul moyen garanti pour les jeux DirectInput stricts.
+        """
+        if not digit.isdigit():
+            return False
+        scan_codes = {
+            "1": 0x02, "2": 0x03, "3": 0x04, "4": 0x05, "5": 0x06,
+            "6": 0x07, "7": 0x08, "8": 0x09, "9": 0x0A, "0": 0x0B,
+        }
+        sc = scan_codes.get(digit)
+        if sc is None:
+            return False
         try:
-            self._input.press_key(str(slot))
+            import ctypes  # noqa: PLC0415
+            import time  # noqa: PLC0415
+
+            KEYEVENTF_KEYUP = 0x0002
+            KEYEVENTF_SCANCODE = 0x0008
+
+            extra = ctypes.c_ulong(0)
+
+            class KeyBdInput(ctypes.Structure):
+                _fields_ = [
+                    ("wVk", ctypes.c_ushort),
+                    ("wScan", ctypes.c_ushort),
+                    ("dwFlags", ctypes.c_ulong),
+                    ("time", ctypes.c_ulong),
+                    ("dwExtraInfo", ctypes.POINTER(ctypes.c_ulong)),
+                ]
+
+            class _InputI(ctypes.Union):
+                _fields_ = [("ki", KeyBdInput)]
+
+            class Input(ctypes.Structure):
+                _fields_ = [
+                    ("type", ctypes.c_ulong),
+                    ("ii", _InputI),
+                ]
+
+            def _send(flags: int) -> None:
+                ii = _InputI()
+                ii.ki = KeyBdInput(0, sc, flags, 0, ctypes.pointer(extra))
+                inp = Input(1, ii)   # INPUT_KEYBOARD = 1
+                ctypes.windll.user32.SendInput(1, ctypes.byref(inp), ctypes.sizeof(inp))
+
+            # Press
+            _send(KEYEVENTF_SCANCODE)
+            time.sleep(0.03)
+            # Release
+            _send(KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP)
             return True
         except Exception as exc:
-            logger.debug("press_key slot échec ({}) : {}", slot, exc)
+            logger.debug("Raw scan code échec : {}", exc)
             return False
 
     def _do_cast(self, key: str, xy: list) -> None:
