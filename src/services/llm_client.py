@@ -360,11 +360,17 @@ class LLMClient:
                 })
         content.append({"type": "text", "text": user_prompt})
 
+        # Prefill : on commence la réponse assistant par "{" pour forcer Claude
+        # à continuer en JSON. C'est la méthode officielle Anthropic pour garantir
+        # une sortie JSON (pas de responseMimeType comme Gemini).
         payload: dict = {
             "model": self.model,
             "max_tokens": max(self.max_tokens, 1024),
             "temperature": self.temperature,
-            "messages": [{"role": "user", "content": content}],
+            "messages": [
+                {"role": "user", "content": content},
+                {"role": "assistant", "content": "{"},
+            ],
         }
         if system:
             payload["system"] = system
@@ -409,6 +415,10 @@ class LLMClient:
                     if not text:
                         last_error = f"{model}: réponse vide"
                         break
+                    # Le prefill "{" n'est PAS répété dans la réponse : on le re-préfixe
+                    # pour que _extract_json trouve un JSON complet.
+                    if not text.startswith("{"):
+                        text = "{" + text
                     if model != self.model:
                         logger.info("Anthropic fallback réussi sur '{}' (demandé : {})", model, self.model)
                     return LLMResponse(
