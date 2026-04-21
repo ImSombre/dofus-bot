@@ -42,7 +42,9 @@ class VisionCombatConfig:
     spell_shortcuts: dict[int, str] = field(default_factory=dict)
     # Provider LLM : "ollama", "lmstudio", "gemini"
     llm_provider: str = "gemini"         # default : Gemini (cloud gratuit, pas de VRAM)
-    llm_model: str = "gemini-2.5-flash-lite"  # le plus rapide (v0.3.1 — ~2x flash-latest)
+    # flash (pas lite) : équilibre vitesse/raisonnement spatial. flash-lite confond
+    # trop les positions dans les combats Dofus (v0.3.3).
+    llm_model: str = "gemini-2.5-flash"
     llm_url: str = ""                    # override optionnel (défaut : selon provider)
     llm_api_key: str = ""                # clé API Gemini (obligatoire pour provider=gemini)
     # Timings optimisés pour vitesse (v0.3.1) :
@@ -152,6 +154,8 @@ class VisionCombatWorker(QThread):
         #   (slot, target_x, target_y)
         self._cast_history: list[tuple[str, int, int]] = []
         self._invalid_cast_streak: int = 0
+        # Compteur anti-boucle : combien de fois on a déjà override ce tour
+        self._stuck_overrides: int = 0
 
     def request_stop(self) -> None:
         self._stop_requested = True
@@ -449,10 +453,88 @@ class VisionCombatWorker(QThread):
         if reasoning:
             self.log_event.emit(f"   💭 {reasoning[:120]}", "info")
 
+        # Reset l'historique du tour si on revient en mon_tour depuis autre chose
+        # (nouveau tour Dofus = PA rechargés, cibles repositionnées).
+        if phase == "mon_tour" and self._last_phase and self._last_phase != "mon_tour":
+            self._cast_history.clear()
+            self._stuck_overrides = 0
+        self._last_phase = phase
+
+        # Override mécanique si le LLM re-cast sur une cible déjà visée (boucle).
+        action = self._override_if_stuck(action, snap)
+
         self._execute_action(action, phase)
 
         if self._config.save_debug_images:
             self._save_debug(frame, decision)
+
+    def _override_if_stuck(self, action: dict, snap) -> dict:
+        """Si le LLM re-propose un cast déjà effectué sur la même cible (±50px),
+        on l'override mécaniquement :
+          - 1er stuck → click_xy sur une case qui contourne (perpendiculaire à l'axe)
+          - 2e stuck → end_turn (pas d'angle viable)
+
+        Cette fonction garantit qu'on ne reste JAMAIS bloqué en boucle infinie,
+        même si le LLM ne comprend pas la ligne de vue.
+        """
+        atype = str(action.get("type", "")).lower()
+        if atype not in ("cast_spell", "spell"):
+            return action
+        if not self._cast_history:
+            return action
+
+        xy = action.get("target_xy") or action.get("target")
+        key = action.get("spell_key") or action.get("key")
+        if not xy or len(xy) != 2 or key is None:
+            return action
+        try:
+            tx, ty = int(xy[0]), int(xy[1])
+            slot = str(key)
+        except (TypeError, ValueError):
+            return action
+
+        # Cherche un cast identique dans l'historique (même slot ± 50px)
+        already = any(
+            s == slot and abs(hx - tx) <= 50 and abs(hy - ty) <= 50
+            for s, hx, hy in self._cast_history
+        )
+        if not already:
+            return action
+
+        self._stuck_overrides += 1
+
+        # 2e override du tour → end_turn sans appel
+        if self._stuck_overrides >= 2:
+            self.log_event.emit(
+                "🚨 Bot coincé 2x sur la même cible → FIN DE TOUR FORCÉE (LoS bloquée ou cible morte)",
+                "warn",
+            )
+            return {"type": "end_turn"}
+
+        # 1er override → calcule une case perpendiculaire pour contourner l'obstacle
+        perso_xy: tuple[int, int] | None = None
+        if snap is not None and snap.perso:
+            perso_xy = (snap.perso.x, snap.perso.y)
+        else:
+            # fallback : centre écran approx
+            perso_xy = (1280, 720)
+
+        dx, dy = tx - perso_xy[0], ty - perso_xy[1]
+        # Perpendiculaire (rotation 90°) normalisée × 2 cases (~120px)
+        length = max(1.0, (dx * dx + dy * dy) ** 0.5)
+        nx, ny = -dy / length, dx / length
+        OFFSET = 140  # ~2.3 cases Dofus
+        bypass_x = int(perso_xy[0] + nx * OFFSET + (dx / length) * 60)
+        bypass_y = int(perso_xy[1] + ny * OFFSET + (dy / length) * 60)
+        # Clamp à l'écran pour éviter clic hors zone
+        bypass_x = max(50, min(bypass_x, 2500))
+        bypass_y = max(50, min(bypass_y, 1400))
+
+        self.log_event.emit(
+            f"🚨 Override : re-cast sur ({tx},{ty}) détecté → je contourne vers ({bypass_x},{bypass_y})",
+            "warn",
+        )
+        return {"type": "click_xy", "target_xy": [bypass_x, bypass_y]}
 
     def _build_user_prompt(self, snap=None) -> str:
         shortcuts = ", ".join(
@@ -631,12 +713,14 @@ class VisionCombatWorker(QThread):
                 pass
             self._stats.actions_taken += 1
             self._cast_history.clear()
+            self._stuck_overrides = 0
 
         elif atype == "close_popup":
             self.log_event.emit("→ Ferme popup (Escape)", "info")
             self._input.press_key("escape")
             self._stats.actions_taken += 1
             self._cast_history.clear()
+            self._stuck_overrides = 0
 
         elif atype == "wait":
             self.log_event.emit("→ Attente", "info")
