@@ -445,16 +445,65 @@ class VisionCombatWorker(QThread):
         # Attend que l'animation se finisse avant le prochain tick
         self.msleep(int(self._config.post_action_delay_sec * 1000))
 
+    # Mapping des slots numériques 1-9 vers les touches AZERTY (rangée du haut sans Shift).
+    # Dofus utilise `&éçà…` comme raccourcis sur clavier AZERTY — presser "1"-"9" ne marche pas.
+    _AZERTY_SLOT_KEYS = {
+        "1": "&", "2": "é", "3": '"', "4": "'", "5": "(",
+        "6": "-", "7": "è", "8": "_", "9": "ç", "0": "à",
+    }
+
+    def _send_spell_hotkey(self, slot: str) -> bool:
+        """Presse la touche correspondant au slot 1-9 en gérant l'AZERTY.
+
+        Essaye dans l'ordre :
+          1. pyautogui.typewrite(char_azerty) — envoie le caractère Unicode (SendInput)
+          2. pyautogui.write(char_azerty)
+          3. press_key(char_azerty) — fallback direct
+          4. press_key(slot) — dernière option (scan code, peut marcher en AZERTY via Windows)
+        Retourne True si une tentative a abouti sans exception.
+        """
+        azerty = self._AZERTY_SLOT_KEYS.get(str(slot), str(slot))
+
+        # Tentative 1 : typewrite via pyautogui (Unicode SendInput)
+        try:
+            import pyautogui as _pg  # noqa: PLC0415
+            _pg.typewrite(azerty, interval=0)
+            return True
+        except Exception as exc:
+            logger.debug("typewrite AZERTY échec ({}) : {}", azerty, exc)
+
+        # Tentative 2 : press_key classique avec le char AZERTY
+        try:
+            self._input.press_key(azerty)
+            return True
+        except Exception as exc:
+            logger.debug("press_key AZERTY échec ({}) : {}", azerty, exc)
+
+        # Tentative 3 : press_key avec le chiffre (pydirectinput scan code)
+        try:
+            self._input.press_key(str(slot))
+            return True
+        except Exception as exc:
+            logger.debug("press_key slot échec ({}) : {}", slot, exc)
+            return False
+
     def _do_cast(self, key: str, xy: list) -> None:
-        """Presse la touche sort puis clique sur les coords LLM."""
+        """Presse la touche sort (AZERTY-aware) puis clique sur les coords LLM."""
         try:
             x, y = int(xy[0]), int(xy[1])
         except (ValueError, TypeError, IndexError):
             self.log_event.emit(f"⚠ target_xy invalide : {xy}", "warn")
             return
-        self.log_event.emit(f"→ Cast touche {key} sur ({x},{y})", "info")
+        azerty_equiv = self._AZERTY_SLOT_KEYS.get(str(key), str(key))
+        self.log_event.emit(
+            f"→ Cast slot {key} (touche AZERTY '{azerty_equiv}') sur ({x},{y})",
+            "info",
+        )
         try:
-            self._input.press_key(key)
+            ok = self._send_spell_hotkey(str(key))
+            if not ok:
+                self.log_event.emit("⚠ Échec envoi touche sort", "warn")
+                return
             self.msleep(int(self._config.key_to_click_delay_sec * 1000))
             self._input.click(x, y, button="left")
             self._stats.actions_taken += 1
