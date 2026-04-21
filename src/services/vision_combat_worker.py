@@ -30,6 +30,7 @@ from loguru import logger
 from PyQt6.QtCore import QThread, pyqtSignal
 
 from src.services.combat_knowledge import CombatKnowledge
+from src.services.combat_state_reader import CombatStateReader
 from src.services.input_service import InputService
 from src.services.llm_client import LLMClient
 from src.services.vision import MssVisionService
@@ -122,6 +123,7 @@ class VisionCombatWorker(QThread):
         self._input = input_svc
         self._config = config
         self._knowledge = CombatKnowledge()
+        self._state_reader = CombatStateReader(vision)
         self._llm = LLMClient(
             provider=config.llm_provider,
             model=config.llm_model,
@@ -322,22 +324,61 @@ class VisionCombatWorker(QThread):
             except Exception:
                 pass
 
-    def _tick(self) -> None:
-        """Un cycle : capture → LLM → action."""
+    def _annotate_frame_with_detections(self, frame):
+        """Dessine des boîtes + labels "MOB @ (x, y)" sur les cercles bleus détectés.
+
+        Le LLM n'a plus à deviner : il lit les coords affichées directement.
+        """
         try:
-            frame = self._vision.capture()
+            import cv2  # noqa: PLC0415
+            snap = self._state_reader.read()
+            out = frame.copy()
+            # Perso en rouge
+            if snap.perso is not None:
+                p = snap.perso
+                cv2.rectangle(out, (p.x - 50, p.y - 50), (p.x + 50, p.y + 50),
+                              (0, 0, 255), 3)
+                cv2.putText(out, f"PERSO ({p.x},{p.y})",
+                            (p.x - 70, p.y - 60),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
+            # Ennemis en bleu avec coords explicites
+            for i, e in enumerate(snap.ennemis, 1):
+                cv2.rectangle(out, (e.x - 60, e.y - 60), (e.x + 60, e.y + 60),
+                              (255, 100, 0), 4)
+                label = f"MOB{i} ({e.x},{e.y})"
+                cv2.putText(out, label,
+                            (e.x - 80, e.y - 70),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 100, 0), 2)
+            return out, snap
+        except Exception as exc:
+            logger.debug("Annotation frame échec : {}", exc)
+            return frame, None
+
+    def _tick(self) -> None:
+        """Un cycle : capture → annotation HSV → LLM → action."""
+        try:
+            raw_frame = self._vision.capture()
         except Exception as exc:
             self.log_event.emit(f"Capture échec : {exc}", "error")
             return
 
-        user_prompt = self._build_user_prompt()
+        # Annote la frame avec les positions détectées (perso + mobs) AVANT envoi LLM.
+        # Le LLM lit les coords directement au lieu de deviner → ciblage précis.
+        annotated_frame, snap = self._annotate_frame_with_detections(raw_frame)
+        if snap is not None and snap.ennemis:
+            detections_summary = ", ".join(
+                f"MOB{i}=({e.x},{e.y})" for i, e in enumerate(snap.ennemis, 1)
+            )
+            self.log_event.emit(f"🔍 Détections HSV : {detections_summary}", "info")
+
+        user_prompt = self._build_user_prompt(snap)
         self.log_event.emit("👁 → LLM (analyse image)...", "info")
 
         t0 = time.time()
         decision = self._llm.ask_json(
             user_prompt,
             system=self._system_prompt,
-            image_bgr=frame,
+            image_bgr=annotated_frame,
             fallback={},
         )
         elapsed = time.time() - t0
@@ -405,26 +446,51 @@ class VisionCombatWorker(QThread):
         if self._config.save_debug_images:
             self._save_debug(frame, decision)
 
-    def _build_user_prompt(self) -> str:
+    def _build_user_prompt(self, snap=None) -> str:
         shortcuts = ", ".join(
             f"touche {k}={name}"
             for k, name in sorted(self._config.spell_shortcuts.items())
         )
+        # Précalcul du scale qui sera appliqué à l'image envoyée au LLM.
+        # Le LLM verra une image redimensionnée à max 2048px → on lui donne
+        # les coords HSV dans CET espace image (pour qu'il copie sans calcul).
+        img_scale = 1.0
+        try:
+            frame = self._vision.capture()
+            h, w = frame.shape[:2]
+            if max(h, w) > 2048:
+                img_scale = 2048 / max(h, w)
+        except Exception:
+            pass
+
+        detections_block = ""
+        if snap is not None:
+            lines = []
+            if snap.perso:
+                px = int(snap.perso.x * img_scale)
+                py = int(snap.perso.y * img_scale)
+                lines.append(f"  • PERSO (toi, {self._config.class_name}) : ({px}, {py})")
+            for i, e in enumerate(snap.ennemis, 1):
+                ex = int(e.x * img_scale)
+                ey = int(e.y * img_scale)
+                lines.append(f"  • MOB{i} (ennemi à CIBLER) : ({ex}, {ey})")
+            if lines:
+                detections_block = (
+                    "\n\n⭐ COORDONNÉES DANS L'IMAGE QUE TU RECOIS "
+                    "(utilise DIRECTEMENT ces valeurs, pas de devinette) :\n"
+                    + "\n".join(lines)
+                    + "\n\n**Pour cibler un MOB avec cast_spell, recopie EXACTEMENT ses coords dans target_xy.** "
+                    + "Ex: pour cibler MOB1, fais `target_xy: [x1, y1]` avec les valeurs exactes ci-dessus."
+                )
         return (
             f"Analyse la capture d'écran fournie. Je joue un **{self._config.class_name}**.\n"
             f"Mes raccourcis clavier sont : {shortcuts or '(aucun configuré)'}.\n"
-            f"J'ai au maximum **{self._config.starting_pa} PA** et **{self._config.starting_pm} PM** par tour.\n\n"
-            f"Observe attentivement l'image (phase de jeu, position de mon perso à l'anneau rouge, "
-            f"position des ennemis à l'anneau bleu, état des boutons UI, popups éventuels) "
+            f"J'ai au maximum **{self._config.starting_pa} PA** et **{self._config.starting_pm} PM** par tour.\n"
+            f"{detections_block}\n\n"
+            f"Observe l'image (phase, mon perso entouré d'un rectangle rouge, "
+            f"mobs entourés de rectangles bleus avec label 'MOB{{n}} (x,y)', UI, popups) "
             f"puis décide UNE action à exécuter MAINTENANT.\n\n"
-            f"**IMPORTANT — COORDONNÉES** : l'image que tu reçois a une GRILLE JAUNE avec des "
-            f"labels de coordonnées tous les 200 pixels (x affiché en haut, y affiché à gauche). "
-            f"LIS DIRECTEMENT les valeurs x et y sur la grille pour localiser le mob. "
-            f"Exemple : si le mob est entre les lignes x=1400 et x=1600 et entre y=800 et y=1000, "
-            f"alors target_xy = [1500, 900]. "
-            f"Sois PRÉCIS — le bot clique exactement aux coords que tu donnes. "
-            f"Mon code fera le scaling vers l'écran automatiquement.\n\n"
-            f"Rappel : réponds UNIQUEMENT en JSON valide avec les champs "
+            f"Réponds UNIQUEMENT en JSON valide avec les champs "
             f"observation/phase/raisonnement/action. Aucun texte avant ou après."
         )
 
