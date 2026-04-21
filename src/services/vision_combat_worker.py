@@ -430,6 +430,14 @@ class VisionCombatWorker(QThread):
         # Reset compteur d'erreurs après succès
         self._consecutive_errors = 0
 
+        # Si parsing JSON a échoué, on a la réponse brute en debug pour comprendre
+        raw_debug = decision.get("_raw_text")
+        if raw_debug:
+            self.log_event.emit(
+                f"⚠ JSON parse échoué — réponse brute Claude : {raw_debug[:200]}",
+                "warn",
+            )
+
         phase = decision.get("phase", "?")
         observation = decision.get("observation") or decision.get("situation", "")
         reasoning = decision.get("raisonnement") or decision.get("reasoning", "")
