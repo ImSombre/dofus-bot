@@ -324,5 +324,27 @@
       "Mot de Frayeur pour repousser l'ennemi adjacent",
       "Se replier derrière le tank"
     ]
+  },
+  "tour_type_pve_solo": {
+    "tour_1": [
+      "mot_stimulant",
+      "mot_de_regeneration",
+      "mot_blessant"
+    ],
+    "tour_n": [
+      "mot_blessant",
+      "mot_de_regeneration",
+      "mot_de_silence"
+    ],
+    "priority_order": [
+      "mot_de_regeneration",
+      "mot_blessant",
+      "mot_de_silence"
+    ],
+    "combos": [],
+    "conseils": [
+      "Eni = soutien. Soin en priorité si allié <50%.",
+      "Mot de régé spammable"
+    ]
   }
 }

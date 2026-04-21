@@ -309,5 +309,27 @@
       "Cadran de Xélor pour maintenir la distance",
       "Flou pour réduire les dégâts reçus ce tour"
     ]
+  },
+  "tour_type_pve_solo": {
+    "tour_1": [
+      "momification",
+      "poussiere_temporelle",
+      "vol_du_temps"
+    ],
+    "tour_n": [
+      "coup_de_minuit",
+      "vol_du_temps",
+      "ralentissement"
+    ],
+    "priority_order": [
+      "coup_de_minuit",
+      "vol_du_temps",
+      "ralentissement"
+    ],
+    "combos": [],
+    "conseils": [
+      "Xelor = contrôle. Vol PA/PM + ralentissement.",
+      "Utilise les téléportations pour positionner"
+    ]
   }
 }

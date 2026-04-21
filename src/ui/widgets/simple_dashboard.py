@@ -1495,6 +1495,15 @@ class SimpleDashboardWidget(QWidget):
             "Détecte les murs et obstacles qui bloquent les sorts à distance."
         )
         mode_row.addWidget(self._chk_pixel_los)
+
+        self._chk_humanize = QCheckBox("Humaniser souris")
+        self._chk_humanize.setChecked(True)
+        self._chk_humanize.setToolTip(
+            "Déplacements souris avec courbes de Bézier + jitter + délais\n"
+            "log-normaux (inspiré BezMouse qui tient 400h+ sans détection).\n"
+            "+200ms par clic mais indistinguable d'un humain."
+        )
+        mode_row.addWidget(self._chk_humanize)
         mode_row.addStretch()
         grp_ai_lay.addLayout(mode_row)
 
@@ -2150,6 +2159,7 @@ class SimpleDashboardWidget(QWidget):
                 save_debug_images=self._chk_save_debug.isChecked(),
                 decision_mode=self._combo_decision_mode.currentData() or "hybrid",
                 use_pixel_los=self._chk_pixel_los.isChecked(),
+                humanize_input=self._chk_humanize.isChecked(),
             )
             worker = VisionCombatWorker(
                 vision=self._vision, input_svc=self._input, config=vcfg,

@@ -323,5 +323,28 @@
       "Bond du Félin pour fuir vers allié soigneur",
       "Rekop vol de vie si en mélée pour sustain"
     ]
+  },
+  "tour_type_pve_solo": {
+    "tour_1": [
+      "ruse_feline",
+      "pile_ou_face",
+      "griffe_du_destin"
+    ],
+    "tour_n": [
+      "pile_ou_face",
+      "griffe_du_destin",
+      "roue_de_la_fortune"
+    ],
+    "priority_order": [
+      "griffe_du_destin",
+      "pile_ou_face",
+      "roue_de_la_fortune",
+      "ruse_feline"
+    ],
+    "combos": [],
+    "conseils": [
+      "Ecaflip = chance critique. Ruse Féline +Critiques.",
+      "Gros burst CaC avec Griffe"
+    ]
   }
 }

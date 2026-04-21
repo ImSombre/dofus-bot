@@ -310,5 +310,29 @@
       "Fuir à distance maximale avec tous les PM disponibles",
       "Flèche Immobilisante pour clouer l'ennemi poursuivant"
     ]
+  },
+  "tour_type_pve_solo": {
+    "tour_1": [
+      "fleche_destructrice",
+      "fleche_enflammee",
+      "tir_eloigne"
+    ],
+    "tour_n": [
+      "fleche_destructrice",
+      "fleche_de_recul",
+      "fleche_persecutrice"
+    ],
+    "priority_order": [
+      "fleche_destructrice",
+      "fleche_persecutrice",
+      "fleche_enflammee",
+      "fleche_de_recul"
+    ],
+    "combos": [],
+    "conseils": [
+      "Cra = tourelle. Reste à distance MAX, spam flèches.",
+      "Fleche de Recul si mob t'approche (tacle risque)",
+      "Garde >5 cases avec les mobs si possible"
+    ]
   }
 }

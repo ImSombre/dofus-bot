@@ -309,5 +309,40 @@
       "Éviter Mutilation (coûte des HP)",
       "Chercher une case hors ligne de vue ennemie"
     ]
+  },
+  "tour_type_pve_solo": {
+    "tour_1": [
+      "compulsion",
+      "bond",
+      "epee_celeste"
+    ],
+    "tour_n": [
+      "epee_celeste",
+      "pression",
+      "intimidation"
+    ],
+    "priority_order": [
+      "epee_celeste",
+      "pression",
+      "intimidation",
+      "bond",
+      "compulsion"
+    ],
+    "combos": [
+      {
+        "nom": "Bond+Épée",
+        "etapes": [
+          "bond",
+          "epee_celeste"
+        ],
+        "condition": "mob_hors_portee_CaC",
+        "note": "Engagement brutal burst 1 tour"
+      }
+    ],
+    "conseils": [
+      "Iop = burst CaC. Engage vite, tape fort.",
+      "Compulsion en début = +30% dégâts tout le combat",
+      "Bond = PM+déplacement = 1 PA"
+    ]
   }
 }

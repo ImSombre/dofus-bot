@@ -310,5 +310,40 @@
       "Épouvante pour repousser un ennemi dangereux",
       "Se replier derrière les alliés en utilisant les PM"
     ]
+  },
+  "tour_type_pve_solo": {
+    "tour_1": [
+      "picole",
+      "vulnerabilite_aqueuse",
+      "gueule_de_bois"
+    ],
+    "tour_n": [
+      "gueule_de_bois",
+      "poing_enflamme",
+      "souffle_alcoolise"
+    ],
+    "priority_order": [
+      "gueule_de_bois",
+      "souffle_alcoolise",
+      "poing_enflamme",
+      "vulnerabilite_aqueuse",
+      "picole"
+    ],
+    "combos": [
+      {
+        "nom": "Porter-Lancer",
+        "etapes": [
+          "karcham",
+          "chamrak"
+        ],
+        "condition": "cible_ivre + mob_adjacent_pour_lancer",
+        "note": "Très efficace PvP, moins en PvE solo"
+      }
+    ],
+    "conseils": [
+      "Monte l'ivresse avant de Gueule de Bois (dégâts ↑)",
+      "Picole tour 1 = bonus force + ivresse self",
+      "Évite de tacle un mob Pandawa (il te porte)"
+    ]
   }
 }

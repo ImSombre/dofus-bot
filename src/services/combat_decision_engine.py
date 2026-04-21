@@ -28,6 +28,7 @@ from loguru import logger
 from src.services.combat_knowledge import CombatKnowledge
 from src.services.combat_state_reader import CombatStateSnapshot
 from src.services.los_detector import check_line_of_sight, find_bypass_cell
+from src.services.movement_planner import plan_movement
 from src.services.targeting import TargetScore, score_targets
 
 
@@ -305,16 +306,37 @@ class CombatDecisionEngine:
                 "reason": f"PA={ctx.pa_remaining} < min_coût={min_cost}",
             }
 
-        # --- Règle 6 : mob hors portée max → approche ---
+        # --- Règle 6 : mob hors portée max → approche via movement_planner ---
         max_range = self._max_spell_range()
         if dist > max_range:
+            if ctx.frame_bgr is not None:
+                mp = plan_movement(
+                    frame_bgr=ctx.frame_bgr,
+                    perso_xy=perso_xy,
+                    target_xy=target_xy,
+                    spell_po_min=1,
+                    spell_po_max=max_range,
+                    spell_needs_los=True,
+                    strategy="cast_from_here",
+                    use_pixel_los=self.cfg.use_pixel_los,
+                )
+                if mp.move_target_xy:
+                    return {
+                        "type": "click_xy",
+                        "target_xy": list(mp.move_target_xy),
+                        "reason": (
+                            f"Mob '{best_target.reasoning}' hors portée "
+                            f"({dist:.0f}c) → {mp.reason}"
+                        ),
+                    }
+            # Fallback : approche linéaire
             approach_xy = self._approach_target(perso_xy, target_xy, distance_cases=3)
             return {
                 "type": "click_xy",
                 "target_xy": list(approach_xy),
                 "reason": (
                     f"Mob '{best_target.reasoning}' hors portée "
-                    f"({dist:.0f}c > {max_range}c) → approche"
+                    f"({dist:.0f}c > {max_range}c) → approche lin\u00e9aire"
                 ),
             }
 

@@ -311,5 +311,38 @@
       "Folie Sanguinaire pour exploiter le bonus HP bas",
       "Demander Transfert de Vie uniquement après l'exploitation du burst"
     ]
+  },
+  "tour_type_pve_solo": {
+    "tour_1": [
+      "chatiment_spirituel",
+      "assaut",
+      "souffrance"
+    ],
+    "tour_n": [
+      "souffrance",
+      "sacrifice",
+      "attirance"
+    ],
+    "priority_order": [
+      "souffrance",
+      "assaut",
+      "chatiment_spirituel"
+    ],
+    "combos": [
+      {
+        "nom": "Chatiment+Souffrance",
+        "etapes": [
+          "chatiment_spirituel",
+          "souffrance"
+        ],
+        "condition": "tour_1",
+        "note": "Buff + gros burst démarrage"
+      }
+    ],
+    "conseils": [
+      "Sacrieur = tank. Prends les coups et rend-les.",
+      "Souffrance = vol de vie, bon sustain",
+      "Attirance pour déplacer le mob vers toi"
+    ]
   }
 }

@@ -77,6 +77,9 @@ class VisionCombatConfig:
     decision_mode: str = "hybrid"
     # Active le raycasting pixel pour LoS (v0.6.0)
     use_pixel_los: bool = True
+    # Humanise les mouvements souris (Bézier + jitter + délais log-normal).
+    # Moins détectable mais ~200ms plus lent par clic. Recommandé.
+    humanize_input: bool = True
     dofus_window_title: str | None = None
     # Sauvegarder chaque capture envoyée au LLM (debug)
     save_debug_images: bool = False
@@ -892,7 +895,7 @@ class VisionCombatWorker(QThread):
             xy = action.get("target_xy") or action.get("xy")
             if xy and len(xy) == 2:
                 self.log_event.emit(f"→ Clic ({xy[0]},{xy[1]})", "info")
-                self._input.click(int(xy[0]), int(xy[1]), button="left")
+                self._do_click(int(xy[0]), int(xy[1]))
                 self._stats.actions_taken += 1
 
         elif atype == "press_key":
@@ -1058,7 +1061,7 @@ class VisionCombatWorker(QThread):
                 self.log_event.emit("⚠ Échec envoi touche sort", "warn")
                 return
             self.msleep(int(self._config.key_to_click_delay_sec * 1000))
-            self._input.click(x, y, button="left")
+            self._do_click(x, y)
             self._stats.actions_taken += 1
             self._cast_history.append((str(key), x, y))
             if len(self._cast_history) > 3:
@@ -1068,6 +1071,17 @@ class VisionCombatWorker(QThread):
             self._pa_remaining = max(0, self._pa_remaining - cost)
         except Exception as exc:
             self.log_event.emit(f"⚠ Cast échec : {exc}", "error")
+
+    def _do_click(self, x: int, y: int, *, button: str = "left") -> None:
+        """Clic avec humanisation optionnelle (Bézier + jitter + délais)."""
+        if self._config.humanize_input:
+            try:
+                from src.services.human_input import human_click  # noqa: PLC0415
+                human_click(self._input, x, y, button=button)
+                return
+            except Exception as exc:
+                logger.debug("human_click échec, fallback classic : {}", exc)
+        self._input.click(x, y, button=button)
 
     def _save_debug(self, frame, decision: dict) -> None:
         try:
