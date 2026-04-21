@@ -36,6 +36,7 @@ from src.services.combat_knowledge import CombatKnowledge
 from src.services.combat_state_reader import CombatStateReader
 from src.services.input_service import InputService
 from src.services.llm_client import LLMClient
+from src.services.phase_detector import detect_phase
 from src.services.vision import MssVisionService
 
 
@@ -417,6 +418,18 @@ class VisionCombatWorker(QThread):
                 f"MOB{i}=({e.x},{e.y})" for i, e in enumerate(snap.ennemis, 1)
             )
             self.log_event.emit(f"🔍 Détections HSV : {detections_summary}", "info")
+
+        # Détection phase rapide par analyse d'image (~10ms)
+        # Court-circuite le LLM si popup victoire/défaite détectée
+        phase_result = detect_phase(raw_frame)
+        if (phase_result.phase == "popup_victoire"
+                and phase_result.confidence > 0.5
+                and self._config.decision_mode in ("hybrid", "rules")):
+            self.log_event.emit(
+                f"🏆 Popup détectée → close ({phase_result.reason})", "info",
+            )
+            self._execute_action({"type": "close_popup"}, "popup_victoire")
+            return
 
         # Essai moteur déterministe v0.6.0 (LoS pixel + targeting + playbooks)
         if self._config.decision_mode in ("hybrid", "rules"):
