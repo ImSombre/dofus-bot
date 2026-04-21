@@ -203,8 +203,9 @@ class LLMClient:
         parsed = self._extract_json(response.text)
         if parsed is None:
             parsed = dict(fallback or {})
-            # Garde la réponse brute pour debug — le worker pourra la logger dans l'UI
-            parsed["_raw_text"] = response.text[:400]
+        # Toujours garder la réponse brute pour debug (utile pour diagnostiquer
+        # les parsing ambigus, les JSON incomplets, etc.)
+        parsed["_raw_text"] = (response.text or "")[:500]
         parsed["_image_scale"] = response.image_scale
         parsed["_image_width"] = response.image_width
         parsed["_image_height"] = response.image_height

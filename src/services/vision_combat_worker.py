@@ -430,18 +430,19 @@ class VisionCombatWorker(QThread):
         # Reset compteur d'erreurs après succès
         self._consecutive_errors = 0
 
-        # Si parsing JSON a échoué, on a la réponse brute en debug pour comprendre
-        raw_debug = decision.get("_raw_text")
-        if raw_debug:
-            self.log_event.emit(
-                f"⚠ JSON parse échoué — réponse brute Claude : {raw_debug[:200]}",
-                "warn",
-            )
-
         phase = decision.get("phase", "?")
         observation = decision.get("observation") or decision.get("situation", "")
         reasoning = decision.get("raisonnement") or decision.get("reasoning", "")
         action = decision.get("action", {}) or {}
+
+        # Si le dict est quasi-vide (pas de phase/action), log la réponse brute
+        # pour comprendre ce que le LLM a renvoyé.
+        if phase == "?" or not action:
+            raw_debug = decision.get("_raw_text", "") or ""
+            self.log_event.emit(
+                f"🔍 DEBUG brut LLM : {raw_debug[:250] or '(vide)'}",
+                "warn",
+            )
 
         # Scale factor de l'image envoyée au LLM.
         # Si le LLM a vu une image 1280×720 mais l'écran fait 2560×1440, scale=0.5.
