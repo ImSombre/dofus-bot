@@ -37,7 +37,7 @@ except ImportError:
     _HAS_REQUESTS = False
 
 
-ProviderType = Literal["ollama", "lmstudio", "gemini"]
+ProviderType = Literal["ollama", "lmstudio", "gemini", "anthropic"]
 
 
 @dataclass
@@ -61,6 +61,7 @@ class LLMClient:
         "ollama": "http://localhost:11434",
         "lmstudio": "http://localhost:1234/v1",
         "gemini": "https://generativelanguage.googleapis.com/v1beta",
+        "anthropic": "https://api.anthropic.com/v1",
     }
 
     def __init__(
@@ -88,7 +89,7 @@ class LLMClient:
             return False
         try:
             import requests  # noqa: PLC0415
-            if self.provider == "gemini":
+            if self.provider in ("gemini", "anthropic"):
                 # Si on a une clé API, on considère disponible (pas de ping gratuit)
                 return bool(self.api_key)
             url = f"{self.base_url}/api/tags" if self.provider == "ollama" \
@@ -125,6 +126,14 @@ class LLMClient:
                         n = m.get("name", "").replace("models/", "")
                         names.append(n)
                 return names
+            elif self.provider == "anthropic":
+                # Anthropic n'a pas d'endpoint list-models public. Liste statique.
+                return [
+                    "claude-haiku-4-5-20251001",
+                    "claude-sonnet-4-6",
+                    "claude-sonnet-4-5-20250929",
+                    "claude-3-5-haiku-20241022",
+                ]
             else:
                 r = requests.get(f"{self.base_url}/models", timeout=3.0)
                 data = r.json()
@@ -156,6 +165,8 @@ class LLMClient:
                 response = self._ask_ollama(user_prompt, system, image_bgr)
             elif self.provider == "gemini":
                 response = self._ask_gemini(user_prompt, system, image_bgr)
+            elif self.provider == "anthropic":
+                response = self._ask_anthropic(user_prompt, system, image_bgr)
             else:
                 response = self._ask_openai(user_prompt, system, image_bgr)
             response.latency_ms = (time.perf_counter() - t0) * 1000
@@ -301,6 +312,126 @@ class LLMClient:
         text = choices[0].get("message", {}).get("content", "").strip()
         return LLMResponse(
             success=True, text=text,
+            image_scale=scale, image_width=img_w, image_height=img_h,
+        )
+
+    # Modèles Anthropic vision avec fallback (vitesse > coût > qualité).
+    # Tarifs 2026 (par 1M tokens) :
+    #   - haiku-4-5 : $1 input / $5 output — ultra rapide, recommandé combat
+    #   - sonnet-4-6 : $3 input / $15 output — top qualité
+    _ANTHROPIC_FALLBACK_CHAIN = [
+        "claude-haiku-4-5-20251001",
+        "claude-sonnet-4-6",
+        "claude-3-5-haiku-20241022",
+    ]
+
+    def _ask_anthropic(
+        self,
+        user_prompt: str,
+        system: str | None,
+        image_bgr,
+    ) -> LLMResponse:
+        """Anthropic Claude Messages API avec vision + retry + fallback.
+
+        Doc : https://docs.claude.com/en/api/messages
+        Tarifs : https://claude.com/pricing — Haiku 4.5 ~$1/1M input.
+        """
+        import requests  # noqa: PLC0415
+        import time as _time  # noqa: PLC0415
+
+        if not self.api_key:
+            return LLMResponse(
+                success=False,
+                error="Clé API Anthropic manquante — obtiens-la sur https://console.anthropic.com/settings/keys",
+            )
+
+        scale, img_w, img_h = 1.0, 0, 0
+        content: list[dict] = []
+        if image_bgr is not None:
+            b64, scale, img_w, img_h = self._encode_image_b64(image_bgr)
+            if b64:
+                content.append({
+                    "type": "image",
+                    "source": {
+                        "type": "base64",
+                        "media_type": "image/jpeg",
+                        "data": b64,
+                    },
+                })
+        content.append({"type": "text", "text": user_prompt})
+
+        payload: dict = {
+            "model": self.model,
+            "max_tokens": max(self.max_tokens, 1024),
+            "temperature": self.temperature,
+            "messages": [{"role": "user", "content": content}],
+        }
+        if system:
+            payload["system"] = system
+
+        headers = {
+            "x-api-key": self.api_key,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+        }
+
+        models_to_try = [self.model]
+        for fb in self._ANTHROPIC_FALLBACK_CHAIN:
+            if fb != self.model and fb not in models_to_try:
+                models_to_try.append(fb)
+
+        last_error = ""
+        for model in models_to_try:
+            payload["model"] = model
+            for retry in range(2):
+                try:
+                    r = requests.post(
+                        f"{self.base_url}/messages",
+                        headers=headers,
+                        json=payload,
+                        timeout=self.timeout_sec,
+                    )
+                except requests.exceptions.Timeout:
+                    last_error = f"{model}: timeout {self.timeout_sec}s"
+                    logger.warning("Anthropic timeout {} (retry {}/2)", model, retry + 1)
+                    _time.sleep(0.5 + retry * 1.5)
+                    continue
+                except Exception as exc:
+                    last_error = f"{model}: {exc}"
+                    logger.warning("Anthropic erreur {} : {}", model, exc)
+                    break
+
+                if r.status_code == 200:
+                    data = r.json()
+                    blocks = data.get("content", [])
+                    text_parts = [b.get("text", "") for b in blocks if b.get("type") == "text"]
+                    text = "\n".join(t for t in text_parts if t).strip()
+                    if not text:
+                        last_error = f"{model}: réponse vide"
+                        break
+                    if model != self.model:
+                        logger.info("Anthropic fallback réussi sur '{}' (demandé : {})", model, self.model)
+                    return LLMResponse(
+                        success=True, text=text,
+                        image_scale=scale, image_width=img_w, image_height=img_h,
+                    )
+
+                if r.status_code in (429, 529, 503):
+                    wait = 0.5 + retry * 1.5
+                    last_error = f"{model}: HTTP {r.status_code}"
+                    logger.warning(
+                        "Anthropic {} sur {} — attente {:.1f}s (retry {}/2)",
+                        r.status_code, model, wait, retry + 1,
+                    )
+                    _time.sleep(wait)
+                    continue
+
+                last_error = f"{model}: HTTP {r.status_code}: {r.text[:200]}"
+                logger.warning("Anthropic HTTP {} sur {} : {}", r.status_code, model, r.text[:200])
+                break
+
+        return LLMResponse(
+            success=False, error=f"Tous les modèles Anthropic ont échoué. Dernier : {last_error}",
             image_scale=scale, image_width=img_w, image_height=img_h,
         )
 

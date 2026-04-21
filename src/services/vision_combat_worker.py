@@ -41,10 +41,11 @@ class VisionCombatConfig:
     class_name: str = "ecaflip"
     spell_shortcuts: dict[int, str] = field(default_factory=dict)
     # Provider LLM : "ollama", "lmstudio", "gemini"
-    llm_provider: str = "gemini"         # default : Gemini (cloud gratuit, pas de VRAM)
-    # flash (pas lite) : équilibre vitesse/raisonnement spatial. flash-lite confond
-    # trop les positions dans les combats Dofus (v0.3.3).
-    llm_model: str = "gemini-2.5-flash"
+    # v0.4.0 : défaut sur Anthropic Claude Haiku 4.5.
+    # Meilleur raisonnement spatial + ~1-2s/décision vs 4-24s sur Gemini flash.
+    # Coût : ~$0.1/jour en usage normal (farm 5 combats).
+    llm_provider: str = "anthropic"
+    llm_model: str = "claude-haiku-4-5-20251001"
     llm_url: str = ""                    # override optionnel (défaut : selon provider)
     llm_api_key: str = ""                # clé API Gemini (obligatoire pour provider=gemini)
     # Timings optimisés pour vitesse (v0.3.1) :
@@ -61,7 +62,9 @@ class VisionCombatConfig:
     # ont leur portée_max augmentée d'autant dans le prompt LLM.
     po_bonus: int = 0
     max_actions_per_turn: int = 6
-    request_timeout_sec: float = 90.0  # Gemini peut être lent + retry interne sur 503
+    # Timeout réduit : 20s max par requête LLM (avant : 90s = blocage en cas de surcharge).
+    # Anthropic Haiku répond typiquement en 1-2s, on a donc 10× de marge.
+    request_timeout_sec: float = 20.0
     dofus_window_title: str | None = None
     # Sauvegarder chaque capture envoyée au LLM (debug)
     save_debug_images: bool = False

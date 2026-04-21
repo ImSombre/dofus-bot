@@ -67,8 +67,9 @@ class GlobalPrefs:
     fullscreen_mode: bool = False
     # Calibration des positions de clic bord (ratios 0.0-1.0 relatifs à la capture)
     edge_ratios: dict | None = None  # None = ratios par défaut
-    # Clé API Gemini (sauvegardée pour ne pas la retaper à chaque session)
+    # Clés API LLM (sauvegardées pour ne pas les retaper à chaque session)
     gemini_api_key: str = ""
+    anthropic_api_key: str = ""
 
     def to_dict(self) -> dict:
         return {
@@ -79,6 +80,7 @@ class GlobalPrefs:
             "fullscreen_mode": self.fullscreen_mode,
             "edge_ratios": self.edge_ratios,
             "gemini_api_key": self.gemini_api_key,
+            "anthropic_api_key": self.anthropic_api_key,
         }
 
     @classmethod
@@ -91,6 +93,7 @@ class GlobalPrefs:
             fullscreen_mode=bool(d.get("fullscreen_mode", False)),
             edge_ratios=d.get("edge_ratios"),
             gemini_api_key=str(d.get("gemini_api_key", "")),
+            anthropic_api_key=str(d.get("anthropic_api_key", "")),
         )
 
 

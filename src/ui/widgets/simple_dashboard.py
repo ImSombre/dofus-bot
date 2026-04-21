@@ -1320,11 +1320,12 @@ class SimpleDashboardWidget(QWidget):
         llm_row = QHBoxLayout()
         llm_row.addWidget(QLabel("Provider :"))
         self._combo_llm_provider = QComboBox()
-        self._combo_llm_provider.addItem("Google Gemini (cloud GRATUIT ⭐)", "gemini")
+        self._combo_llm_provider.addItem("Anthropic Claude (payant ~$0.1/jour ⭐⭐ RECO)", "anthropic")
+        self._combo_llm_provider.addItem("Google Gemini (cloud GRATUIT)", "gemini")
         self._combo_llm_provider.addItem("Auto-détection local", "auto")
         self._combo_llm_provider.addItem("Ollama (localhost:11434)", "ollama")
         self._combo_llm_provider.addItem("LM Studio (localhost:1234)", "lmstudio")
-        self._combo_llm_provider.setFixedWidth(260)
+        self._combo_llm_provider.setFixedWidth(300)
         llm_row.addWidget(self._combo_llm_provider)
 
         llm_row.addWidget(QLabel("Modèle :"))
@@ -1333,10 +1334,14 @@ class SimpleDashboardWidget(QWidget):
         self._combat_vision_model = QComboBox()
         self._combat_vision_model.setEditable(True)
         self._combat_vision_model.addItems([
-            # Gemini (cloud gratuit) — RECOMMANDÉ
-            "gemini-2.5-flash-lite", # ⭐⭐ LE PLUS RAPIDE (~2x flash-latest, qualité ok combat)
-            "gemini-flash-latest",   # alias auto vers la dernière version stable
+            # Anthropic Claude — RECOMMANDÉ (rapide + intelligent)
+            "claude-haiku-4-5-20251001",  # ⭐⭐ rapide ~1-2s, ~$1/1M tokens
+            "claude-sonnet-4-6",          # top qualité, ~$3/1M tokens
+            "claude-3-5-haiku-20241022",  # legacy rapide
+            # Gemini (cloud gratuit)
             "gemini-2.5-flash",      # GRATUIT, rapide, top qualité (peut être surchargé)
+            "gemini-flash-latest",   # alias auto vers la dernière version stable
+            "gemini-2.5-flash-lite", # rapide mais faible spatial
             "gemini-2.5-pro",        # Meilleur raisonnement (quota réduit)
             "gemini-2.0-flash",      # legacy
             # Ollama (local) — nécessite VRAM
@@ -1350,7 +1355,7 @@ class SimpleDashboardWidget(QWidget):
             "qwen/qwen2.5-vl-3b-instruct",
             "qwen/qwen2.5-vl-7b-instruct",
         ])
-        self._combat_vision_model.setCurrentText("gemini-2.5-flash")
+        self._combat_vision_model.setCurrentText("claude-haiku-4-5-20251001")
         self._combat_vision_model.setMinimumWidth(220)
         self._combat_vision_model.setToolTip(
             "⭐ GEMINI (cloud gratuit) — recommandé si PC faible :\n"
@@ -1407,6 +1412,39 @@ class SimpleDashboardWidget(QWidget):
         self._gemini_key_container = QWidget()
         self._gemini_key_container.setLayout(self._gemini_key_row)
         grp_ai_lay.addWidget(self._gemini_key_container)
+
+        # Ligne clé API Anthropic (visible seulement si provider=anthropic)
+        self._anthropic_key_row = QHBoxLayout()
+        self._anthropic_key_row.addWidget(QLabel("Clé API Anthropic :"))
+        self._edit_anthropic_key = QLineEdit()
+        self._edit_anthropic_key.setEchoMode(QLineEdit.EchoMode.Password)
+        self._edit_anthropic_key.setPlaceholderText("sk-ant-...")
+        self._edit_anthropic_key.setToolTip(
+            "Obtiens ta clé sur console.anthropic.com (1 min) :\n"
+            "  1. Va sur https://console.anthropic.com/settings/keys\n"
+            "  2. Crée un compte (Google/email)\n"
+            "  3. Clique 'Create Key' → Copy\n"
+            "  4. Colle-la ici\n\n"
+            "Coût combat Dofus : ~$0.10-0.30/jour avec Haiku 4.5\n"
+            "(5 combats × 20 tours × ~4k tokens ≈ 400k tokens = $0.40 MAX)"
+        )
+        try:
+            from src.services.user_prefs import get_user_prefs  # noqa: PLC0415
+            prefs = get_user_prefs()
+            saved_anth = getattr(prefs.global_prefs, "anthropic_api_key", "") or ""
+            if saved_anth:
+                self._edit_anthropic_key.setText(saved_anth)
+        except Exception:
+            pass
+        self._anthropic_key_row.addWidget(self._edit_anthropic_key, stretch=1)
+
+        self._btn_get_anthropic_key = QPushButton("🌐 Obtenir une clé")
+        self._btn_get_anthropic_key.clicked.connect(self._open_anthropic_key_page)
+        self._anthropic_key_row.addWidget(self._btn_get_anthropic_key)
+
+        self._anthropic_key_container = QWidget()
+        self._anthropic_key_container.setLayout(self._anthropic_key_row)
+        grp_ai_lay.addWidget(self._anthropic_key_container)
 
         # Ligne bouton test + status
         test_row = QHBoxLayout()
@@ -1615,9 +1653,13 @@ class SimpleDashboardWidget(QWidget):
             self._combat_vision_model.setCurrentText("qwen/qwen2.5-vl-3b-instruct")
         elif provider == "gemini":
             self._combat_vision_model.setCurrentText("gemini-2.5-flash")
-        # Affiche le champ clé API seulement pour gemini
+        elif provider == "anthropic":
+            self._combat_vision_model.setCurrentText("claude-haiku-4-5-20251001")
+        # Affiche les champs clé API selon provider
         if hasattr(self, "_gemini_key_container"):
             self._gemini_key_container.setVisible(provider == "gemini")
+        if hasattr(self, "_anthropic_key_container"):
+            self._anthropic_key_container.setVisible(provider == "anthropic")
 
     def _open_gemini_key_page(self) -> None:
         """Ouvre la page Google AI Studio pour créer une clé API."""
@@ -1629,6 +1671,18 @@ class SimpleDashboardWidget(QWidget):
                 self,
                 "Ouvre manuellement",
                 f"Va sur : https://aistudio.google.com/app/apikey\n\nErreur : {exc}",
+            )
+
+    def _open_anthropic_key_page(self) -> None:
+        """Ouvre la page Anthropic Console pour créer une clé API."""
+        try:
+            import webbrowser  # noqa: PLC0415
+            webbrowser.open("https://console.anthropic.com/settings/keys")
+        except Exception as exc:
+            QMessageBox.information(
+                self,
+                "Ouvre manuellement",
+                f"Va sur : https://console.anthropic.com/settings/keys\n\nErreur : {exc}",
             )
 
     @staticmethod
@@ -1797,7 +1851,7 @@ class SimpleDashboardWidget(QWidget):
                     self_inner.sig.done.emit(f"✗ Erreur : {exc}", "#e53935")
 
         shortcuts = self._collect_spell_shortcuts()
-        # Récupère la clé API Gemini si provider=gemini (depuis UI, sinon prefs)
+        # Récupère la clé API selon provider (depuis UI, sinon prefs)
         api_key = ""
         if provider == "gemini":
             api_key = self._edit_gemini_key.text().strip()
@@ -1805,6 +1859,14 @@ class SimpleDashboardWidget(QWidget):
                 try:
                     from src.services.user_prefs import get_user_prefs  # noqa: PLC0415
                     api_key = getattr(get_user_prefs().global_prefs, "gemini_api_key", "") or ""
+                except Exception:
+                    pass
+        elif provider == "anthropic":
+            api_key = self._edit_anthropic_key.text().strip()
+            if not api_key:
+                try:
+                    from src.services.user_prefs import get_user_prefs  # noqa: PLC0415
+                    api_key = getattr(get_user_prefs().global_prefs, "anthropic_api_key", "") or ""
                 except Exception:
                     pass
         job = _TestJob(
@@ -2003,34 +2065,51 @@ class SimpleDashboardWidget(QWidget):
                     f"🔍 Auto-détection LLM : provider={provider} url={llm_url or '(défaut)'}",
                     "info",
                 )
-            # Clé API Gemini (si provider=gemini)
-            gemini_key = ""
+            # Clé API (Gemini ou Anthropic selon provider)
+            llm_api_key = ""
             if provider == "gemini":
-                gemini_key = self._edit_gemini_key.text().strip()
-                if not gemini_key:
+                llm_api_key = self._edit_gemini_key.text().strip()
+                if not llm_api_key:
                     QMessageBox.warning(
                         self, "Clé API manquante",
                         "Gemini nécessite une clé API gratuite.\n"
                         "Clique sur '🌐 Obtenir une clé' pour l'obtenir en 30s.",
                     )
                     return
-                # Sauvegarde la clé pour les prochaines fois
                 try:
                     from src.services.user_prefs import get_user_prefs  # noqa: PLC0415
                     prefs = get_user_prefs()
                     if hasattr(prefs.global_prefs, "gemini_api_key"):
-                        prefs.global_prefs.gemini_api_key = gemini_key
+                        prefs.global_prefs.gemini_api_key = llm_api_key
                         prefs.save()
                 except Exception as exc:
                     logger.debug("Save gemini key échec : {}", exc)
+            elif provider == "anthropic":
+                llm_api_key = self._edit_anthropic_key.text().strip()
+                if not llm_api_key:
+                    QMessageBox.warning(
+                        self, "Clé API manquante",
+                        "Anthropic Claude nécessite une clé API (sk-ant-...).\n"
+                        "Clique sur '🌐 Obtenir une clé' sur console.anthropic.com.\n"
+                        "Coût : ~$0.1/jour avec Haiku 4.5.",
+                    )
+                    return
+                try:
+                    from src.services.user_prefs import get_user_prefs  # noqa: PLC0415
+                    prefs = get_user_prefs()
+                    if hasattr(prefs.global_prefs, "anthropic_api_key"):
+                        prefs.global_prefs.anthropic_api_key = llm_api_key
+                        prefs.save()
+                except Exception as exc:
+                    logger.debug("Save anthropic key échec : {}", exc)
 
             vcfg = VisionCombatConfig(
                 class_name=self._combat_selected_class,
                 spell_shortcuts=spell_shortcuts,
                 llm_provider=provider,
-                llm_model=self._combat_vision_model.currentText().strip() or "gemini-2.5-flash",
+                llm_model=self._combat_vision_model.currentText().strip() or "claude-haiku-4-5-20251001",
                 llm_url=llm_url,
-                llm_api_key=gemini_key,
+                llm_api_key=llm_api_key,
                 dofus_window_title=self._selected_window.title,
                 starting_pa=self._spin_combat_pa.value(),
                 starting_pm=self._spin_combat_pm.value(),
