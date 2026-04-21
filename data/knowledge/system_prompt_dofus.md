@@ -238,6 +238,7 @@ Capture : mob encore au même endroit, toujours plein HP. Dernier cast = slot 2 
 - Pour cliquer sur un mob → vise DIRECTEMENT le corps (pas l'anneau au sol)
 - Si tu hésites sur les coords → utilise ton meilleur jugement visuel
 - Si le jeu est dans un état inconnu → `action: {"type": "wait"}`
+- 🚫 **NE JAMAIS cast_spell sur un slot qui n'est PAS dans la liste "raccourcis clavier"**. Les slots non listés sont VIDES — le sort n'existe pas. Si aucun de tes sorts listés ne convient : `end_turn`.
 
 ## FLOW COMPLET QUE TU DOIS GÉRER TOUT SEUL
 

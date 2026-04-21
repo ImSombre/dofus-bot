@@ -151,6 +151,7 @@ class VisionCombatWorker(QThread):
         # Historique des 3 derniers casts (pour détecter cible morte / mur / LoS bloquée)
         #   (slot, target_x, target_y)
         self._cast_history: list[tuple[str, int, int]] = []
+        self._invalid_cast_streak: int = 0
 
     def request_stop(self) -> None:
         self._stop_requested = True
@@ -458,6 +459,17 @@ class VisionCombatWorker(QThread):
             f"touche {k}={name}"
             for k, name in sorted(self._config.spell_shortcuts.items())
         )
+        allowed_slots = sorted(self._config.spell_shortcuts.keys())
+        allowed_block = (
+            f"\n\n🚫 **TOUCHES AUTORISÉES POUR cast_spell — LISTE FERMÉE** : {allowed_slots}\n"
+            f"Tous les autres slots (1-9) sont VIDES, il n'y a AUCUN sort dessus. "
+            f"Si tu renvoies `cast_spell` avec `spell_key` hors de cette liste, "
+            f"l'action sera IGNORÉE et le bot passera son tour.\n"
+            f"→ Si aucun de tes sorts autorisés ne convient, utilise `end_turn` ou `click_xy` (déplacement)."
+        ) if allowed_slots else (
+            "\n\n🚫 **AUCUN SORT CONFIGURÉ** : la liste de raccourcis est vide. "
+            "Tu ne peux PAS utiliser cast_spell. Utilise uniquement click_xy / end_turn / wait."
+        )
         # Précalcul du scale qui sera appliqué à l'image envoyée au LLM.
         # Le LLM verra une image redimensionnée à max 2048px → on lui donne
         # les coords HSV dans CET espace image (pour qu'il copie sans calcul).
@@ -544,6 +556,7 @@ class VisionCombatWorker(QThread):
             f"Mes raccourcis clavier sont : {shortcuts or '(aucun configuré)'}.\n"
             f"J'ai au maximum **{self._config.starting_pa} PA** et **{self._config.starting_pm} PM** par tour."
             f"{po_bonus_line}"
+            f"{allowed_block}"
             f"{detections_block}"
             f"{history_block}\n\n"
             f"Observe l'image (phase, mon perso entouré d'un rectangle rouge, "
@@ -569,6 +582,30 @@ class VisionCombatWorker(QThread):
             if not key or not xy:
                 self.log_event.emit("⚠ cast_spell sans key/xy → skip", "warn")
                 return
+            # Garde-fou : refuse de cast un slot non configuré (halluciné par le LLM)
+            try:
+                slot_int = int(str(key).strip())
+            except (ValueError, TypeError):
+                slot_int = -1
+            allowed = set(self._config.spell_shortcuts.keys())
+            if allowed and slot_int not in allowed:
+                self.log_event.emit(
+                    f"🚫 Slot {key} non configuré (autorisés : {sorted(allowed)}) → cast ignoré",
+                    "warn",
+                )
+                self._invalid_cast_streak = getattr(self, "_invalid_cast_streak", 0) + 1
+                if self._invalid_cast_streak >= 2:
+                    self.log_event.emit(
+                        "→ Trop de casts invalides consécutifs → fin de tour automatique",
+                        "warn",
+                    )
+                    self._input.press_key("f1")
+                    self._cast_history.clear()
+                    self._invalid_cast_streak = 0
+                    self._stats.actions_taken += 1
+                self.msleep(int(self._config.post_action_delay_sec * 1000))
+                return
+            self._invalid_cast_streak = 0
             self._do_cast(str(key), xy)
 
         elif atype == "click_xy":
