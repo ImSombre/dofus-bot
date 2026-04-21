@@ -373,15 +373,16 @@ class LLMClient:
 
         last_error = ""
         for attempt, model in enumerate(models_to_try):
-            # Retry 3 fois par modèle en cas de 503 / timeout (backoff)
-            for retry in range(3):
+            # Retry 2 fois par modèle en cas de 503 / timeout (backoff léger)
+            # Réduit pour éviter les attentes de 75s+ quand Google surcharge.
+            for retry in range(2):
                 try:
                     url = f"{self.base_url}/models/{model}:generateContent?key={self.api_key}"
                     r = requests.post(url, json=payload, timeout=self.timeout_sec)
                 except requests.exceptions.Timeout:
                     last_error = f"{model}: timeout {self.timeout_sec}s"
-                    logger.warning("Gemini timeout sur {} (retry {}/3)", model, retry + 1)
-                    _time.sleep(2 + retry * 2)
+                    logger.warning("Gemini timeout sur {} (retry {}/2)", model, retry + 1)
+                    _time.sleep(1 + retry * 2)
                     continue
                 except Exception as exc:
                     last_error = f"{model}: {exc}"
@@ -431,8 +432,8 @@ class LLMClient:
 
                 # HTTP != 200
                 if r.status_code in (503, 429):
-                    # Serveur surchargé ou rate limit : backoff puis retry
-                    wait = 2 + retry * 3
+                    # Serveur surchargé ou rate limit : backoff court puis retry
+                    wait = 1 + retry * 2   # 1s puis 3s
                     last_error = f"{model}: HTTP {r.status_code}"
                     logger.warning(
                         "Gemini {} sur {} — attente {}s (retry {}/3)",
