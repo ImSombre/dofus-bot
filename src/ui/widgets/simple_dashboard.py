@@ -1563,6 +1563,19 @@ class SimpleDashboardWidget(QWidget):
         self._spin_combat_pm.setToolTip("Points de Mouvement par tour (standard : 3-5)")
         stats_row.addWidget(self._spin_combat_pm)
 
+        stats_row.addSpacing(20)
+        stats_row.addWidget(QLabel("Bonus PO :"))
+        self._spin_combat_po_bonus = QSpinBox()
+        self._spin_combat_po_bonus.setRange(0, 15)
+        self._spin_combat_po_bonus.setValue(0)
+        self._spin_combat_po_bonus.setMinimumWidth(90)
+        self._spin_combat_po_bonus.setToolTip(
+            "Bonus de Portée (PO) de ton stuff/buff.\n"
+            "Ex: si tu as +3 PO d'items, mets 3.\n"
+            "S'ajoute à la portée max de tous les sorts à portée modifiable."
+        )
+        stats_row.addWidget(self._spin_combat_po_bonus)
+
         stats_row.addStretch()
         grp_stats_lay.addLayout(stats_row)
 
@@ -2020,6 +2033,7 @@ class SimpleDashboardWidget(QWidget):
                 dofus_window_title=self._selected_window.title,
                 starting_pa=self._spin_combat_pa.value(),
                 starting_pm=self._spin_combat_pm.value(),
+                po_bonus=self._spin_combat_po_bonus.value(),
                 save_debug_images=self._chk_save_debug.isChecked(),
             )
             worker = VisionCombatWorker(

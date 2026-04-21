@@ -54,6 +54,10 @@ class VisionCombatConfig:
     key_to_click_delay_sec: float = 0.25
     starting_pa: int = 6
     starting_pm: int = 3
+    # Bonus de portée (PO) appliqué à tous les sorts "à portée modifiable".
+    # Ex: stuff/buff donnant +3 PO → po_bonus = 3, tous les sorts concernés
+    # ont leur portée_max augmentée d'autant dans le prompt LLM.
+    po_bonus: int = 0
     max_actions_per_turn: int = 6
     request_timeout_sec: float = 90.0  # Gemini peut être lent + retry interne sur 503
     dofus_window_title: str | None = None
@@ -496,10 +500,20 @@ class VisionCombatWorker(QThread):
                     + "Exemple : si MOB1 à 8 cases et ton sort a portée 5 → bouge d'abord (click_xy vers MOB1, "
                     + "à 3-4 cases dans sa direction), puis cast au tour suivant ou quand re-scan."
                 )
+        po_bonus_line = ""
+        if self._config.po_bonus > 0:
+            po_bonus_line = (
+                f"\n**⚡ BONUS PORTÉE : +{self._config.po_bonus} PO** (stuff/buff). "
+                f"Ajoute ce bonus à la portée_max de chaque sort 'à portée modifiable' "
+                f"(la plupart sauf certains sorts fixes). "
+                f"Ex: si un sort a portée 1-5 et +{self._config.po_bonus} PO → "
+                f"portée effective 1-{5 + self._config.po_bonus}.\n"
+            )
         return (
             f"Analyse la capture d'écran fournie. Je joue un **{self._config.class_name}**.\n"
             f"Mes raccourcis clavier sont : {shortcuts or '(aucun configuré)'}.\n"
-            f"J'ai au maximum **{self._config.starting_pa} PA** et **{self._config.starting_pm} PM** par tour.\n"
+            f"J'ai au maximum **{self._config.starting_pa} PA** et **{self._config.starting_pm} PM** par tour."
+            f"{po_bonus_line}"
             f"{detections_block}\n\n"
             f"Observe l'image (phase, mon perso entouré d'un rectangle rouge, "
             f"mobs entourés de rectangles bleus avec label 'MOB{{n}} (x,y)', UI, popups) "
