@@ -591,32 +591,33 @@ class VisionCombatWorker(QThread):
         detections_block = ""
         if snap is not None:
             # Dofus isométrique : 1 case ≈ 86px horizontal, 43px vertical.
-            # Distance en cases ≈ max(|dx|/86, |dy|/43) — c'est l'approximation la
-            # plus juste pour juger la portée d'un sort.
+            # Distance en cases ≈ max(|dx|/86, |dy|/43).
             CELL_X, CELL_Y = 86, 43
             lines = []
-            perso_px = None
+            perso_px_screen = None
             if snap.perso:
+                # Coords dans l'espace image envoyé au LLM (il voit la même chose).
                 px_img = int(snap.perso.x * img_scale)
                 py_img = int(snap.perso.y * img_scale)
-                perso_px = (snap.perso.x, snap.perso.y)
-                lines.append(f"  PERSO (toi) image=({px_img},{py_img}) ecran=({snap.perso.x},{snap.perso.y})")
+                perso_px_screen = (snap.perso.x, snap.perso.y)
+                lines.append(f"  PERSO en ({px_img},{py_img})")
             for i, e in enumerate(snap.ennemis, 1):
                 ex_img = int(e.x * img_scale)
                 ey_img = int(e.y * img_scale)
-                line = f"  MOB{i} image=({ex_img},{ey_img}) ecran=({e.x},{e.y})"
-                if perso_px:
+                line = f"  MOB{i} en ({ex_img},{ey_img})"
+                if perso_px_screen:
                     dist_cases = max(
-                        abs(e.x - perso_px[0]) / CELL_X,
-                        abs(e.y - perso_px[1]) / CELL_Y,
+                        abs(e.x - perso_px_screen[0]) / CELL_X,
+                        abs(e.y - perso_px_screen[1]) / CELL_Y,
                     )
-                    line += f" dist={dist_cases:.0f}cases"
+                    line += f" — dist={dist_cases:.0f} cases"
                 lines.append(line)
             if lines:
                 detections_block = (
-                    "\nPositions détectées (coords image ET ecran fournis) :\n"
+                    "\nPositions sur l'image que tu reçois (coords en pixels image) :\n"
                     + "\n".join(lines)
-                    + "\n→ Pour cast_spell ou click_xy : utilise les coords ECRAN."
+                    + "\n→ target_xy = coords dans CETTE image "
+                    "(notre code les reconvertira automatiquement en pixels écran)."
                 )
         po_bonus_line = ""
         if self._config.po_bonus > 0:
@@ -625,19 +626,25 @@ class VisionCombatWorker(QThread):
                 f"(ajoute à la portée_max des sorts modifiables, ex: 1-5 devient 1-{5 + self._config.po_bonus})."
             )
 
-        # Historique des casts récents + signal anti-boucle (LoS bloquée / mob immobile).
+        # Historique des casts récents + signal anti-boucle.
+        # Les coords dans _cast_history sont en ECRAN (stockées par _do_cast),
+        # on les convertit en coords IMAGE pour rester cohérent avec le reste du prompt.
         history_block = ""
         if self._cast_history:
-            hist_str = " ; ".join(
-                f"slot{s}→({hx},{hy})" for s, hx, hy in self._cast_history
-            )
-            history_block = f"\nCasts ce tour : {hist_str}"
+            hist_parts = []
+            for s, hx, hy in self._cast_history:
+                hx_img = int(hx * img_scale)
+                hy_img = int(hy * img_scale)
+                hist_parts.append(f"slot{s}→({hx_img},{hy_img})")
+            history_block = f"\nCasts ce tour : {' ; '.join(hist_parts)}"
             if snap is not None and snap.ennemis:
                 last_slot, lx, ly = self._cast_history[-1]
                 for e in snap.ennemis:
                     if abs(e.x - lx) <= 40 and abs(e.y - ly) <= 40:
+                        lx_img = int(lx * img_scale)
+                        ly_img = int(ly * img_scale)
                         history_block += (
-                            f" ⚠ ALERTE : MOB toujours à ({lx},{ly}) après slot {last_slot} "
+                            f" ⚠ ALERTE : MOB toujours à ({lx_img},{ly_img}) après slot {last_slot} "
                             f"→ LoS BLOQUÉE, ne re-cast PAS, bouge ou change de cible."
                         )
                         break
