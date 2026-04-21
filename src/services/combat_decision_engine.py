@@ -26,6 +26,9 @@ import numpy as np
 from loguru import logger
 
 from src.services.combat_knowledge import CombatKnowledge
+from src.services.combat_rules import (
+    context_from_snap, find_matching_rule, rule_to_action,
+)
 from src.services.combat_state_reader import CombatStateSnapshot
 from src.services.los_detector import check_line_of_sight, find_bypass_cell
 from src.services.movement_planner import plan_movement
@@ -48,6 +51,8 @@ class EngineConfig:
     """Sous ce % HP, on priorise la fuite."""
     use_pixel_los: bool = True
     """Activer le raycasting pixel pour LoS (False = distance-only)."""
+    custom_rules: list[dict] = field(default_factory=list)
+    """Règles user (profil). Évaluées en PREMIER, avant la logique hardcoded."""
 
 
 def dist_cases(a_xy: tuple[int, int], b_xy: tuple[int, int]) -> float:
@@ -262,6 +267,22 @@ class CombatDecisionEngine:
             return {"type": "defer_to_llm", "reason": "aucun ennemi HSV"}
         if not ctx.snap.perso:
             return {"type": "defer_to_llm", "reason": "perso HSV non détecté"}
+
+        # --- Règles USER (profil) : évaluées AVANT les règles hardcoded ---
+        # Permet au joueur de customiser son IA via un profil JSON.
+        if self.cfg.custom_rules:
+            rule_ctx = context_from_snap(
+                snap=ctx.snap,
+                turn_number=ctx.turn_number,
+                pa_remaining=ctx.pa_remaining,
+                pm_remaining=self.cfg.starting_pm,  # approximation : pas tracké actuellement
+                buffs_cast=ctx.buffs_cast_this_fight,
+            )
+            rule = find_matching_rule(self.cfg.custom_rules, rule_ctx)
+            if rule:
+                action = rule_to_action(rule, rule_ctx, ctx.snap)
+                logger.debug("Custom rule matched : {}", rule.get("name"))
+                return action
 
         perso_xy = (ctx.snap.perso.x, ctx.snap.perso.y)
 

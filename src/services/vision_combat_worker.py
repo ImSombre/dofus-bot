@@ -82,6 +82,9 @@ class VisionCombatConfig:
     # Humanise les mouvements souris (Bézier + jitter + délais log-normal).
     # Moins détectable mais ~200ms plus lent par clic. Recommandé.
     humanize_input: bool = True
+    # Règles custom utilisateur (profil combat_profiles / combat_rules)
+    # Si fournies, elles sont évaluées AVANT la logique hardcoded du moteur.
+    custom_rules: list[dict] = field(default_factory=list)
     dofus_window_title: str | None = None
     # Sauvegarder chaque capture envoyée au LLM (debug)
     save_debug_images: bool = False
@@ -177,6 +180,7 @@ class VisionCombatWorker(QThread):
                 starting_pm=config.starting_pm,
                 po_bonus=config.po_bonus,
                 use_pixel_los=config.use_pixel_los,
+                custom_rules=list(config.custom_rules or []),
             ),
             self._knowledge,
         )

@@ -768,6 +768,105 @@ class SimpleDashboardWidget(QWidget):
         except Exception:
             pass
 
+    def _apply_combat_profile(self) -> None:
+        """Applique le profil sélectionné : classe + raccourcis + règles."""
+        try:
+            name = self._combo_combat_profile.currentData() or ""
+            if not name:
+                QMessageBox.information(self, "Profil", "Aucun profil sélectionné.")
+                return
+            from src.services.combat_profiles import list_available_profiles  # noqa: PLC0415
+            profiles = list_available_profiles()
+            profile = next((p for p in profiles if p.name == name), None)
+            if not profile:
+                QMessageBox.warning(self, "Profil", f"Profil '{name}' introuvable.")
+                return
+
+            # Applique la classe
+            self._select_class(profile.class_name)
+
+            # Applique les raccourcis de sorts
+            if hasattr(self, "_combat_spell_slots"):
+                shortcuts_int = profile.spell_shortcuts_as_ints()
+                for slot, spell in shortcuts_int.items():
+                    if 1 <= slot <= 9 and slot - 1 < len(self._combat_spell_slots):
+                        combo = self._combat_spell_slots[slot - 1]
+                        try:
+                            combo.setCurrentText(spell)
+                        except Exception:
+                            pass
+
+            # Applique la config (PA/PM/PO, etc.)
+            cfg = profile.config or {}
+            if "starting_pa" in cfg and hasattr(self, "_spin_combat_pa"):
+                self._spin_combat_pa.setValue(int(cfg["starting_pa"]))
+            if "starting_pm" in cfg and hasattr(self, "_spin_combat_pm"):
+                self._spin_combat_pm.setValue(int(cfg["starting_pm"]))
+            if "po_bonus" in cfg and hasattr(self, "_spin_combat_po_bonus"):
+                self._spin_combat_po_bonus.setValue(int(cfg["po_bonus"]))
+            if "decision_mode" in cfg and hasattr(self, "_combo_decision_mode"):
+                mode = str(cfg["decision_mode"])
+                for i in range(self._combo_decision_mode.count()):
+                    if self._combo_decision_mode.itemData(i) == mode:
+                        self._combo_decision_mode.setCurrentIndex(i)
+                        break
+
+            # Stocke les règles pour le lancement combat
+            self._active_profile_rules = list(profile.rules or [])
+            QMessageBox.information(
+                self, "Profil",
+                f"Profil '{profile.name}' appliqué :\n"
+                f"• Classe : {profile.class_name}\n"
+                f"• {len(profile.spell_shortcuts)} raccourcis\n"
+                f"• {len(profile.rules)} règles custom\n\n"
+                f"{profile.description}",
+            )
+        except Exception as exc:
+            import traceback  # noqa: PLC0415
+            traceback.print_exc()
+            QMessageBox.critical(self, "Erreur", f"Échec application profil : {exc}")
+
+    def _save_current_as_profile(self) -> None:
+        """Sauvegarde la config combat actuelle comme nouveau profil JSON."""
+        try:
+            from PyQt6.QtWidgets import QInputDialog  # noqa: PLC0415
+            from src.services.combat_profiles import CombatProfile  # noqa: PLC0415
+
+            name, ok = QInputDialog.getText(
+                self, "Sauvegarder profil", "Nom du profil :",
+            )
+            if not ok or not name.strip():
+                return
+
+            shortcuts = self._collect_spell_shortcuts()
+            # Convert int keys to str for JSON
+            shortcuts_str = {str(k): v for k, v in shortcuts.items()}
+
+            profile = CombatProfile(
+                name=name.strip(),
+                class_name=self._combat_selected_class or "ecaflip",
+                spell_shortcuts=shortcuts_str,
+                rules=list(getattr(self, "_active_profile_rules", [])),
+                config={
+                    "starting_pa": self._spin_combat_pa.value(),
+                    "starting_pm": self._spin_combat_pm.value(),
+                    "po_bonus": self._spin_combat_po_bonus.value(),
+                    "decision_mode": self._combo_decision_mode.currentData() or "hybrid",
+                    "use_pixel_los": self._chk_pixel_los.isChecked(),
+                    "humanize_input": self._chk_humanize.isChecked(),
+                },
+                description="Profil sauvegardé depuis l'UI",
+                author="user",
+            )
+            path = profile.save()
+            QMessageBox.information(
+                self, "Profil sauvé",
+                f"Profil '{profile.name}' sauvegardé dans :\n{path}\n\n"
+                f"Recharge le dropdown pour le voir apparaître.",
+            )
+        except Exception as exc:
+            QMessageBox.critical(self, "Erreur", f"Sauvegarde échec : {exc}")
+
     def _launch_hsv_calibrator(self) -> None:
         """Lance l'outil de calibration HSV avec une capture live de l'écran."""
         try:
@@ -1278,6 +1377,44 @@ class SimpleDashboardWidget(QWidget):
         # ═══════════════════════════════════════════════════
         # SECTION 1 : Classe
         # ═══════════════════════════════════════════════════
+        # Panel Profils (optionnel, Snowbot-style)
+        # ═══════════════════════════════════════════════════
+        grp_profile = QGroupBox("📦  Profil combat (optionnel)")
+        grp_profile.setStyleSheet(_GROUPBOX_STYLE)
+        grp_profile_lay = QHBoxLayout(grp_profile)
+        grp_profile_lay.addWidget(QLabel("Profil :"))
+
+        self._combo_combat_profile = QComboBox()
+        self._combo_combat_profile.addItem("— Aucun (défauts du moteur) —", "")
+        try:
+            from src.services.combat_profiles import list_available_profiles  # noqa: PLC0415
+            for p in list_available_profiles():
+                label = f"{p.name} ({p.class_name})"
+                self._combo_combat_profile.addItem(label, p.name)
+        except Exception:
+            pass
+        self._combo_combat_profile.setToolTip(
+            "Charge un profil combat préconfiguré : classe + raccourcis de sorts\n"
+            "+ règles d'IA (type Snowbot). Le profil surcharge la configuration courante."
+        )
+        self._combo_combat_profile.setFixedWidth(350)
+        grp_profile_lay.addWidget(self._combo_combat_profile)
+
+        btn_apply_profile = QPushButton("✅ Appliquer")
+        btn_apply_profile.setToolTip("Applique le profil : classe + raccourcis + règles")
+        btn_apply_profile.clicked.connect(self._apply_combat_profile)
+        grp_profile_lay.addWidget(btn_apply_profile)
+
+        btn_save_profile = QPushButton("💾 Sauver profil")
+        btn_save_profile.setToolTip(
+            "Sauvegarde la configuration actuelle comme nouveau profil JSON"
+        )
+        btn_save_profile.clicked.connect(self._save_current_as_profile)
+        grp_profile_lay.addWidget(btn_save_profile)
+
+        grp_profile_lay.addStretch()
+        root.addWidget(grp_profile)
+
         grp_class = QGroupBox("1️⃣  Choisis ta classe")
         grp_class.setStyleSheet(_GROUPBOX_STYLE)
         grp_class_lay = QVBoxLayout(grp_class)
@@ -2198,6 +2335,7 @@ class SimpleDashboardWidget(QWidget):
                 decision_mode=self._combo_decision_mode.currentData() or "hybrid",
                 use_pixel_los=self._chk_pixel_los.isChecked(),
                 humanize_input=self._chk_humanize.isChecked(),
+                custom_rules=list(getattr(self, "_active_profile_rules", [])),
             )
             worker = VisionCombatWorker(
                 vision=self._vision, input_svc=self._input, config=vcfg,
