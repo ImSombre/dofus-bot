@@ -2,7 +2,10 @@
   "class_id": "xelor",
   "nom_fr": "Xelor",
   "archetype": "mage-contrôle intelligence, manipulation du temps et des PA ennemis",
-  "stats_principales": ["Intelligence", "Sagesse"],
+  "stats_principales": [
+    "Intelligence",
+    "Sagesse"
+  ],
   "philosophie": "Le Xelor manipule le temps via son Cadran de Xélor pour se repositionner gratuitement. Aiguille et Contre sont les sorts de contrôle fondamentaux. Ralentissement et Démotivation retirent PA et PM. Frappe de Xélor et Horloge pour le burst. Sablier de Xélor pour un tour supplémentaire.",
   "priorites_generales": [
     "Utiliser Cadran de Xélor pour le repositionnement gratuit chaque tour",
@@ -22,7 +25,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Sort économique. Retire un peu de PA à la cible en plus des dégâts. Spam pour contrôle progressif."
+      "note": "Sort économique. Retire un peu de PA à la cible en plus des dégâts. Spam pour contrôle progressif.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "contre",
@@ -34,7 +39,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Renvoie le prochain sort ennemi vers son lanceur. Contre majeur contre les sorts puissants ou AoE ennemies."
+      "note": "Renvoie le prochain sort ennemi vers son lanceur. Contre majeur contre les sorts puissants ou AoE ennemies.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "ralentissement",
@@ -46,7 +53,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Retire beaucoup de PM sans dégâts importants. Contrôle pur pour immobiliser les ennemis mobiles."
+      "note": "Retire beaucoup de PM sans dégâts importants. Contrôle pur pour immobiliser les ennemis mobiles.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "gelure",
@@ -58,7 +67,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "Dégâts eau et retire PA. Combinaison dégâts + contrôle efficace. Rotation principale en build eau."
+      "note": "Dégâts eau et retire PA. Combinaison dégâts + contrôle efficace. Rotation principale en build eau.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "sablier_de_xelor",
@@ -70,7 +81,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 5,
-      "note": "Sort ultime. Donne un tour supplémentaire au Xelor. À utiliser pour un combo dévastateur avec tous les sorts burst."
+      "note": "Sort ultime. Donne un tour supplémentaire au Xelor. À utiliser pour un combo dévastateur avec tous les sorts burst.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "rayon_obscur",
@@ -82,7 +95,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "Sort de dégâts feu puissant. Rotation principale build intelligence avec Frappe de Xélor."
+      "note": "Sort de dégâts feu puissant. Rotation principale build intelligence avec Frappe de Xélor.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "teleportation",
@@ -94,7 +109,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Téléportation contrôlée sur une case cible. Repositionnement précis, plus flexible que Cadran de Xélor."
+      "note": "Téléportation contrôlée sur une case cible. Repositionnement précis, plus flexible que Cadran de Xélor.",
+      "role": "deplacement",
+      "portee_modifiable": true
     },
     {
       "id": "fletrissement",
@@ -106,7 +123,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "Réduit les résistances de la cible. Synergise avec toute la rotation de dégâts pour amplifier l'output."
+      "note": "Réduit les résistances de la cible. Synergise avec toute la rotation de dégâts pour amplifier l'output.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "flou",
@@ -118,7 +137,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Rend le Xelor difficile à cibler pendant 1 tour. Réduction des dégâts reçus. Défense temporaire."
+      "note": "Rend le Xelor difficile à cibler pendant 1 tour. Réduction des dégâts reçus. Défense temporaire.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "poussiere_temporelle",
@@ -130,7 +151,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "AoE en croix. Retire des PM à toutes les cibles touchées. Excellent contrôle de mobilité de zone."
+      "note": "AoE en croix. Retire des PM à toutes les cibles touchées. Excellent contrôle de mobilité de zone.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "vol_du_temps",
@@ -142,7 +165,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Vole des PA à la cible et les donne au Xelor. Synergise la rotation : retirer les PA ennemis en gagnant les siens."
+      "note": "Vole des PA à la cible et les donne au Xelor. Synergise la rotation : retirer les PA ennemis en gagnant les siens.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "aiguille_chercheuse",
@@ -154,7 +179,9 @@
       "ligne_de_vue": false,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "Sort sans ligne de vue. Attaque la cible quelle que soit la position. Très polyvalent en terrain complexe."
+      "note": "Sort sans ligne de vue. Attaque la cible quelle que soit la position. Très polyvalent en terrain complexe.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "devouement",
@@ -166,7 +193,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Donne des PA à un allié. Sort de support clé pour permettre à un DPS allié de lancer un sort supplémentaire."
+      "note": "Donne des PA à un allié. Sort de support clé pour permettre à un DPS allié de lancer un sort supplémentaire.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "fuite",
@@ -178,7 +207,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Téléportation d'urgence sur une case du cadran. Échapper à un encerclement rapidement."
+      "note": "Téléportation d'urgence sur une case du cadran. Échapper à un encerclement rapidement.",
+      "role": "offensif",
+      "portee_modifiable": false
     },
     {
       "id": "demotivation",
@@ -190,7 +221,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Retire PA et PM à la cible. Contrôle total sur les ennemis mobiles et actifs. Priorité sur les DPS rapides."
+      "note": "Retire PA et PM à la cible. Contrôle total sur les ennemis mobiles et actifs. Priorité sur les DPS rapides.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "protection_aveuglante",
@@ -202,7 +235,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Bouclier qui réduit la précision des attaquants. Protection pour soi ou un allié fragile."
+      "note": "Bouclier qui réduit la précision des attaquants. Protection pour soi ou un allié fragile.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "momification",
@@ -214,7 +249,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 3,
-      "note": "Inflige des dégâts et immobilise temporairement la cible. Contrôle + dégâts combinés, utile pour bloquer un ennemi clé."
+      "note": "Inflige des dégâts et immobilise temporairement la cible. Contrôle + dégâts combinés, utile pour bloquer un ennemi clé.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "horloge",
@@ -226,7 +263,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Invoque une horloge qui modifie le Cadran de Xélor. Ajoute des cases de déplacement disponibles."
+      "note": "Invoque une horloge qui modifie le Cadran de Xélor. Ajoute des cases de déplacement disponibles.",
+      "role": "invoc",
+      "portee_modifiable": false
     },
     {
       "id": "frappe_de_xelor",
@@ -238,7 +277,9 @@
       "ligne_de_vue": true,
       "degats": "très élevés",
       "cooldown": 3,
-      "note": "Sort burst principal du Xelor. Dégâts maximaux feu. Réserver pour les cibles prioritaires ou boss."
+      "note": "Sort burst principal du Xelor. Dégâts maximaux feu. Réserver pour les cibles prioritaires ou boss.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "cadran_de_xelor",
@@ -250,7 +291,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Déplacement gratuit sur une case du cadran. Utiliser systématiquement en début de tour pour se positionner."
+      "note": "Déplacement gratuit sur une case du cadran. Utiliser systématiquement en début de tour pour se positionner.",
+      "role": "offensif",
+      "portee_modifiable": false
     }
   ],
   "plan_tour_type": [

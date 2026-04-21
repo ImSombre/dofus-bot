@@ -2,7 +2,11 @@
   "class_id": "cra",
   "nom_fr": "Crâ",
   "archetype": "archer distance (agilité/intelligence/chance)",
-  "stats_principales": ["Agilité", "Intelligence", "Chance"],
+  "stats_principales": [
+    "Agilité",
+    "Intelligence",
+    "Chance"
+  ],
   "philosophie": "Le Crâ domine à distance. Il doit maintenir la distance, poser des balises, et exploiter ses flèches élémentaires selon le build. Flèche de Recul et Flèche Immobilisante sont les outils de survie si un ennemi approche. L'Œil de Taupe permet des tirs sans ligne de vue ponctuels.",
   "priorites_generales": [
     "Maintenir 5+ cases de distance avec les ennemis mélée",
@@ -22,7 +26,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "Inflige un poison (DoT). Priorité sur les cibles robustes à longue durée de vie."
+      "note": "Inflige un poison (DoT). Priorité sur les cibles robustes à longue durée de vie.",
+      "role": "debuff",
+      "portee_modifiable": true
     },
     {
       "id": "fleche_de_recul",
@@ -34,7 +40,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 1,
-      "note": "Repousse la cible de 4 cases. Sort anti-mélée essentiel. Utiliser dès qu'un ennemi est adjacent."
+      "note": "Repousse la cible de 4 cases. Sort anti-mélée essentiel. Utiliser dès qu'un ennemi est adjacent.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "fleche_magique",
@@ -46,7 +54,9 @@
       "ligne_de_vue": false,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Longue portée, pas de ligne de vue. Sort de base très polyvalent. Permet d'attaquer à travers obstacles."
+      "note": "Longue portée, pas de ligne de vue. Sort de base très polyvalent. Permet d'attaquer à travers obstacles.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "fleche_enflammee",
@@ -58,7 +68,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "AoE en ligne feu. Excellente contre les ennemis alignés. Rotation principale build intelligence."
+      "note": "AoE en ligne feu. Excellente contre les ennemis alignés. Rotation principale build intelligence.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "fleche_explosive",
@@ -70,7 +82,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "AoE en carré autour de l'impact. Meilleur sort de zone du Crâ. Utiliser si 2+ ennemis groupés."
+      "note": "AoE en carré autour de l'impact. Meilleur sort de zone du Crâ. Utiliser si 2+ ennemis groupés.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "fleche_harcelante",
@@ -82,7 +96,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Retire des PM à la cible. Excellent pour ralentir les ennemis mobiles ou pour spam à longue portée."
+      "note": "Retire des PM à la cible. Excellent pour ralentir les ennemis mobiles ou pour spam à longue portée.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "fleche_glacee",
@@ -94,7 +110,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "Ralentit la cible (retire PM + immobilise). Contrôle de mobilité puissant en build eau/chance."
+      "note": "Ralentit la cible (retire PM + immobilise). Contrôle de mobilité puissant en build eau/chance.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "fleche_cinglante",
@@ -106,7 +124,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 1,
-      "note": "DPS direct solide. Bon rapport PA/dégâts. Rotation principale en build agilité."
+      "note": "DPS direct solide. Bon rapport PA/dégâts. Rotation principale en build agilité.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "oeil_de_taupe",
@@ -118,7 +138,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Retire la ligne de vue pour le prochain lancer. Contourner les obstacles ponctuellement."
+      "note": "Retire la ligne de vue pour le prochain lancer. Contourner les obstacles ponctuellement.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "fleche_de_dispersion",
@@ -130,7 +152,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "AoE en croix. Repousse les cibles dans différentes directions. Désorganiser un groupe ennemi compact."
+      "note": "AoE en croix. Repousse les cibles dans différentes directions. Désorganiser un groupe ennemi compact.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "fleche_puissante",
@@ -142,7 +166,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Boost de puissance temporaire. Lancer avant les sorts principaux pour amplifier les dégâts."
+      "note": "Boost de puissance temporaire. Lancer avant les sorts principaux pour amplifier les dégâts.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "fleche_immobilisante",
@@ -154,7 +180,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Empêche la cible de se déplacer pendant 1-2 tours. Clouer un ennemi sur place pour le burst."
+      "note": "Empêche la cible de se déplacer pendant 1-2 tours. Clouer un ennemi sur place pour le burst.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "fleche_de_chasse",
@@ -166,7 +194,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 0,
-      "note": "Portée minimum 5 cases. DPS élevé si bien positionné à grande distance. Idéale pour exploiter la distance."
+      "note": "Portée minimum 5 cases. DPS élevé si bien positionné à grande distance. Idéale pour exploiter la distance.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "punition_du_cra",
@@ -178,7 +208,9 @@
       "ligne_de_vue": true,
       "degats": "très élevés",
       "cooldown": 3,
-      "note": "Sort burst à gros cooldown. Dégâts maximaux du Crâ sur une cible unique. Réserver pour boss ou cibles prioritaires."
+      "note": "Sort burst à gros cooldown. Dégâts maximaux du Crâ sur une cible unique. Réserver pour boss ou cibles prioritaires.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "fleche_d_huile",
@@ -190,7 +222,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Applique un débuff résistance eau sur la cible. Utile pour synergiser en équipe ou préparer Flèche Glacée."
+      "note": "Applique un débuff résistance eau sur la cible. Utile pour synergiser en équipe ou préparer Flèche Glacée.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "tir_concentre",
@@ -202,7 +236,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "Sort critique garanti ou à très haut taux critique. Excellent en build critique pour des dégâts fiables."
+      "note": "Sort critique garanti ou à très haut taux critique. Excellent en build critique pour des dégâts fiables.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "oeil_de_cra",
@@ -214,7 +250,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Révèle les entités invisibles dans une zone. Contre les Srams et invisibles. Toujours utile en combat PvP."
+      "note": "Révèle les entités invisibles dans une zone. Contre les Srams et invisibles. Toujours utile en combat PvP.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "balise_de_cra",
@@ -226,7 +264,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Pose une balise permettant la téléportation. Repositionnement avancé pour maintenir la distance optimale."
+      "note": "Pose une balise permettant la téléportation. Repositionnement avancé pour maintenir la distance optimale.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "fleche_envoutante",
@@ -238,7 +278,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "Retire des PA à la cible en plus des dégâts. Contrôle + dégâts combinés, excellent contre les classes à fort APM."
+      "note": "Retire des PA à la cible en plus des dégâts. Contrôle + dégâts combinés, excellent contre les classes à fort APM.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "fleche_destructrice",
@@ -250,7 +292,9 @@
       "ligne_de_vue": true,
       "degats": "très élevés",
       "cooldown": 4,
-      "note": "Sort de destruction à grand cooldown. Réserver pour le burst final sur boss ou cibles à haute résistance."
+      "note": "Sort de destruction à grand cooldown. Réserver pour le burst final sur boss ou cibles à haute résistance.",
+      "role": "offensif",
+      "portee_modifiable": true
     }
   ],
   "plan_tour_type": [

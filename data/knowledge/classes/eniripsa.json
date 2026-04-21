@@ -2,7 +2,11 @@
   "class_id": "eniripsa",
   "nom_fr": "Eniripsa",
   "archetype": "soigneur / support (intelligence ou chance)",
-  "stats_principales": ["Intelligence", "Chance", "Sagesse"],
+  "stats_principales": [
+    "Intelligence",
+    "Chance",
+    "Sagesse"
+  ],
   "philosophie": "L'Eniripsa est le pilier de soin du groupe. Ses Mots couvrent toutes les situations : soin direct, soin sur la durée, PA bonus, retraits PA ennemis. En solo, Mot d'Épine et Mot Blessant assurent le DPS. Mot Stimulant donne 2 PA à l'équipe en zone. Ne jamais tomber sous 4 PA réservés pour un soin d'urgence.",
   "priorites_generales": [
     "Scanner les HP alliés avant chaque action offensive",
@@ -22,7 +26,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 3,
-      "note": "Sort de dégâts puissant. Retire des PA à la cible. Utile contre les classes à fort APM."
+      "note": "Sort de dégâts puissant. Retire des PA à la cible. Utile contre les classes à fort APM.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "mot_de_frayeur",
@@ -34,7 +40,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "Repousse la cible de plusieurs cases. Défense essentielle si un ennemi s'approche de l'Eniripsa."
+      "note": "Repousse la cible de plusieurs cases. Défense essentielle si un ennemi s'approche de l'Eniripsa.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "mot_curatif",
@@ -46,7 +54,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Soin de base économique. Spammable, excellent pour soigner plusieurs fois par tour."
+      "note": "Soin de base économique. Spammable, excellent pour soigner plusieurs fois par tour.",
+      "role": "soin",
+      "portee_modifiable": true
     },
     {
       "id": "mot_soignant",
@@ -58,7 +68,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Soin principal de l'Eniripsa. Bon rendement PA/soin. Sort de référence pour maintenir les alliés en vie."
+      "note": "Soin principal de l'Eniripsa. Bon rendement PA/soin. Sort de référence pour maintenir les alliés en vie.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "mot_blessant",
@@ -70,7 +82,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Sort de dégâts basique et économique. Finir les tours avec PA restants quand tout le monde est bien en vie."
+      "note": "Sort de dégâts basique et économique. Finir les tours avec PA restants quand tout le monde est bien en vie.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "mot_stimulant",
@@ -82,7 +96,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Donne 2 PA à la cible pendant plusieurs tours. Sort de soutien majeur. Lancer sur le DPS principal dès le tour 1."
+      "note": "Donne 2 PA à la cible pendant plusieurs tours. Sort de soutien majeur. Lancer sur le DPS principal dès le tour 1.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "mot_de_prevention",
@@ -94,7 +110,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Réduit les dégâts reçus par la cible. Poser préventivement sur le tank avant qu'il subisse des attaques."
+      "note": "Réduit les dégâts reçus par la cible. Poser préventivement sur le tank avant qu'il subisse des attaques.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "mot_drainant",
@@ -106,7 +124,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "Vol de vie à distance. Soigne l'Eniripsa en attaquant. Excellent pour le sustain en solo."
+      "note": "Vol de vie à distance. Soigne l'Eniripsa en attaquant. Excellent pour le sustain en solo.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "mot_revitalisant",
@@ -118,7 +138,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Soin fort, spammable. Sort de référence pour les situations d'urgence. 0 cooldown, toujours disponible."
+      "note": "Soin fort, spammable. Sort de référence pour les situations d'urgence. 0 cooldown, toujours disponible.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "mot_de_regeneration",
@@ -130,7 +152,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Soin sur plusieurs tours. Lancer sur le tank ou l'allié blessé pour soins passifs. Très efficient en PA."
+      "note": "Soin sur plusieurs tours. Lancer sur le tank ou l'allié blessé pour soins passifs. Très efficient en PA.",
+      "role": "soin",
+      "portee_modifiable": true
     },
     {
       "id": "mot_d_epine",
@@ -142,7 +166,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Pose une épine sur la cible : les attaquants subissent des dégâts en retour. DPS indirect ET protection."
+      "note": "Pose une épine sur la cible : les attaquants subissent des dégâts en retour. DPS indirect ET protection.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "mot_de_jouvence",
@@ -154,7 +180,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Soin AoE en croix. Soigne tous les alliés dans la zone. Utiliser en situation critique ou après une AoE ennemie."
+      "note": "Soin AoE en croix. Soigne tous les alliés dans la zone. Utiliser en situation critique ou après une AoE ennemie.",
+      "role": "soin",
+      "portee_modifiable": true
     },
     {
       "id": "mot_vampirique",
@@ -166,7 +194,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 3,
-      "note": "Vol de vie puissant. Inflige des dégâts et soigne l'Eniripsa. Meilleur sort DPS/sustain du kit."
+      "note": "Vol de vie puissant. Inflige des dégâts et soigne l'Eniripsa. Meilleur sort DPS/sustain du kit.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "mot_de_sacrifice",
@@ -178,7 +208,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Soin puissant ciblé. Coûte des HP à l'Eniripsa. Réserver pour sortir un allié du seuil critique."
+      "note": "Soin puissant ciblé. Coûte des HP à l'Eniripsa. Réserver pour sortir un allié du seuil critique.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "mot_d_amitie",
@@ -190,7 +222,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Soin à portée réduite. Économique et efficace pour maintenir les alliés proches en bonne santé."
+      "note": "Soin à portée réduite. Économique et efficace pour maintenir les alliés proches en bonne santé.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "mot_d_immobilisation",
@@ -202,7 +236,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Retire des PM à la cible. Contrôle de mobilité utile pour empêcher les ennemis d'approcher l'Eniripsa."
+      "note": "Retire des PM à la cible. Contrôle de mobilité utile pour empêcher les ennemis d'approcher l'Eniripsa.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "mot_d_envol",
@@ -214,7 +250,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Donne des PM à un allié. Repositionner rapidement un allié bloqué ou faciliter une fuite."
+      "note": "Donne des PM à un allié. Repositionner rapidement un allié bloqué ou faciliter une fuite.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "mot_de_silence",
@@ -226,7 +264,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Empêche la cible de lancer des sorts. Contrôle majeur contre les casters ennemis dangereux."
+      "note": "Empêche la cible de lancer des sorts. Contrôle majeur contre les casters ennemis dangereux.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "mot_d_altruisme",
@@ -238,7 +278,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Soin massif ciblé. Sort d'urgence pour un allié à très bas HP. Réserver pour les situations critiques."
+      "note": "Soin massif ciblé. Sort d'urgence pour un allié à très bas HP. Réserver pour les situations critiques.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "mot_de_reconstitution",
@@ -250,7 +292,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Soin massif à grande portée. Ultime de soin de l'Eniripsa. Réserver pour les urgences absolues."
+      "note": "Soin massif à grande portée. Ultime de soin de l'Eniripsa. Réserver pour les urgences absolues.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "mot_lotof",
@@ -262,7 +306,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Sort spécial Retrozia. Boost les soins de l'Eniripsa pendant plusieurs tours. Activer avant une série de soins critiques."
+      "note": "Sort spécial Retrozia. Boost les soins de l'Eniripsa pendant plusieurs tours. Activer avant une série de soins critiques.",
+      "role": "buff",
+      "portee_modifiable": false
     }
   ],
   "plan_tour_type": [

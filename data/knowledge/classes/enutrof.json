@@ -2,7 +2,10 @@
   "class_id": "enutrof",
   "nom_fr": "Enutrof",
   "archetype": "support-chance à distance, pelles et malédictions, invocations",
-  "stats_principales": ["Chance", "Vitalité"],
+  "stats_principales": [
+    "Chance",
+    "Vitalité"
+  ],
   "philosophie": "L'Enutrof contrôle le terrain via ses malédictions et son coffre animé. Il affaiblit les résistances ennemies, invoque son coffre comme allié permanent, et spamme les lancers de pièces et de pelle depuis une distance confortable. Maladresse réduit la précision des ennemis.",
   "priorites_generales": [
     "Tour 1 : invoquer Coffre Animé si non présent",
@@ -22,7 +25,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Sort de dégâts principal chance. Spammable, longue portée. Base de la rotation DPS de l'Enutrof."
+      "note": "Sort de dégâts principal chance. Spammable, longue portée. Base de la rotation DPS de l'Enutrof.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "lancer_de_pelle",
@@ -34,7 +39,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 1,
-      "note": "Dégâts terre corrects. Cooldown court. Alterner avec Lancer de Pièces pour maximiser le DPS."
+      "note": "Dégâts terre corrects. Cooldown court. Alterner avec Lancer de Pièces pour maximiser le DPS.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "sac_anime",
@@ -46,7 +53,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Invoque un sac animé. Créature utilitaire qui peut bloquer le passage ou attirer les attaques."
+      "note": "Invoque un sac animé. Créature utilitaire qui peut bloquer le passage ou attirer les attaques.",
+      "role": "invoc",
+      "portee_modifiable": true
     },
     {
       "id": "pelle_fantomatique",
@@ -58,7 +67,9 @@
       "ligne_de_vue": false,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "Sort terre sans ligne de vue. Permet d'attaquer depuis derrière des obstacles. Très précieux tactiquement."
+      "note": "Sort terre sans ligne de vue. Permet d'attaquer depuis derrière des obstacles. Très précieux tactiquement.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "chance",
@@ -70,7 +81,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Boost temporaire de la chance du lanceur. Lancer avant les sorts chance principaux pour amplifier les dégâts."
+      "note": "Boost temporaire de la chance du lanceur. Lancer avant les sorts chance principaux pour amplifier les dégâts.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "boite_de_pandore",
@@ -82,7 +95,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 3,
-      "note": "AoE en croix. Effets aléatoires multiples sur les cibles. Peut débuffer ou infliger dégâts variables."
+      "note": "AoE en croix. Effets aléatoires multiples sur les cibles. Peut débuffer ou infliger dégâts variables.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "remblai",
@@ -94,7 +109,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Modifie le terrain (crée des cases traversables/non-traversables). Bloquer des couloirs ennemis."
+      "note": "Modifie le terrain (crée des cases traversables/non-traversables). Bloquer des couloirs ennemis.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "cle_reductrice",
@@ -106,7 +123,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "Réduit les résistances de la cible et retire des PM. Priorité pour synergiser les dégâts de l'équipe."
+      "note": "Réduit les résistances de la cible et retire des PM. Priorité pour synergiser les dégâts de l'équipe.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "force_de_l_age",
@@ -118,7 +137,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Buff de force ou chance selon le niveau. Renforce les prochaines attaques. Lancer avant la rotation DPS."
+      "note": "Buff de force ou chance selon le niveau. Renforce les prochaines attaques. Lancer avant la rotation DPS.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "desinvocation",
@@ -130,7 +151,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Retire les invocations ennemies. Contre les Osamodas et Sadidas. Libère les emplacements d'invocation alliés."
+      "note": "Retire les invocations ennemies. Contre les Osamodas et Sadidas. Libère les emplacements d'invocation alliés.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "cupidite",
@@ -142,7 +165,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Augmente les probabilités de drop et booste légèrement les stats. Lancer au début du tour pour l'effet chance."
+      "note": "Augmente les probabilités de drop et booste légèrement les stats. Lancer au début du tour pour l'effet chance.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "roulage_de_pelle",
@@ -154,7 +179,9 @@
       "ligne_de_vue": false,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "Sort mélée d'urgence avec léger recul. Créer de la distance si encerclé par un ennemi mélée."
+      "note": "Sort mélée d'urgence avec léger recul. Créer de la distance si encerclé par un ennemi mélée.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "maladresse",
@@ -166,7 +193,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Réduit la précision de la cible pendant plusieurs tours. Excellent contre les archers et DPS distance ennemis."
+      "note": "Réduit la précision de la cible pendant plusieurs tours. Excellent contre les archers et DPS distance ennemis.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "maladresse_de_masse",
@@ -178,7 +207,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "AoE de Maladresse sur plusieurs cibles. Réduire la précision de tout un groupe ennemi."
+      "note": "AoE de Maladresse sur plusieurs cibles. Réduire la précision de tout un groupe ennemi.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "acceleration",
@@ -190,7 +221,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Donne des PM à un allié ou à soi. Utile pour le repositionnement ou fuir rapidement."
+      "note": "Donne des PM à un allié ou à soi. Utile pour le repositionnement ou fuir rapidement.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "pelle_du_jugement",
@@ -202,7 +235,9 @@
       "ligne_de_vue": true,
       "degats": "très élevés",
       "cooldown": 3,
-      "note": "Sort burst ultime de l'Enutrof. Dégâts terre maximaux à courte portée. Réserver pour boss ou cibles prioritaires."
+      "note": "Sort burst ultime de l'Enutrof. Dégâts terre maximaux à courte portée. Réserver pour boss ou cibles prioritaires.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "pelle_massacrante",
@@ -214,7 +249,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "Sort terre à distance correcte. Dégâts solides, constituant principal de la rotation DPS terre."
+      "note": "Sort terre à distance correcte. Dégâts solides, constituant principal de la rotation DPS terre.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "corruption",
@@ -226,7 +263,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "Poison sur la cible. DoT efficace pour les longues batailles contre des cibles résistantes."
+      "note": "Poison sur la cible. DoT efficace pour les longues batailles contre des cibles résistantes.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "pelle_animee",
@@ -238,7 +277,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Invoque une pelle animée qui attaque les ennemis adjacents. Créature DPS simple pour harceler."
+      "note": "Invoque une pelle animée qui attaque les ennemis adjacents. Créature DPS simple pour harceler.",
+      "role": "invoc",
+      "portee_modifiable": true
     },
     {
       "id": "coffre_anime",
@@ -250,7 +291,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 5,
-      "note": "Invocation principale de l'Enutrof. Sortir dès le tour 1. Le coffre peut absorber des attaques et attaquer les ennemis."
+      "note": "Invocation principale de l'Enutrof. Sortir dès le tour 1. Le coffre peut absorber des attaques et attaquer les ennemis.",
+      "role": "invoc",
+      "portee_modifiable": true
     }
   ],
   "plan_tour_type": [

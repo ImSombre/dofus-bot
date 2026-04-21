@@ -2,7 +2,10 @@
   "class_id": "sram",
   "nom_fr": "Sram",
   "archetype": "DPS agilité mélée/pièges, invisibilité et embuscades",
-  "stats_principales": ["Agilité", "Chance"],
+  "stats_principales": [
+    "Agilité",
+    "Chance"
+  ],
   "philosophie": "Le Sram opère dans l'ombre. Il pose des pièges sur les cases de passage, s'invisibilise pour se repositionner, et frappe avec un maximum de dégâts depuis l'ombre. Double et Attaque Mortelle sont les sorts burst. Concentration de Chakra + Pulsion de Chakra pour le pic de dégâts.",
   "priorites_generales": [
     "Poser Piège Sournois et Piège Empoisonné sur les cases d'approche ennemie",
@@ -22,7 +25,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 5,
-      "note": "Rend le Sram invisible. Repositionnement sécurisé ou préparation d'une embuscade. Sort fondamental."
+      "note": "Rend le Sram invisible. Repositionnement sécurisé ou préparation d'une embuscade. Sort fondamental.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "piege_sournois",
@@ -34,7 +39,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 0,
-      "note": "Piège de dégâts principal. Spammable. Couvrir toutes les cases de passage avant que les ennemis avancent."
+      "note": "Piège de dégâts principal. Spammable. Couvrir toutes les cases de passage avant que les ennemis avancent.",
+      "role": "trap",
+      "portee_modifiable": true
     },
     {
       "id": "sournoiserie",
@@ -46,7 +53,9 @@
       "ligne_de_vue": false,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "Sort mélée/courte portée. Pas de ligne de vue. Dégâts bonus si attaque dans le dos. Positionnement clé."
+      "note": "Sort mélée/courte portée. Pas de ligne de vue. Dégâts bonus si attaque dans le dos. Positionnement clé.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "poison_insidieux",
@@ -58,7 +67,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "Poison à longue portée. DoT efficace pour les longues batailles. Compléter avec les pièges."
+      "note": "Poison à longue portée. DoT efficace pour les longues batailles. Compléter avec les pièges.",
+      "role": "debuff",
+      "portee_modifiable": true
     },
     {
       "id": "fourvoiement",
@@ -70,7 +81,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Retire des PM et PA à la cible. Contrôle utile pour ralentir les ennemis rapides et les empêcher de fuir."
+      "note": "Retire des PM et PA à la cible. Contrôle utile pour ralentir les ennemis rapides et les empêcher de fuir.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "coup_sournois",
@@ -82,7 +95,9 @@
       "ligne_de_vue": false,
       "degats": "élevés",
       "cooldown": 1,
-      "note": "Sort mélée avec bonus si attaque dans le flanc ou le dos. Bien se positionner pour maximiser les dégâts."
+      "note": "Sort mélée avec bonus si attaque dans le flanc ou le dos. Bien se positionner pour maximiser les dégâts.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "double",
@@ -94,7 +109,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Crée un double du Sram qui attaque les ennemis adjacents. Utile comme leurre ou complément DPS."
+      "note": "Crée un double du Sram qui attaque les ennemis adjacents. Utile comme leurre ou complément DPS.",
+      "role": "invoc",
+      "portee_modifiable": false
     },
     {
       "id": "reperage",
@@ -106,7 +123,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Révèle les pièges et entités invisibles dans la zone. Contre les autres Srams invisibles en PvP."
+      "note": "Révèle les pièges et entités invisibles dans la zone. Contre les autres Srams invisibles en PvP.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "piege_de_masse",
@@ -118,7 +137,9 @@
       "ligne_de_vue": true,
       "degats": "très élevés",
       "cooldown": 3,
-      "note": "Piège AoE qui touche toutes les cibles dans une large zone au déclenchement. Dégâts dévastateurs."
+      "note": "Piège AoE qui touche toutes les cibles dans une large zone au déclenchement. Dégâts dévastateurs.",
+      "role": "trap",
+      "portee_modifiable": true
     },
     {
       "id": "invisibilite_d_autrui",
@@ -130,7 +151,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 5,
-      "note": "Rend un allié invisible. Sauver un allié en danger ou permettre une embuscade alliée."
+      "note": "Rend un allié invisible. Sauver un allié en danger ou permettre une embuscade alliée.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "piege_empoisonne",
@@ -142,7 +165,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Piège qui applique un poison au déclenchement. Couplé au Piège Sournois, crée un combo dégâts + DoT."
+      "note": "Piège qui applique un poison au déclenchement. Couplé au Piège Sournois, crée un combo dégâts + DoT.",
+      "role": "trap",
+      "portee_modifiable": true
     },
     {
       "id": "concentration_de_chakra",
@@ -154,7 +179,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Charge le Chakra. Doit être lancé avant Pulsion de Chakra pour maximiser les dégâts du prochain sort."
+      "note": "Charge le Chakra. Doit être lancé avant Pulsion de Chakra pour maximiser les dégâts du prochain sort.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "piege_d_immobilisation",
@@ -166,7 +193,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Piège qui retire tous les PM au déclenchement. Clouer un ennemi sur place pour le burst."
+      "note": "Piège qui retire tous les PM au déclenchement. Clouer un ennemi sur place pour le burst.",
+      "role": "trap",
+      "portee_modifiable": true
     },
     {
       "id": "piege_de_silence",
@@ -178,7 +207,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Piège qui empêche le lancement de sorts. Placer devant les casters ennemis dangereux."
+      "note": "Piège qui empêche le lancement de sorts. Placer devant les casters ennemis dangereux.",
+      "role": "trap",
+      "portee_modifiable": true
     },
     {
       "id": "piege_repulsif",
@@ -190,7 +221,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Piège qui repousse la cible vers d'autres pièges. Créer des chaînes de pièges."
+      "note": "Piège qui repousse la cible vers d'autres pièges. Créer des chaînes de pièges.",
+      "role": "trap",
+      "portee_modifiable": true
     },
     {
       "id": "peur",
@@ -202,7 +235,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Repousse l'ennemi de plusieurs cases. Orienter une cible vers les pièges posés stratégiquement."
+      "note": "Repousse l'ennemi de plusieurs cases. Orienter une cible vers les pièges posés stratégiquement.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "arnaque",
@@ -214,7 +249,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Sort de dégâts à distance standard. Spam si pas en position pour les pièges ou la mélée."
+      "note": "Sort de dégâts à distance standard. Spam si pas en position pour les pièges ou la mélée.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "pulsion_de_chakra",
@@ -226,7 +263,9 @@
       "ligne_de_vue": true,
       "degats": "très élevés",
       "cooldown": 3,
-      "note": "Libère le Chakra chargé. Dégâts maximaux après Concentration de Chakra. Réserver pour les cibles prioritaires."
+      "note": "Libère le Chakra chargé. Dégâts maximaux après Concentration de Chakra. Réserver pour les cibles prioritaires.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "attaque_mortelle",
@@ -238,7 +277,9 @@
       "ligne_de_vue": false,
       "degats": "très élevés",
       "cooldown": 3,
-      "note": "Burst mélée ultime du Sram. Dégâts maximaux en corps-à-corps. Réserver pour les cibles à bas HP ou exposées."
+      "note": "Burst mélée ultime du Sram. Dégâts maximaux en corps-à-corps. Réserver pour les cibles à bas HP ou exposées.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "piege_mortel",
@@ -250,7 +291,9 @@
       "ligne_de_vue": true,
       "degats": "très élevés",
       "cooldown": 3,
-      "note": "Piège ultime à dégâts maximaux. Un seul peut tuer une cible non-tank. Réserver pour les ennemis prioritaires."
+      "note": "Piège ultime à dégâts maximaux. Un seul peut tuer une cible non-tank. Réserver pour les ennemis prioritaires.",
+      "role": "trap",
+      "portee_modifiable": true
     }
   ],
   "plan_tour_type": [

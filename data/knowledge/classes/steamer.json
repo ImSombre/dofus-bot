@@ -2,7 +2,10 @@
   "class_id": "steamer",
   "nom_fr": "Steamer",
   "archetype": "DPS-support intelligence, tourelles mécaniques et vapeur",
-  "stats_principales": ["Intelligence", "Vitalité"],
+  "stats_principales": [
+    "Intelligence",
+    "Vitalité"
+  ],
   "philosophie": "ATTENTION : le Steamer n'est pas documenté sur le gitbook Retrozia (serveur 12 classes classiques). Ce fichier est basé sur les sorts Dofus 2.x standards. Le Steamer déploie des tourelles mécaniques pour contrôler le terrain. L'économie de méca (charges mécaniques) détermine quelles tourelles poser. Optimiser les angles de tir des tourelles est fondamental.",
   "priorites_generales": [
     "Déployer la Tourelle Feu en priorité sur une position de contrôle optimale",
@@ -22,7 +25,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 4,
-      "note": "Tourelle principale DPS. Placer en hauteur ou en couloir pour couvrir un maximum de cases."
+      "note": "Tourelle principale DPS. Placer en hauteur ou en couloir pour couvrir un maximum de cases.",
+      "role": "invoc",
+      "portee_modifiable": true
     },
     {
       "id": "tourelle_glace",
@@ -34,7 +39,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 4,
-      "note": "Tourelle de contrôle. Ralentit les PM ennemis pour les garder à portée des autres tourelles."
+      "note": "Tourelle de contrôle. Ralentit les PM ennemis pour les garder à portée des autres tourelles.",
+      "role": "invoc",
+      "portee_modifiable": true
     },
     {
       "id": "tir_a_la_vapeur",
@@ -46,7 +53,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 0,
-      "note": "Sort de dégâts direct principal. Spammable si pas de déploiement à faire ce tour."
+      "note": "Sort de dégâts direct principal. Spammable si pas de déploiement à faire ce tour.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "propulsion",
@@ -58,7 +67,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Pousser un ennemi vers une tourelle ou s'échapper d'un encerclement."
+      "note": "Pousser un ennemi vers une tourelle ou s'échapper d'un encerclement.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "explosion_mecanique",
@@ -70,7 +81,9 @@
       "ligne_de_vue": true,
       "degats": "très élevés",
       "cooldown": 2,
-      "note": "Sacrifie une tourelle pour un burst AoE. Utiliser si la tourelle allait mourir de toute façon."
+      "note": "Sacrifie une tourelle pour un burst AoE. Utiliser si la tourelle allait mourir de toute façon.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "vapeur",
@@ -82,7 +95,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Zone de vapeur. Réduit la précision ennemie et inflige des dégâts de zone légers."
+      "note": "Zone de vapeur. Réduit la précision ennemie et inflige des dégâts de zone légers.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "reparation",
@@ -94,7 +109,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Répare une tourelle endommagée. Maintenir en vie une tourelle bien positionnée plutôt que de la réinvoquer."
+      "note": "Répare une tourelle endommagée. Maintenir en vie une tourelle bien positionnée plutôt que de la réinvoquer.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "canonnade",
@@ -106,7 +123,9 @@
       "ligne_de_vue": true,
       "degats": "très élevés",
       "cooldown": 3,
-      "note": "Sort burst à très longue portée. DPS le plus élevé du Steamer sur cible unique."
+      "note": "Sort burst à très longue portée. DPS le plus élevé du Steamer sur cible unique.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "harponnage",
@@ -118,7 +137,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "Attire l'ennemi vers le Steamer et ses tourelles. Forcer l'engagement sur les zones couvertes."
+      "note": "Attire l'ennemi vers le Steamer et ses tourelles. Forcer l'engagement sur les zones couvertes.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "tir_de_barrage",
@@ -130,7 +151,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "Tir en ligne qui touche tout dans son chemin. Excellent si ennemis alignés avec le Steamer."
+      "note": "Tir en ligne qui touche tout dans son chemin. Excellent si ennemis alignés avec le Steamer.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "tir_lourd",
@@ -142,7 +165,9 @@
       "ligne_de_vue": true,
       "degats": "très élevés",
       "cooldown": 3,
-      "note": "Tir puissant qui repousse la cible. Dégâts + repositionnement ennemi."
+      "note": "Tir puissant qui repousse la cible. Dégâts + repositionnement ennemi.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "tir_maladroit",
@@ -154,7 +179,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Sort économique. Finir les tours avec peu de PA sans gaspiller des ressources."
+      "note": "Sort économique. Finir les tours avec peu de PA sans gaspiller des ressources.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "tourelle_aerienne",
@@ -166,7 +193,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 4,
-      "note": "Tourelle air à longue portée. Retire des PM aux cibles touchées. Contrôle de mobilité passif."
+      "note": "Tourelle air à longue portée. Retire des PM aux cibles touchées. Contrôle de mobilité passif.",
+      "role": "invoc",
+      "portee_modifiable": true
     },
     {
       "id": "tourelle_terrestre",
@@ -178,7 +207,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 4,
-      "note": "Tourelle terre très résistante. Sert de bouclier vivant et inflige des dégâts en zone rapprochée."
+      "note": "Tourelle terre très résistante. Sert de bouclier vivant et inflige des dégâts en zone rapprochée.",
+      "role": "invoc",
+      "portee_modifiable": true
     },
     {
       "id": "vapocharge",
@@ -190,7 +221,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 3,
-      "note": "Charge de vapeur en zone. AoE puissante sur ennemis groupés."
+      "note": "Charge de vapeur en zone. AoE puissante sur ennemis groupés.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "vent_fort",
@@ -202,7 +235,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "AoE de poussée en ligne. Repousse les ennemis et crée de la distance pour les tourelles."
+      "note": "AoE de poussée en ligne. Repousse les ennemis et crée de la distance pour les tourelles.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "tir_piege",
@@ -214,7 +249,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "Pose un piège mécanique sur la case ciblée. Se déclenche au passage ennemi."
+      "note": "Pose un piège mécanique sur la case ciblée. Se déclenche au passage ennemi.",
+      "role": "trap",
+      "portee_modifiable": true
     },
     {
       "id": "torpille",
@@ -226,7 +263,9 @@
       "ligne_de_vue": true,
       "degats": "très élevés",
       "cooldown": 4,
-      "note": "Projectile à très longue portée. Sort de snipe ultime pour atteindre des cibles éloignées."
+      "note": "Projectile à très longue portée. Sort de snipe ultime pour atteindre des cibles éloignées.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "bombe_en_mer",
@@ -238,7 +277,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 3,
-      "note": "AoE eau à distance. Complément si les ennemis résistent au feu."
+      "note": "AoE eau à distance. Complément si les ennemis résistent au feu.",
+      "role": "offensif",
+      "portee_modifiable": true
     }
   ],
   "plan_tour_type": [

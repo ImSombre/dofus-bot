@@ -2,7 +2,11 @@
   "class_id": "sacrieur",
   "nom_fr": "Sacrieur",
   "archetype": "tank DPS force/feu/agilité mélée, puissance croissante avec les blessures",
-  "stats_principales": ["Force", "Vitalité", "Agilité"],
+  "stats_principales": [
+    "Force",
+    "Vitalité",
+    "Agilité"
+  ],
   "philosophie": "Le Sacrieur est plus dangereux quand il est blessé. Les Châtiments accumulent les stacks de douleur qui amplifient les dégâts. Attirance ramène les ennemis au corps-à-corps. Transposition échange les positions pour les engager. Ne pas soigner le Sacrieur trop tôt : il est dans son pic de puissance à bas HP.",
   "priorites_generales": [
     "Rester en mélée sur les ennemis : tous les Châtiments sont à portée courte",
@@ -22,7 +26,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Attire une cible distante vers le Sacrieur. Forcer l'engagement sans se déplacer."
+      "note": "Attire une cible distante vers le Sacrieur. Forcer l'engagement sans se déplacer.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "pied_du_sacrieur",
@@ -34,7 +40,9 @@
       "ligne_de_vue": false,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Sort mélée rapide à courte portée. Spam avec les Châtiments pour épuiser les PA efficacement."
+      "note": "Sort mélée rapide à courte portée. Spam avec les Châtiments pour épuiser les PA efficacement.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "chatiment_force",
@@ -46,7 +54,9 @@
       "ligne_de_vue": false,
       "degats": "élevés",
       "cooldown": 0,
-      "note": "Châtiment force. DPS mélée principal. Dégâts croissants avec les stacks. Rotation de base."
+      "note": "Châtiment force. DPS mélée principal. Dégâts croissants avec les stacks. Rotation de base.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "derobade",
@@ -58,7 +68,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Téléportation libre sur une case non-occupée. Repositionnement offensif pour s'engager ou défensif pour fuir."
+      "note": "Téléportation libre sur une case non-occupée. Repositionnement offensif pour s'engager ou défensif pour fuir.",
+      "role": "offensif",
+      "portee_modifiable": false
     },
     {
       "id": "detour",
@@ -70,7 +82,9 @@
       "ligne_de_vue": false,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Sort sans ligne de vue. Bon pour attaquer depuis derrière un obstacle ou dans un couloir étroit."
+      "note": "Sort sans ligne de vue. Bon pour attaquer depuis derrière un obstacle ou dans un couloir étroit.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "assaut",
@@ -82,7 +96,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 3,
-      "note": "AoE en croix. Excellent si plusieurs ennemis regroupés autour du Sacrieur."
+      "note": "AoE en croix. Excellent si plusieurs ennemis regroupés autour du Sacrieur.",
+      "role": "deplacement",
+      "portee_modifiable": true
     },
     {
       "id": "chatiment_agile",
@@ -94,7 +110,9 @@
       "ligne_de_vue": false,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Châtiment agilité en corps-à-corps. Alternative si les ennemis ont de hautes résistances force."
+      "note": "Châtiment agilité en corps-à-corps. Alternative si les ennemis ont de hautes résistances force.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "dissolution",
@@ -106,7 +124,9 @@
       "ligne_de_vue": false,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "Retire les armures et boucliers ennemis. Essentiel contre les Fécas et tanks protégés."
+      "note": "Retire les armures et boucliers ennemis. Essentiel contre les Fécas et tanks protégés.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "chatiment_ose",
@@ -118,7 +138,9 @@
       "ligne_de_vue": false,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "Gros dégâts mélée chance. Utiliser avec des stacks Châtiment élevés pour un burst important."
+      "note": "Gros dégâts mélée chance. Utiliser avec des stacks Châtiment élevés pour un burst important.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "chatiment_spirituel",
@@ -130,7 +152,9 @@
       "ligne_de_vue": false,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Châtiment intelligence. Variante pour les builds mixtes ou contre ennemis résistants force."
+      "note": "Châtiment intelligence. Variante pour les builds mixtes ou contre ennemis résistants force.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "sacrifice",
@@ -142,7 +166,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Sort de tank : absorbe les dégâts destinés à un allié. Les dégâts reçus amplifient les stacks Châtiment."
+      "note": "Sort de tank : absorbe les dégâts destinés à un allié. Les dégâts reçus amplifient les stacks Châtiment.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "absorption",
@@ -154,7 +180,9 @@
       "ligne_de_vue": false,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Vol de vie en mélée. Récupérer des HP tout en infligeant des dégâts. Excellent pour le sustain."
+      "note": "Vol de vie en mélée. Récupérer des HP tout en infligeant des dégâts. Excellent pour le sustain.",
+      "role": "soin",
+      "portee_modifiable": true
     },
     {
       "id": "chatiment_vitalesque",
@@ -166,7 +194,9 @@
       "ligne_de_vue": false,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Monte les stacks Châtiment rapidement. Sort de base pour accumuler les charges en début de combat."
+      "note": "Monte les stacks Châtiment rapidement. Sort de base pour accumuler les charges en début de combat.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "cooperation",
@@ -178,7 +208,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Transfère une partie des dégâts reçus par un allié au Sacrieur. Protège l'équipe tout en montant les stacks."
+      "note": "Transfère une partie des dégâts reçus par un allié au Sacrieur. Protège l'équipe tout en montant les stacks.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "transposition",
@@ -190,7 +222,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Échange de position avec une cible. Engager un ennemi distant, ou sauver un allié en danger."
+      "note": "Échange de position avec une cible. Engager un ennemi distant, ou sauver un allié en danger.",
+      "role": "deplacement",
+      "portee_modifiable": true
     },
     {
       "id": "punition",
@@ -202,7 +236,9 @@
       "ligne_de_vue": false,
       "degats": "très élevés",
       "cooldown": 3,
-      "note": "Sort burst ultime du Sacrieur. Dégâts maximaux quand HP < 50%. Garder pour les moments critiques."
+      "note": "Sort burst ultime du Sacrieur. Dégâts maximaux quand HP < 50%. Garder pour les moments critiques.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "furie",
@@ -214,7 +250,9 @@
       "ligne_de_vue": false,
       "degats": "élevés",
       "cooldown": 3,
-      "note": "AoE en ligne depuis le Sacrieur. Repousse les ennemis alignés devant soi."
+      "note": "AoE en ligne depuis le Sacrieur. Repousse les ennemis alignés devant soi.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "epee_volante",
@@ -226,7 +264,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "Sort à distance du Sacrieur. Utile pour finir une cible éloignée ou avant de s'engager."
+      "note": "Sort à distance du Sacrieur. Utile pour finir une cible éloignée ou avant de s'engager.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "transfert_de_vie",
@@ -238,7 +278,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Donne des HP à un allié en en perdant soi-même. Aide l'allié tout en montant les stacks Châtiment."
+      "note": "Donne des HP à un allié en en perdant soi-même. Aide l'allié tout en montant les stacks Châtiment.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "folie_sanguinaire",
@@ -250,7 +292,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 5,
-      "note": "Mode berserk ultime : boost massif des dégâts pendant plusieurs tours. Sort signature pour le pic de puissance."
+      "note": "Mode berserk ultime : boost massif des dégâts pendant plusieurs tours. Sort signature pour le pic de puissance.",
+      "role": "buff",
+      "portee_modifiable": false
     }
   ],
   "plan_tour_type": [

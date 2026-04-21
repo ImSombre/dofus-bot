@@ -2,7 +2,11 @@
   "class_id": "pandawa",
   "nom_fr": "Pandawa",
   "archetype": "tank-support chance/force/feu, contrôle via ivresse et lancers",
-  "stats_principales": ["Force", "Chance", "Vitalité"],
+  "stats_principales": [
+    "Force",
+    "Chance",
+    "Vitalité"
+  ],
   "philosophie": "Le Pandawa enivre ses ennemis pour les projeter dans le décor ou sur d'autres. Karcham permet de porter une cible ivre, puis de la lancer via Chamrak sur d'autres ennemis. Les Vulnérabilités débuffent les résistances élémentaires des ennemis pour amplifier les dégâts de l'équipe.",
   "priorites_generales": [
     "Monter l'ivresse d'une cible via Lait de Bambou ou Poing Enflammé",
@@ -22,7 +26,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Monte l'ivresse personnelle rapidement. Très économique (2 PA). Lancer pour bénéficier des bonus d'ivresse."
+      "note": "Monte l'ivresse personnelle rapidement. Très économique (2 PA). Lancer pour bénéficier des bonus d'ivresse.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "poing_enflamme",
@@ -34,7 +40,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Sort feu de base. Monte l'ivresse de la cible et inflige des dégâts. Spammable."
+      "note": "Sort feu de base. Monte l'ivresse de la cible et inflige des dégâts. Spammable.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "gueule_de_bois",
@@ -46,7 +54,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "Retire de l'ivresse accumulée à la cible et inflige des dégâts en fonction de l'ivresse retirée."
+      "note": "Retire de l'ivresse accumulée à la cible et inflige des dégâts en fonction de l'ivresse retirée.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "epouvante",
@@ -58,7 +68,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Repousse la cible de plusieurs cases. Contrôle de positionnement pour orienter un ennemi vers un allié."
+      "note": "Repousse la cible de plusieurs cases. Contrôle de positionnement pour orienter un ennemi vers un allié.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "souffle_alcoolise",
@@ -70,7 +82,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 3,
-      "note": "AoE de zone. Monte l'ivresse de tous les ennemis dans la zone. Bon pour préparer un lancer de masse."
+      "note": "AoE de zone. Monte l'ivresse de tous les ennemis dans la zone. Bon pour préparer un lancer de masse.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "vulnerabilite_aqueuse",
@@ -82,7 +96,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Réduit les résistances eau de la cible. Synergie avec alliés Eniripsa chance ou Enutrof chance."
+      "note": "Réduit les résistances eau de la cible. Synergie avec alliés Eniripsa chance ou Enutrof chance.",
+      "role": "debuff",
+      "portee_modifiable": true
     },
     {
       "id": "vulnerabilite_incandescente",
@@ -94,7 +110,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Réduit les résistances feu de la cible. Synergie avec alliés Xelor intel ou Eniripsa intel."
+      "note": "Réduit les résistances feu de la cible. Synergie avec alliés Xelor intel ou Eniripsa intel.",
+      "role": "debuff",
+      "portee_modifiable": true
     },
     {
       "id": "karcham",
@@ -106,7 +124,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Saisit une cible adjacente. Mécanisme central du Pandawa. Utiliser sur une cible ivre pour la porter."
+      "note": "Saisit une cible adjacente. Mécanisme central du Pandawa. Utiliser sur une cible ivre pour la porter.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "vulnerabilite_venteuse",
@@ -118,7 +138,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Réduit les résistances air de la cible. Synergie avec alliés Crâ air ou Iop air."
+      "note": "Réduit les résistances air de la cible. Synergie avec alliés Crâ air ou Iop air.",
+      "role": "debuff",
+      "portee_modifiable": true
     },
     {
       "id": "stabilisation",
@@ -130,7 +152,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Empêche la cible d'être déplacée. Utile pour protéger un allié des lancers ou poussées ennemies."
+      "note": "Empêche la cible d'être déplacée. Utile pour protéger un allié des lancers ou poussées ennemies.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "chamrak",
@@ -142,7 +166,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 0,
-      "note": "Lance la cible portée via Karcham. Dégâts selon la distance parcourue. Utiliser après Karcham pour projeter."
+      "note": "Lance la cible portée via Karcham. Dégâts selon la distance parcourue. Utiliser après Karcham pour projeter.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "vulnerabilite_terrestre",
@@ -154,7 +180,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Réduit les résistances terre de la cible. Synergie avec alliés Iop force, Enutrof force."
+      "note": "Réduit les résistances terre de la cible. Synergie avec alliés Iop force, Enutrof force.",
+      "role": "debuff",
+      "portee_modifiable": true
     },
     {
       "id": "souillure",
@@ -166,7 +194,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "Applique un poison et réduit les soins reçus par la cible. Anti-heal efficace contre les tanks bien soignés."
+      "note": "Applique un poison et réduit les soins reçus par la cible. Anti-heal efficace contre les tanks bien soignés.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "lait_de_bambou",
@@ -178,7 +208,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Sort eau principal. Monte l'ivresse et inflige des dégâts eau. Spammable, base de la rotation offensive."
+      "note": "Sort eau principal. Monte l'ivresse et inflige des dégâts eau. Spammable, base de la rotation offensive.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "vague_a_lame",
@@ -190,7 +222,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 3,
-      "note": "AoE en ligne d'eau puissante. Repousse les ennemis dans la ligne. Excellent pour aligner des cibles vers un mur."
+      "note": "AoE en ligne d'eau puissante. Repousse les ennemis dans la ligne. Excellent pour aligner des cibles vers un mur.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "colere_de_zatoishan",
@@ -202,7 +236,9 @@
       "ligne_de_vue": true,
       "degats": "très élevés",
       "cooldown": 4,
-      "note": "Sort AoE ultime du Pandawa. Dégâts massifs en croix. Réserver pour les groupes d'ennemis avec ivresse élevée."
+      "note": "Sort AoE ultime du Pandawa. Dégâts massifs en croix. Réserver pour les groupes d'ennemis avec ivresse élevée.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "flasque_explosive",
@@ -214,7 +250,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 3,
-      "note": "AoE en carré. Explose en zone et monte l'ivresse des cibles touchées. Excellent avant un Karcham."
+      "note": "AoE en carré. Explose en zone et monte l'ivresse des cibles touchées. Excellent avant un Karcham.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "pandatak",
@@ -226,7 +264,9 @@
       "ligne_de_vue": false,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Sort mélée courte portée. Pas de ligne de vue. Sort de base pour finaliser les tours avec PA restants."
+      "note": "Sort mélée courte portée. Pas de ligne de vue. Sort de base pour finaliser les tours avec PA restants.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "pandanlku",
@@ -238,7 +278,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Sort spécial Retrozia. Boost les dégâts du Pandawa selon son ivresse actuelle. Lancer à ivresse maximale."
+      "note": "Sort spécial Retrozia. Boost les dégâts du Pandawa selon son ivresse actuelle. Lancer à ivresse maximale.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "lien_spiritueux",
@@ -250,7 +292,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Crée un lien de synergie entre le Pandawa et un allié. Les dégâts ou soins sont partagés entre les deux."
+      "note": "Crée un lien de synergie entre le Pandawa et un allié. Les dégâts ou soins sont partagés entre les deux.",
+      "role": "buff",
+      "portee_modifiable": true
     }
   ],
   "plan_tour_type": [

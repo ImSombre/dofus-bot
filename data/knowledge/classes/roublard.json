@@ -2,7 +2,10 @@
   "class_id": "roublard",
   "nom_fr": "Roublard",
   "archetype": "DPS chance à distance, bombes et combos explosifs",
-  "stats_principales": ["Chance", "Agilité"],
+  "stats_principales": [
+    "Chance",
+    "Agilité"
+  ],
   "philosophie": "ATTENTION : le Roublard n'est pas documenté sur le gitbook Retrozia (serveur 12 classes classiques). Ce fichier est basé sur les sorts Dofus 2.x standards. Le Roublard pose des bombes pour créer des chaînes d'explosions. Bombe Boum + Bombe Krâ + Bombe Sombre forment le triangle explosif optimal. Détonateur déclenche depuis la sécurité.",
   "priorites_generales": [
     "Poser les 3 types de bombes en triangle autour des cibles",
@@ -22,7 +25,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 0,
-      "note": "Bombe principale. Poser en premier autour des cibles. Dégâts élevés à l'explosion."
+      "note": "Bombe principale. Poser en premier autour des cibles. Dégâts élevés à l'explosion.",
+      "role": "invoc",
+      "portee_modifiable": true
     },
     {
       "id": "bombe_kra",
@@ -34,7 +39,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Bombe de contrôle. Combinée à Boum, amplifie la zone d'effet et ajoute un effet de recul."
+      "note": "Bombe de contrôle. Combinée à Boum, amplifie la zone d'effet et ajoute un effet de recul.",
+      "role": "invoc",
+      "portee_modifiable": true
     },
     {
       "id": "bombe_sombre",
@@ -46,7 +53,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Bombe d'attraction. Attire les cibles vers le centre à l'explosion. Compléter le triangle."
+      "note": "Bombe d'attraction. Attire les cibles vers le centre à l'explosion. Compléter le triangle.",
+      "role": "invoc",
+      "portee_modifiable": true
     },
     {
       "id": "detonateur",
@@ -58,7 +67,9 @@
       "ligne_de_vue": true,
       "degats": "très élevés",
       "cooldown": 0,
-      "note": "Sort de déclenchement des bombes à distance. Utiliser quand le triangle est en place."
+      "note": "Sort de déclenchement des bombes à distance. Utiliser quand le triangle est en place.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "tir_de_sommation",
@@ -70,7 +81,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 0,
-      "note": "Sort de dégâts direct à longue portée. Maintenir la pression en attendant le setup des bombes."
+      "note": "Sort de dégâts direct à longue portée. Maintenir la pression en attendant le setup des bombes.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "ruse_de_roublard",
@@ -82,7 +95,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Repositionnement d'urgence. Fuir le corps-à-corps ou optimiser les angles pour les bombes."
+      "note": "Repositionnement d'urgence. Fuir le corps-à-corps ou optimiser les angles pour les bombes.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "casse_noisette",
@@ -94,7 +109,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Sort polyvalent distance. Bon finisseur de tour ou sort de harcèlement à distance."
+      "note": "Sort polyvalent distance. Bon finisseur de tour ou sort de harcèlement à distance.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "attirance",
@@ -106,7 +123,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Attire l'ennemi vers une bombe positionnée. Repositionner les cibles sur les bombes."
+      "note": "Attire l'ennemi vers une bombe positionnée. Repositionner les cibles sur les bombes.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "boulet",
@@ -118,7 +137,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "Sort de dégâts lourds à distance. Alternative quand les bombes sont déjà en cooldown."
+      "note": "Sort de dégâts lourds à distance. Alternative quand les bombes sont déjà en cooldown.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "diversion",
@@ -130,7 +151,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Crée un leurre. Réduire les dégâts reçus pendant le setup des bombes."
+      "note": "Crée un leurre. Réduire les dégâts reçus pendant le setup des bombes.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "mise_a_sac",
@@ -142,7 +165,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "Réduit les résistances de la cible. Lancer avant l'explosion pour maximiser les dégâts."
+      "note": "Réduit les résistances de la cible. Lancer avant l'explosion pour maximiser les dégâts.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "pichenette",
@@ -154,7 +179,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Sort économique de remplissage. Finir les tours sans dépenser trop de PA."
+      "note": "Sort économique de remplissage. Finir les tours sans dépenser trop de PA.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "poussiere_explosive",
@@ -166,7 +193,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 3,
-      "note": "AoE explosif direct. Complément aux bombes pour des dégâts de zone immédiats."
+      "note": "AoE explosif direct. Complément aux bombes pour des dégâts de zone immédiats.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "tir_de_diversion",
@@ -178,7 +207,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Sort distance alternatif entre deux poses de bombes pour maintenir la pression."
+      "note": "Sort distance alternatif entre deux poses de bombes pour maintenir la pression.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "botte_roublarde",
@@ -190,7 +221,9 @@
       "ligne_de_vue": false,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "Sort mélée défensif. Utiliser si un ennemi s'approche dangereusement. Repousse la cible."
+      "note": "Sort mélée défensif. Utiliser si un ennemi s'approche dangereusement. Repousse la cible.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "bombe_sournoise",
@@ -202,7 +235,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "Bombe invisible posée sans que l'ennemi puisse la voir. Idéale pour les embuscades préparées."
+      "note": "Bombe invisible posée sans que l'ennemi puisse la voir. Idéale pour les embuscades préparées.",
+      "role": "invoc",
+      "portee_modifiable": true
     },
     {
       "id": "roublabot",
@@ -214,7 +249,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Invoque un robot qui peut pousser/tirer les bombes et ennemis. Repositionner les bombes sans les déclencher."
+      "note": "Invoque un robot qui peut pousser/tirer les bombes et ennemis. Repositionner les bombes sans les déclencher.",
+      "role": "invoc",
+      "portee_modifiable": true
     },
     {
       "id": "tir_rapide",
@@ -226,7 +263,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Sort distance économique. Bon rapport PA/dégâts pour les tours de transition entre poses de bombes."
+      "note": "Sort distance économique. Bon rapport PA/dégâts pour les tours de transition entre poses de bombes.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "concentration",
@@ -238,7 +277,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Boost les dégâts du prochain sort. Lancer avant Tir de Sommation ou un Détonateur pour maximiser l'explosion."
+      "note": "Boost les dégâts du prochain sort. Lancer avant Tir de Sommation ou un Détonateur pour maximiser l'explosion.",
+      "role": "buff",
+      "portee_modifiable": false
     }
   ],
   "plan_tour_type": [

@@ -1,39 +1,37 @@
-"""Moteur de décision combat déterministe (rule-based).
+"""Moteur de décision combat Dofus 2.64 — rule-based, testé, rapide.
 
-Remplace le LLM pour 90% des décisions combat simples. Inspiration : Inkybot
-(rule-based AI, chain-of-responsibility, décisions <100ms).
+v0.6.0 — Refonte intelligente :
+  - LoS réelle par raycasting pixels (los_detector) au lieu de heuristique
+  - Priorisation cible multi-critères (targeting.py) : finish-kill, CaC, HP bas
+  - Choix de sort optimal : favorise gros dégâts tant que PA permet
+  - Anti-boucle : détection cible immobile après cast = mur confirmé
+  - Buffs en début de tour (si configurés dans knowledge)
+  - Gestion HP basse (fuite si <20%)
 
-Usage :
-    engine = CombatDecisionEngine(config, knowledge)
-    action = engine.decide(snapshot, pa_remaining, cast_history)
-    if action.type == "defer_to_llm":
-        # cas ambigu → tomber sur le LLM
-        ...
-    else:
-        # action déterministe trouvée, exécuter
-        ...
+Inspirations :
+  - ArakneUtils (algo LoS Dofus officiel)
+  - BlueSheep (Pathfinding MapPoint / formule cellId)
+  - Inkybot (chain-of-responsibility rule-based)
+  - Guides classes Dofus 2.64 (DofHub, Wiki-Dofus, Millenium)
 
-Décisions produites (format compatible vision_combat_worker) :
-    {"type": "cast_spell", "spell_key": 2, "target_xy": [x, y]}
-    {"type": "click_xy", "target_xy": [x, y]}
-    {"type": "end_turn"}
-    {"type": "wait"}
-    {"type": "defer_to_llm"}  # demande au LLM de trancher
-
-Latence typique : <5ms (pure Python, pas d'IO).
+Le moteur retourne un dict d'action OU {"type": "defer_to_llm"} quand il ne
+peut pas décider seul (cas ambigus : popup incertain, phase inconnue…).
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
+import numpy as np
 from loguru import logger
 
 from src.services.combat_knowledge import CombatKnowledge
 from src.services.combat_state_reader import CombatStateSnapshot
+from src.services.los_detector import check_line_of_sight, find_bypass_cell
+from src.services.targeting import TargetScore, score_targets
 
 
-# Dofus isométrique : 1 case ≈ 86px horizontal, 43px vertical.
+# Constantes Dofus iso
 CELL_PX_X = 86
 CELL_PX_Y = 43
 
@@ -41,42 +39,61 @@ CELL_PX_Y = 43
 @dataclass
 class EngineConfig:
     class_name: str = "ecaflip"
-    spell_shortcuts: dict[int, str] = None  # {slot: spell_name_or_id}
+    spell_shortcuts: dict[int, str] = field(default_factory=dict)
     starting_pa: int = 6
     starting_pm: int = 3
     po_bonus: int = 0
-    # Rayon "proche" en cases : si mob à ≤N cases, on engage direct
-    engage_range_cases: int = 6
+    low_hp_flee_threshold: float = 0.20
+    """Sous ce % HP, on priorise la fuite."""
+    use_pixel_los: bool = True
+    """Activer le raycasting pixel pour LoS (False = distance-only)."""
 
 
 def dist_cases(a_xy: tuple[int, int], b_xy: tuple[int, int]) -> float:
-    """Distance Dofus iso entre 2 points écran."""
+    """Distance Dofus iso (86/43 px/case)."""
     dx = abs(a_xy[0] - b_xy[0])
     dy = abs(a_xy[1] - b_xy[1])
-    # max(dx/86, dy/43) approxime bien une case Dofus iso
     return max(dx / CELL_PX_X, dy / CELL_PX_Y)
 
 
+@dataclass
+class DecisionContext:
+    """Contexte d'une décision (état + historique)."""
+    snap: CombatStateSnapshot | None
+    pa_remaining: int
+    cast_history: list[tuple[str, int, int]]
+    stuck_overrides: int = 0
+    turn_number: int = 1
+    frame_bgr: np.ndarray | None = None
+    buffs_cast_this_fight: set[int] = field(default_factory=set)
+
+
 class CombatDecisionEngine:
-    """Moteur de décision combat rule-based."""
+    """Moteur rule-based pour combat Dofus.
+
+    Usage :
+        engine = CombatDecisionEngine(config, knowledge)
+        action = engine.decide(context)
+        if action["type"] == "defer_to_llm":
+            # fallback LLM
+        else:
+            execute(action)
+    """
 
     def __init__(self, config: EngineConfig, knowledge: CombatKnowledge) -> None:
         self.cfg = config
         self.kb = knowledge
-        # Cache : {slot: {pa, po_min, po_max, nom, ...}}
         self._spell_info_cache: dict[int, dict] = {}
 
-    def _get_spell_info(self, slot: int) -> dict:
-        """Résout les infos d'un sort depuis sa position slot via knowledge DB.
+    # ---------- Résolution des sorts (via knowledge DB) ----------
 
-        Retourne un dict {pa, po_min, po_max, nom} ou {} si introuvable.
-        """
+    def _get_spell_info(self, slot: int) -> dict:
+        """Résout infos d'un sort depuis son slot, via spell_shortcuts + kb."""
         if slot in self._spell_info_cache:
             return self._spell_info_cache[slot]
-        info = {}
+        info: dict[str, Any] = {}
         try:
-            spell_ref = self.cfg.spell_shortcuts.get(slot, "") if self.cfg.spell_shortcuts else ""
-            spell_ref = str(spell_ref).strip().lower()
+            spell_ref = str(self.cfg.spell_shortcuts.get(slot, "")).strip().lower()
             if spell_ref:
                 cls = self.kb.get_class(self.cfg.class_name)
                 if cls:
@@ -89,8 +106,14 @@ class CombatDecisionEngine:
                                 "pa": int(s.get("pa", 3)),
                                 "po_min": int(s.get("po_min", 1)),
                                 "po_max": int(s.get("po_max", 5)),
-                                "type": s.get("type", ""),
+                                "type": str(s.get("type", "")).lower(),
                                 "ligne_de_vue": bool(s.get("ligne_de_vue", True)),
+                                "degats": s.get("degats", ""),
+                                "role": str(s.get("role", "offensif")).lower(),
+                                # Sort "modifiable" = portée étendue par bonus PO
+                                "portee_modifiable": bool(
+                                    s.get("portee_modifiable", True),
+                                ),
                             }
                             break
         except Exception as exc:
@@ -99,67 +122,71 @@ class CombatDecisionEngine:
         return info
 
     def _effective_max_range(self, spell: dict) -> int:
-        """Portée max effective = portée base + bonus PO (si sort modifiable)."""
         base = spell.get("po_max", 5)
-        # Approximation : on applique toujours le bonus PO (la plupart des sorts
-        # le sont modifiables). Les sorts "portée fixe" sont rares.
-        return base + max(0, self.cfg.po_bonus)
+        if spell.get("portee_modifiable", True):
+            return base + max(0, self.cfg.po_bonus)
+        return base
 
-    def _best_spell_for_range(
+    def _all_spells(self) -> list[tuple[int, dict]]:
+        """Liste des sorts configurés avec infos résolues."""
+        out = []
+        for slot in sorted(self.cfg.spell_shortcuts.keys()):
+            info = self._get_spell_info(slot)
+            if info:
+                out.append((slot, info))
+        return out
+
+    def _min_spell_cost(self) -> int:
+        spells = self._all_spells()
+        return min((s[1].get("pa", 99) for s in spells), default=99)
+
+    def _max_spell_range(self) -> int:
+        spells = self._all_spells()
+        return max((self._effective_max_range(s[1]) for s in spells), default=0)
+
+    # ---------- Choix de sort ----------
+
+    def _best_offensive_spell(
         self, dist: float, pa_available: int,
     ) -> tuple[int, dict] | None:
-        """Choisit le meilleur sort à cast étant donné la distance et les PA dispo.
+        """Meilleur sort offensif qui :
+          - coûte ≤ pa_available
+          - portée compatible avec dist
+          - rôle offensif (pas buff/soin)
 
-        Stratégie : sort avec la plus forte "priorité" parmi ceux qui :
-        - Coûtent ≤ pa_available
-        - Ont po_min ≤ dist ≤ po_max_effective
-
-        Priorité = PA dépensé (un sort qui coûte 4 PA fait plus qu'un à 2 PA
-        dans Dofus en général). Ordre secondaire : plus haute portée_min
-        (privilégier les sorts de CaC quand on est au contact).
-
-        Retourne (slot, spell_info) ou None.
+        Priorité : score = coût PA (proxy dégâts) + bonus portée_min basse.
         """
-        if not self.cfg.spell_shortcuts:
-            return None
         candidates: list[tuple[int, dict, int]] = []
-        for slot in self.cfg.spell_shortcuts:
-            info = self._get_spell_info(slot)
-            if not info:
+        for slot, info in self._all_spells():
+            if info.get("role", "offensif") not in ("offensif", "degats", ""):
                 continue
             cost = info.get("pa", 99)
             if cost > pa_available:
                 continue
             max_r = self._effective_max_range(info)
             min_r = info.get("po_min", 1)
-            if min_r <= dist <= max_r:
-                # score = coût PA (proxy pour dégâts) + bonus portée_min basse
-                score = cost * 10 + (5 - min_r)
-                candidates.append((slot, info, score))
+            if not (min_r <= dist <= max_r):
+                continue
+            score = cost * 10 + (5 - min_r)
+            candidates.append((slot, info, score))
         if not candidates:
             return None
-        # Plus haut score = mieux
         candidates.sort(key=lambda c: -c[2])
         slot, info, _ = candidates[0]
         return (slot, info)
 
-    def _min_spell_cost(self) -> int:
-        """Plus petit coût PA parmi les sorts configurés (pour check si on peut encore cast)."""
-        costs = []
-        for slot in (self.cfg.spell_shortcuts or {}):
-            info = self._get_spell_info(slot)
-            if info:
-                costs.append(info.get("pa", 99))
-        return min(costs) if costs else 99
+    def _buff_spells_pending(self, already_cast: set[int]) -> list[tuple[int, dict]]:
+        """Retourne les buffs configurés pas encore cast ce combat."""
+        out = []
+        for slot, info in self._all_spells():
+            role = info.get("role", "")
+            if role in ("buff", "soutien") and slot not in already_cast:
+                out.append((slot, info))
+        # Priorise les buffs "début de combat" (coût faible d'abord)
+        out.sort(key=lambda x: x[1].get("pa", 99))
+        return out
 
-    def _max_spell_range(self) -> int:
-        """Plus grande portée parmi les sorts configurés."""
-        ranges = []
-        for slot in (self.cfg.spell_shortcuts or {}):
-            info = self._get_spell_info(slot)
-            if info:
-                ranges.append(self._effective_max_range(info))
-        return max(ranges) if ranges else 0
+    # ---------- Utilitaires position ----------
 
     def _recently_cast_same_target(
         self,
@@ -168,7 +195,6 @@ class CombatDecisionEngine:
         cast_history: list[tuple[str, int, int]],
         tolerance: int = 50,
     ) -> bool:
-        """True si on a déjà cast ce slot sur ±tolerance px de cette cible."""
         for s, hx, hy in cast_history:
             if str(s) == str(slot):
                 if abs(hx - target_xy[0]) <= tolerance and abs(hy - target_xy[1]) <= tolerance:
@@ -181,13 +207,10 @@ class CombatDecisionEngine:
         target_xy: tuple[int, int],
         distance_cases: int = 3,
     ) -> tuple[int, int]:
-        """Calcule un point vers la cible, à `distance_cases` cases du perso.
-        Utilisé pour se rapprocher avant de pouvoir cast.
-        """
         dx = target_xy[0] - perso_xy[0]
         dy = target_xy[1] - perso_xy[1]
         length = max(1.0, (dx * dx + dy * dy) ** 0.5)
-        step_px = distance_cases * CELL_PX_X * 0.9  # un peu moins pour ne pas dépasser
+        step_px = distance_cases * CELL_PX_X * 0.9
         nx = dx / length
         ny = dy / length
         return (
@@ -195,118 +218,186 @@ class CombatDecisionEngine:
             int(perso_xy[1] + ny * step_px),
         )
 
-    def _bypass_perpendicular(
+    def _flee_from_target(
         self,
         perso_xy: tuple[int, int],
-        target_xy: tuple[int, int],
+        threat_xy: tuple[int, int],
+        distance_cases: int = 3,
     ) -> tuple[int, int]:
-        """Calcule une case perpendiculaire pour contourner un obstacle LoS."""
-        dx = target_xy[0] - perso_xy[0]
-        dy = target_xy[1] - perso_xy[1]
+        """Position opposée à la menace (pour HP critique)."""
+        dx = perso_xy[0] - threat_xy[0]
+        dy = perso_xy[1] - threat_xy[1]
         length = max(1.0, (dx * dx + dy * dy) ** 0.5)
-        # Perpendiculaire + un petit pas vers l'avant
-        offset = 140
-        nx, ny = -dy / length, dx / length
+        step_px = distance_cases * CELL_PX_X * 0.9
         return (
-            int(perso_xy[0] + nx * offset + (dx / length) * 60),
-            int(perso_xy[1] + ny * offset + (dy / length) * 60),
+            int(perso_xy[0] + (dx / length) * step_px),
+            int(perso_xy[1] + (dy / length) * step_px),
         )
 
-    def decide(
-        self,
-        snap: CombatStateSnapshot | None,
-        pa_remaining: int,
-        cast_history: list[tuple[str, int, int]],
-        stuck_overrides: int = 0,
-    ) -> dict[str, Any]:
-        """Décide d'une action à partir de l'état visuel.
+    # ---------- Main decision loop ----------
 
-        Ordre des règles (chain-of-responsibility) :
-          1. Pas d'état → defer LLM (il voit peut-être un popup)
-          2. Pas notre tour → wait
-          3. Pas d'ennemi visible → defer LLM (popup fin combat ? hors combat ?)
-          4. Plus de PA pour un sort → end_turn
-          5. Trouve l'ennemi cible (le plus proche)
-          6. Cas re-cast boucle → override mécanique (bouge)
-          7. Mob hors portée max → s'approcher
-          8. Mob à portée ET sort dispo ET pas déjà cast dessus → cast
-          9. Aucune règle ne s'applique → defer LLM
+    def decide(self, ctx: DecisionContext) -> dict[str, Any]:
+        """Décision principale. Chaîne de règles.
 
-        Returns:
-            dict: action au format vision_combat_worker, ou {"type": "defer_to_llm"}
-                  si le moteur n'est pas sûr.
+        Ordre (priorité décroissante) :
+          0. Popup / phase incertaine → defer LLM (il voit l'écran)
+          1. Pas d'ennemi → defer LLM
+          2. HP perso critique + menace au CaC → FUITE
+          3. Buff de début de combat pas encore cast → cast le buff
+          4. PA insuffisants → end_turn
+          5. Pick best target (scoring multi-critères)
+          6. Mob hors portée max → approche
+          7. Mob à portée :
+             a. LoS check (pixel raycasting si use_pixel_los=True)
+             b. LoS OK → meilleur sort offensif
+             c. LoS bloquée → bypass via find_bypass_cell
+          8. Re-cast boucle anti → override mécanique
+          9. Aucune règle → defer LLM
         """
-        # Règle 1 : pas de snapshot → LLM voit peut-être autre chose
-        if snap is None:
+        # --- Règle 0/1 : défaut LLM si pas d'info ---
+        if ctx.snap is None:
             return {"type": "defer_to_llm", "reason": "pas de snapshot HSV"}
-
-        # Règle 3 : pas d'ennemi → LLM doit analyser (popup ? hors combat ?)
-        if not snap.ennemis:
-            return {"type": "defer_to_llm", "reason": "aucun ennemi HSV détecté"}
-
-        # Règle 4 : PA < plus petit coût → end_turn
-        min_cost = self._min_spell_cost()
-        if pa_remaining < min_cost:
-            return {"type": "end_turn", "reason": f"PA={pa_remaining} < min_coût={min_cost}"}
-
-        # Règle 5 : trouve le mob le plus proche
-        if not snap.perso:
+        if not ctx.snap.ennemis:
+            return {"type": "defer_to_llm", "reason": "aucun ennemi HSV"}
+        if not ctx.snap.perso:
             return {"type": "defer_to_llm", "reason": "perso HSV non détecté"}
-        perso_xy = (snap.perso.x, snap.perso.y)
-        target = min(
-            snap.ennemis,
-            key=lambda e: (e.x - perso_xy[0]) ** 2 + (e.y - perso_xy[1]) ** 2,
-        )
-        target_xy = (target.x, target.y)
-        dist = dist_cases(perso_xy, target_xy)
 
-        # Règle 7 : mob hors portée max → s'approcher
+        perso_xy = (ctx.snap.perso.x, ctx.snap.perso.y)
+
+        # --- Règle 5 : meilleure cible (score multi-critères) ---
+        target_scores = score_targets(ctx.snap)
+        if not target_scores:
+            return {"type": "defer_to_llm", "reason": "aucun target scoré"}
+        best_target = target_scores[0]
+        target_xy = (best_target.entity.x, best_target.entity.y)
+        dist = best_target.distance_cases
+
+        # --- Règle 2 : HP perso critique → fuite ---
+        hp_pct = ctx.snap.hp_pct
+        if (hp_pct is not None and hp_pct < self.cfg.low_hp_flee_threshold * 100
+                and best_target.is_melee_threat):
+            flee_xy = self._flee_from_target(perso_xy, target_xy, distance_cases=3)
+            return {
+                "type": "click_xy",
+                "target_xy": list(flee_xy),
+                "reason": f"HP critique {hp_pct:.0f}% + mob CaC → FUITE",
+            }
+
+        # --- Règle 3 : buffs début de combat (tour 1, pas encore cast) ---
+        if ctx.turn_number == 1:
+            buffs = self._buff_spells_pending(ctx.buffs_cast_this_fight)
+            for slot, buff_info in buffs:
+                if buff_info.get("pa", 99) <= ctx.pa_remaining:
+                    # Buff target : souvent soi-même → target_xy = perso_xy
+                    return {
+                        "type": "cast_spell",
+                        "spell_key": slot,
+                        "target_xy": list(perso_xy),
+                        "reason": f"Buff tour 1 : {buff_info.get('nom', '?')}",
+                        "_buff_slot": slot,  # pour tracking
+                    }
+
+        # --- Règle 4 : PA insuffisants ---
+        min_cost = self._min_spell_cost()
+        if ctx.pa_remaining < min_cost:
+            return {
+                "type": "end_turn",
+                "reason": f"PA={ctx.pa_remaining} < min_coût={min_cost}",
+            }
+
+        # --- Règle 6 : mob hors portée max → approche ---
         max_range = self._max_spell_range()
         if dist > max_range:
             approach_xy = self._approach_target(perso_xy, target_xy, distance_cases=3)
             return {
                 "type": "click_xy",
                 "target_xy": list(approach_xy),
-                "reason": f"mob à {dist:.0f}c > portée_max {max_range}c → approche",
+                "reason": (
+                    f"Mob '{best_target.reasoning}' hors portée "
+                    f"({dist:.0f}c > {max_range}c) → approche"
+                ),
             }
 
-        # Règle 8 : mob à portée → choisir un sort
-        choice = self._best_spell_for_range(dist, pa_remaining)
-        if not choice:
-            # Aucun sort dispo à cette distance → s'approcher ou reculer
-            approach_xy = self._approach_target(perso_xy, target_xy, distance_cases=2)
+        # --- Règle 7 : mob à portée → check LoS puis cast ---
+        spell_choice = self._best_offensive_spell(dist, ctx.pa_remaining)
+
+        if spell_choice is None:
+            # Portée min trop grande (CaC ennemi trop proche) ou autre anomalie
+            # → approche d'1 case pour changer les conditions
+            approach_xy = self._approach_target(perso_xy, target_xy, distance_cases=1)
             return {
                 "type": "click_xy",
                 "target_xy": list(approach_xy),
-                "reason": f"aucun sort à {dist:.0f}c avec {pa_remaining}PA → bouge",
+                "reason": f"aucun sort utilisable à dist {dist:.0f}c → rapproche 1c",
             }
-        slot, spell_info = choice
 
-        # Règle 6 : check anti-boucle — déjà cast ce slot sur cette cible ?
-        if self._recently_cast_same_target(slot, target_xy, cast_history):
-            # Boucle détectée → stratégie selon distance
-            if dist > 4:
-                # Mob loin → avance encore
-                next_xy = self._approach_target(perso_xy, target_xy, distance_cases=3)
+        slot, spell_info = spell_choice
+
+        # Check LoS si requise par le sort et si activé dans la config
+        needs_los = spell_info.get("ligne_de_vue", True)
+        if needs_los and self.cfg.use_pixel_los and ctx.frame_bgr is not None:
+            los = check_line_of_sight(ctx.frame_bgr, perso_xy, target_xy)
+            if not los.is_clear:
+                # LoS bloquée → cherche une case qui débloque
+                bypass = find_bypass_cell(ctx.frame_bgr, perso_xy, target_xy)
+                if bypass:
+                    return {
+                        "type": "click_xy",
+                        "target_xy": list(bypass),
+                        "reason": (
+                            f"LoS BLOQUÉE vers ({target_xy[0]},{target_xy[1]}) "
+                            f"({los.obstacle_ratio:.0%}) → bypass"
+                        ),
+                    }
+                # Sinon, essaie juste une perpendiculaire
+                approach_xy = self._approach_target(
+                    perso_xy, target_xy, distance_cases=2,
+                )
                 return {
                     "type": "click_xy",
-                    "target_xy": list(next_xy),
-                    "reason": f"déjà cast slot{slot} sur ({target_xy[0]},{target_xy[1]}) sans effet → approche",
+                    "target_xy": list(approach_xy),
+                    "reason": f"LoS bloquée ({los.obstacle_ratio:.0%}) → déplace",
                 }
-            # Mob proche → contournement (LoS bloquée probable)
-            if stuck_overrides >= 1:
-                return {"type": "end_turn", "reason": "déjà tenté bypass, end_turn"}
-            bypass_xy = self._bypass_perpendicular(perso_xy, target_xy)
+
+        # --- Règle 8 : anti-boucle — déjà cast ce slot sur cette cible ? ---
+        if self._recently_cast_same_target(slot, target_xy, ctx.cast_history):
+            # Si ça n'a pas marché, c'est que la LoS pixel ne détecte pas un
+            # petit obstacle. Force un déplacement de contournement.
+            if ctx.stuck_overrides >= 2:
+                return {
+                    "type": "end_turn",
+                    "reason": f"3e stuck sur même cible → end_turn",
+                }
+            if dist > 3:
+                next_xy = self._approach_target(perso_xy, target_xy, distance_cases=2)
+            else:
+                # proche mais cast rate = mur → perpendiculaire
+                import math
+                dx = target_xy[0] - perso_xy[0]
+                dy = target_xy[1] - perso_xy[1]
+                length = max(1.0, (dx * dx + dy * dy) ** 0.5)
+                perp_x = -dy / length
+                perp_y = dx / length
+                next_xy = (
+                    int(perso_xy[0] + perp_x * 140 + (dx / length) * 60),
+                    int(perso_xy[1] + perp_y * 140 + (dy / length) * 60),
+                )
             return {
                 "type": "click_xy",
-                "target_xy": list(bypass_xy),
-                "reason": f"re-cast sur cible immobile à {dist:.0f}c → contournement LoS",
+                "target_xy": list(next_xy),
+                "reason": (
+                    f"déjà cast slot{slot} sur cible immobile à {dist:.0f}c "
+                    f"(stuck {ctx.stuck_overrides}) → bypass"
+                ),
             }
 
-        # Règle 8 finale : cast !
+        # --- Règle finale : CAST ! ---
         return {
             "type": "cast_spell",
             "spell_key": slot,
             "target_xy": list(target_xy),
-            "reason": f"cast slot{slot} '{spell_info.get('nom','?')}' sur mob à {dist:.0f}c",
+            "reason": (
+                f"cast slot{slot} '{spell_info.get('nom','?')}' sur "
+                f"{best_target.reasoning}"
+            ),
         }

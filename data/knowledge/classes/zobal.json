@@ -2,7 +2,11 @@
   "class_id": "zobal",
   "nom_fr": "Zobal",
   "archetype": "DPS-support agilité/chance, masques et altérations d'état",
-  "stats_principales": ["Agilité", "Chance", "Vitalité"],
+  "stats_principales": [
+    "Agilité",
+    "Chance",
+    "Vitalité"
+  ],
   "philosophie": "ATTENTION : le Zobal n'est pas documenté sur le gitbook Retrozia (serveur 12 classes classiques). Ce fichier est basé sur les sorts Dofus 2.x standards. Le Zobal change de masque pour alterner entre rôles : Masque du Guerrier pour les dégâts, Masque du Totem pour les soins, Masque du Bouffon pour le contrôle. Adapter le masque à chaque situation est la clé.",
   "priorites_generales": [
     "Identifier le rôle requis en début de tour et changer de masque si nécessaire",
@@ -22,7 +26,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Mode DPS. Activer quand aucun allié en danger. Débloque Frappe Meurtrière et Lame Bouffon en mode guerrier."
+      "note": "Mode DPS. Activer quand aucun allié en danger. Débloque Frappe Meurtrière et Lame Bouffon en mode guerrier.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "masque_du_totem",
@@ -34,7 +40,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Mode support/soin. Passer en Totem si allié critique. Débloque Soin du Totem et Statue Totem."
+      "note": "Mode support/soin. Passer en Totem si allié critique. Débloque Soin du Totem et Statue Totem.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "masque_du_bouffon",
@@ -46,7 +54,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Mode contrôle. Passer en Bouffon pour immobiliser ou retirer PA/PM aux ennemis mobiles dangereux."
+      "note": "Mode contrôle. Passer en Bouffon pour immobiliser ou retirer PA/PM aux ennemis mobiles dangereux.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "frappe_meurtriere",
@@ -58,7 +68,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 0,
-      "note": "Sort DPS principal (masque guerrier). Spammable, bon rendement PA. Rotation de base offensive."
+      "note": "Sort DPS principal (masque guerrier). Spammable, bon rendement PA. Rotation de base offensive.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "soin_du_totem",
@@ -70,7 +82,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Soin puissant (masque totem). Meilleur soin du Zobal. Utiliser sur allié à HP critique."
+      "note": "Soin puissant (masque totem). Meilleur soin du Zobal. Utiliser sur allié à HP critique.",
+      "role": "soin",
+      "portee_modifiable": true
     },
     {
       "id": "attaque_festive",
@@ -82,7 +96,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "Sort hybride dégâts/contrôle (masque bouffon). Idéal contre les ennemis actifs dangereux."
+      "note": "Sort hybride dégâts/contrôle (masque bouffon). Idéal contre les ennemis actifs dangereux.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "lame_bouffon",
@@ -94,7 +110,9 @@
       "ligne_de_vue": false,
       "degats": "très élevés",
       "cooldown": 3,
-      "note": "AoE burst mélée/courte portée (masque guerrier). Garder pour les regroupements ou finir plusieurs ennemis."
+      "note": "AoE burst mélée/courte portée (masque guerrier). Garder pour les regroupements ou finir plusieurs ennemis.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "appel_du_masque",
@@ -106,7 +124,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Partage les bonus du masque actif avec un allié. Support avancé pour amplifier l'équipe."
+      "note": "Partage les bonus du masque actif avec un allié. Support avancé pour amplifier l'équipe.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "arret_zobal",
@@ -118,7 +138,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "Immobilise temporairement la cible. Permet de configurer le positionnement ou préparer un burst."
+      "note": "Immobilise temporairement la cible. Permet de configurer le positionnement ou préparer un burst.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "bond_inspire",
@@ -130,7 +152,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Saut vers une case cible. Se repositionner rapidement pour adapter le masque au besoin."
+      "note": "Saut vers une case cible. Se repositionner rapidement pour adapter le masque au besoin.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "brutalite",
@@ -142,7 +166,9 @@
       "ligne_de_vue": false,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "Sort mélée puissant sans ligne de vue (masque guerrier). Alternative à Frappe Meurtrière en corps-à-corps."
+      "note": "Sort mélée puissant sans ligne de vue (masque guerrier). Alternative à Frappe Meurtrière en corps-à-corps.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "bouffonnerie",
@@ -154,7 +180,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "Retire des PA à la cible (masque bouffon). Contrôle efficace sur des ennemis à haut APM."
+      "note": "Retire des PA à la cible (masque bouffon). Contrôle efficace sur des ennemis à haut APM.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "capacite",
@@ -166,7 +194,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Améliore les effets du masque actif. Booster l'efficacité du rôle choisi pour ce tour."
+      "note": "Améliore les effets du masque actif. Booster l'efficacité du rôle choisi pour ce tour.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "coup_du_totem",
@@ -178,7 +208,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Sort de base du masque totem. Inflige des dégâts et soigne légèrement le Zobal. Spammable."
+      "note": "Sort de base du masque totem. Inflige des dégâts et soigne légèrement le Zobal. Spammable.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "ecureuil",
@@ -190,7 +222,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Donne des PM supplémentaires. Meilleure mobilité pour ajuster la position après un changement de masque."
+      "note": "Donne des PM supplémentaires. Meilleure mobilité pour ajuster la position après un changement de masque.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "fausse_note",
@@ -202,7 +236,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "Sort distance (masque bouffon). Retire PM et applique un malus à la cible pendant 1 tour."
+      "note": "Sort distance (masque bouffon). Retire PM et applique un malus à la cible pendant 1 tour.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "moqueries",
@@ -214,7 +250,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Provoque la cible pour attirer ses attaques. Détourner les attaques ennemies des alliés fragiles."
+      "note": "Provoque la cible pour attirer ses attaques. Détourner les attaques ennemies des alliés fragiles.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "mort_et_damnation",
@@ -226,7 +264,9 @@
       "ligne_de_vue": true,
       "degats": "très élevés",
       "cooldown": 4,
-      "note": "Sort burst ultime (masque guerrier). Réserver pour finir une cible prioritaire à bas HP."
+      "note": "Sort burst ultime (masque guerrier). Réserver pour finir une cible prioritaire à bas HP.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "pelote",
@@ -238,7 +278,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 3,
-      "note": "AoE de zone (masque bouffon). Ralentit tous les ennemis dans la zone ciblée."
+      "note": "AoE de zone (masque bouffon). Ralentit tous les ennemis dans la zone ciblée.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "reprimande",
@@ -250,7 +292,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "Sort efficace tous masques. Dégâts corrects quelle que soit le masque actif du Zobal."
+      "note": "Sort efficace tous masques. Dégâts corrects quelle que soit le masque actif du Zobal.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "statue_totem",
@@ -262,7 +306,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 5,
-      "note": "Invoque une statue soigneuse (masque totem). Soigne les alliés adjacents chaque tour. Positionnement défensif clé."
+      "note": "Invoque une statue soigneuse (masque totem). Soigne les alliés adjacents chaque tour. Positionnement défensif clé.",
+      "role": "invoc",
+      "portee_modifiable": true
     },
     {
       "id": "tour_de_passe_passe",
@@ -274,7 +320,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Échange de place avec un allié. Sauver un allié en danger ou optimiser les positions."
+      "note": "Échange de place avec un allié. Sauver un allié en danger ou optimiser les positions.",
+      "role": "offensif",
+      "portee_modifiable": true
     }
   ],
   "plan_tour_type": [

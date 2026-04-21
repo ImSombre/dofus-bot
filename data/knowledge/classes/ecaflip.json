@@ -2,7 +2,10 @@
   "class_id": "ecaflip",
   "nom_fr": "Ecaflip",
   "archetype": "guerrier-chance polyvalent (mélée/distance), mécanique chance",
-  "stats_principales": ["Chance", "Agilité"],
+  "stats_principales": [
+    "Chance",
+    "Agilité"
+  ],
   "philosophie": "L'Ecaflip joue avec le hasard : Pile ou Face et Roulette sont aléatoires mais puissants. Griffe de Ceangal est le sort DPS de référence en mélée. Bond du Félin permet l'engagement ou la fuite. Destin d'Ecaflip et Tout ou Rien sont des paris à haut risque/haute récompense.",
   "priorites_generales": [
     "Utiliser Bond du Félin pour s'engager ou fuir selon la situation",
@@ -22,7 +25,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Sort de distance aléatoire. Pile : dégâts. Face : dégâts + effet chance. Spammable, bon rendement moyen."
+      "note": "Sort de distance aléatoire. Pile : dégâts. Face : dégâts + effet chance. Spammable, bon rendement moyen.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "chance_d_ecaflip",
@@ -34,7 +39,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Donne un bonus de chance à un allié. Lancer sur le DPS principal en tour 1 pour amplifier les dégâts."
+      "note": "Donne un bonus de chance à un allié. Lancer sur le DPS principal en tour 1 pour amplifier les dégâts.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "bond_du_felin",
@@ -46,7 +53,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Téléportation tactique. Engagement ou fuite selon la situation. Fondamental pour la mobilité de l'Ecaflip."
+      "note": "Téléportation tactique. Engagement ou fuite selon la situation. Fondamental pour la mobilité de l'Ecaflip.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "bluff",
@@ -58,7 +67,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Sort distance alternatif à Pile ou Face. Peut débuffer la cible (réduction de statistiques)."
+      "note": "Sort distance alternatif à Pile ou Face. Peut débuffer la cible (réduction de statistiques).",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "perception",
@@ -70,7 +81,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Révèle les entités invisibles dans une zone. Contre les Srams. Utile en PvP."
+      "note": "Révèle les entités invisibles dans une zone. Contre les Srams. Utile en PvP.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "contrecoup",
@@ -82,7 +95,9 @@
       "ligne_de_vue": false,
       "degats": "moyens",
       "cooldown": 1,
-      "note": "Sort mélée/courte portée. Pas de ligne de vue. Bon complément aux sorts mélée de l'Ecaflip."
+      "note": "Sort mélée/courte portée. Pas de ligne de vue. Bon complément aux sorts mélée de l'Ecaflip.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "trefle",
@@ -94,7 +109,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Soin aléatoire (variable selon le résultat). Utiliser si pas d'autre option de survie disponible."
+      "note": "Soin aléatoire (variable selon le résultat). Utiliser si pas d'autre option de survie disponible.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "tout_ou_rien",
@@ -106,7 +123,9 @@
       "ligne_de_vue": true,
       "degats": "très élevés",
       "cooldown": 3,
-      "note": "Pari maximum : dégâts très élevés OU effet négatif. Réserver pour les moments décisifs où le risque vaut la peine."
+      "note": "Pari maximum : dégâts très élevés OU effet négatif. Réserver pour les moments décisifs où le risque vaut la peine.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "roulette",
@@ -118,7 +137,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 3,
-      "note": "AoE aléatoire en croix. Effets variables selon le résultat (dégâts, soins, buffs/debuffs). Puissant en groupe."
+      "note": "AoE aléatoire en croix. Effets variables selon le résultat (dégâts, soins, buffs/debuffs). Puissant en groupe.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "topkaj",
@@ -130,7 +151,9 @@
       "ligne_de_vue": false,
       "degats": "très élevés",
       "cooldown": 4,
-      "note": "Sort burst mélée/courte portée à très haut potentiel. Réserver pour les cibles prioritaires ou boss."
+      "note": "Sort burst mélée/courte portée à très haut potentiel. Réserver pour les cibles prioritaires ou boss.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "langue_rapeuse",
@@ -142,7 +165,9 @@
       "ligne_de_vue": false,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Sort mélée de base. Pas de ligne de vue. Finir les tours avec les PA restants en corps-à-corps."
+      "note": "Sort mélée de base. Pas de ligne de vue. Finir les tours avec les PA restants en corps-à-corps.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "roue_de_la_fortune",
@@ -154,7 +179,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "AoE en croix. Bon potentiel de dégâts sur plusieurs cibles. Utiliser si 2+ ennemis sont regroupés."
+      "note": "AoE en croix. Bon potentiel de dégâts sur plusieurs cibles. Utiliser si 2+ ennemis sont regroupés.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "griffe_invocatrice",
@@ -166,7 +193,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Invoque un Chacha pour aider au combat. Créature alliée DPS/tank selon le niveau."
+      "note": "Invoque un Chacha pour aider au combat. Créature alliée DPS/tank selon le niveau.",
+      "role": "invoc",
+      "portee_modifiable": true
     },
     {
       "id": "esprit_felin",
@@ -178,7 +207,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Buff passif de l'Ecaflip. Augmente les statistiques (esquive, critique) pendant quelques tours."
+      "note": "Buff passif de l'Ecaflip. Augmente les statistiques (esquive, critique) pendant quelques tours.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "odorat",
@@ -190,7 +221,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Détecte les pièges et entités cachées à proximité. Contre les Srams en PvP, utile dans les donjons piégés."
+      "note": "Détecte les pièges et entités cachées à proximité. Contre les Srams en PvP, utile dans les donjons piégés.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "reflexes",
@@ -202,7 +235,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Augmente l'esquive et les résistances. Lancer si on anticipe une salve d'attaques ennemies."
+      "note": "Augmente l'esquive et les résistances. Lancer si on anticipe une salve d'attaques ennemies.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "griffe_joueuse",
@@ -214,7 +249,9 @@
       "ligne_de_vue": false,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Sort mélée économique. Effet aléatoire bonus (peut appliquer un débuff chance). Bon spam en corps-à-corps."
+      "note": "Sort mélée économique. Effet aléatoire bonus (peut appliquer un débuff chance). Bon spam en corps-à-corps.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "griffe_de_ceangal",
@@ -226,7 +263,9 @@
       "ligne_de_vue": false,
       "degats": "élevés",
       "cooldown": 0,
-      "note": "Sort mélée principal. Corps-à-corps, dégâts élevés, spammable. Sort de référence DPS mélée de l'Ecaflip."
+      "note": "Sort mélée principal. Corps-à-corps, dégâts élevés, spammable. Sort de référence DPS mélée de l'Ecaflip.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "rekop",
@@ -238,7 +277,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Sort de base mélée, coût minimal. Finir les tours avec 2 PA. Léger vol de vie ou effet bonus selon build."
+      "note": "Sort de base mélée, coût minimal. Finir les tours avec 2 PA. Léger vol de vie ou effet bonus selon build.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "destin_d_ecaflip",
@@ -250,7 +291,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 5,
-      "note": "Sort ultime de transformation. Boost massif de toutes les statistiques. Réserver pour les combats décisifs."
+      "note": "Sort ultime de transformation. Boost massif de toutes les statistiques. Réserver pour les combats décisifs.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "felination",
@@ -262,7 +305,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 5,
-      "note": "Transformation féline : boost considérable des dégâts. Sort signature Retrozia pour le burst ultime."
+      "note": "Transformation féline : boost considérable des dégâts. Sort signature Retrozia pour le burst ultime.",
+      "role": "buff",
+      "portee_modifiable": false
     }
   ],
   "plan_tour_type": [

@@ -1465,6 +1465,39 @@ class SimpleDashboardWidget(QWidget):
         test_row.addStretch()
         grp_ai_lay.addLayout(test_row)
 
+        # Mode de décision (v0.6.0)
+        mode_row = QHBoxLayout()
+        mode_row.addWidget(QLabel("Mode décision :"))
+        self._combo_decision_mode = QComboBox()
+        self._combo_decision_mode.addItem(
+            "Hybride ⭐ (règles + LLM fallback) — recommandé", "hybrid",
+        )
+        self._combo_decision_mode.addItem(
+            "Règles only (gratuit, 0 appel LLM)", "rules",
+        )
+        self._combo_decision_mode.addItem(
+            "LLM only (tout au LLM, plus coûteux)", "llm",
+        )
+        self._combo_decision_mode.setToolTip(
+            "• Hybride : moteur déterministe (LoS, targeting, sorts optimaux)\n"
+            "  décide 90% des cas, LLM seulement si ambigu. Rapide et précis.\n"
+            "• Règles only : 100% moteur, 0 appel API. Gratuit, ~2 coups/sec.\n"
+            "  Moins adaptatif aux cas complexes mais joue efficacement.\n"
+            "• LLM only : tout au LLM. Plus adaptatif mais ~$0.1/combat + 2-4s/tour."
+        )
+        self._combo_decision_mode.setFixedWidth(380)
+        mode_row.addWidget(self._combo_decision_mode)
+        self._chk_pixel_los = QCheckBox("LoS pixel (détection murs)")
+        self._chk_pixel_los.setChecked(True)
+        self._chk_pixel_los.setToolTip(
+            "Active la détection de ligne de vue par analyse de pixels\n"
+            "(raycasting Bresenham sur la capture écran).\n"
+            "Détecte les murs et obstacles qui bloquent les sorts à distance."
+        )
+        mode_row.addWidget(self._chk_pixel_los)
+        mode_row.addStretch()
+        grp_ai_lay.addLayout(mode_row)
+
         # Status bar IA (rempli dynamiquement)
         self._lbl_llm_status = QLabel(
             "<span style='color:#888'>Clique 🔄 pour tester la connexion au LLM</span>"
@@ -2115,6 +2148,8 @@ class SimpleDashboardWidget(QWidget):
                 starting_pm=self._spin_combat_pm.value(),
                 po_bonus=self._spin_combat_po_bonus.value(),
                 save_debug_images=self._chk_save_debug.isChecked(),
+                decision_mode=self._combo_decision_mode.currentData() or "hybrid",
+                use_pixel_los=self._chk_pixel_los.isChecked(),
             )
             worker = VisionCombatWorker(
                 vision=self._vision, input_svc=self._input, config=vcfg,

@@ -29,7 +29,9 @@ from pathlib import Path
 from loguru import logger
 from PyQt6.QtCore import QThread, pyqtSignal
 
-from src.services.combat_decision_engine import CombatDecisionEngine, EngineConfig
+from src.services.combat_decision_engine import (
+    CombatDecisionEngine, DecisionContext, EngineConfig,
+)
 from src.services.combat_knowledge import CombatKnowledge
 from src.services.combat_state_reader import CombatStateReader
 from src.services.input_service import InputService
@@ -71,6 +73,8 @@ class VisionCombatConfig:
     #   - "llm"    : tout au LLM (comportement v0.4.x)
     #   - "rules"  : tout aux règles (pas d'appel LLM, gratuit mais moins adaptatif)
     decision_mode: str = "hybrid"
+    # Active le raycasting pixel pour LoS (v0.6.0)
+    use_pixel_los: bool = True
     dofus_window_title: str | None = None
     # Sauvegarder chaque capture envoyée au LLM (debug)
     save_debug_images: bool = False
@@ -165,6 +169,7 @@ class VisionCombatWorker(QThread):
                 starting_pa=config.starting_pa,
                 starting_pm=config.starting_pm,
                 po_bonus=config.po_bonus,
+                use_pixel_los=config.use_pixel_los,
             ),
             self._knowledge,
         )
@@ -182,6 +187,10 @@ class VisionCombatWorker(QThread):
         self._pa_remaining: int = config.starting_pa
         # Cache coût PA par slot (résolu via knowledge DB)
         self._spell_cost_cache: dict[str, int] = {}
+        # Compteur de tour (incrémenté à chaque transition autre→mon_tour)
+        self._turn_number: int = 1
+        # Buffs déjà cast ce combat (reset au nouveau combat)
+        self._buffs_cast: set[int] = set()
 
     def request_stop(self) -> None:
         self._stop_requested = True
@@ -409,14 +418,18 @@ class VisionCombatWorker(QThread):
             )
             self.log_event.emit(f"🔍 Détections HSV : {detections_summary}", "info")
 
-        # Essai moteur déterministe (si pas en mode "llm" pur)
+        # Essai moteur déterministe v0.6.0 (LoS pixel + targeting + playbooks)
         if self._config.decision_mode in ("hybrid", "rules"):
-            rule_action = self._engine.decide(
+            ctx = DecisionContext(
                 snap=snap,
                 pa_remaining=self._pa_remaining,
                 cast_history=list(self._cast_history),
                 stuck_overrides=self._stuck_overrides,
+                turn_number=self._turn_number,
+                frame_bgr=raw_frame,
+                buffs_cast_this_fight=self._buffs_cast,
             )
+            rule_action = self._engine.decide(ctx)
             rtype = str(rule_action.get("type", "")).lower()
             rreason = rule_action.get("reason", "")
 
@@ -426,6 +439,9 @@ class VisionCombatWorker(QThread):
                     f"⚙ Moteur règles : {rtype} — {rreason}",
                     "info",
                 )
+                # Track les buffs cast pour ne pas les refaire
+                if "_buff_slot" in rule_action:
+                    self._buffs_cast.add(rule_action["_buff_slot"])
                 self._execute_action(rule_action, "mon_tour")
                 return
 
@@ -536,6 +552,11 @@ class VisionCombatWorker(QThread):
             self._cast_history.clear()
             self._stuck_overrides = 0
             self._pa_remaining = self._config.starting_pa
+            self._turn_number += 1
+        # Reset complet à chaque popup victoire/défaite (fin du combat)
+        if phase in ("popup_victoire", "popup_defaite"):
+            self._turn_number = 1
+            self._buffs_cast.clear()
         self._last_phase = phase
 
         # Override mécanique si le LLM re-cast sur une cible déjà visée (boucle).

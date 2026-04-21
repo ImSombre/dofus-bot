@@ -2,7 +2,10 @@
   "class_id": "iop",
   "nom_fr": "Iop",
   "archetype": "guerrier mélée burst (force/feu/air)",
-  "stats_principales": ["Force", "Vitalité"],
+  "stats_principales": [
+    "Force",
+    "Vitalité"
+  ],
   "philosophie": "L'Iop est le DPS mélée pur. Bond permet de s'engager immédiatement, puis on spam les épées. Compulsion et Puissance boostent les dégâts avant l'engagement. Concentration et Amplification assurent le burst. Pression en fin de tour pour maximiser le DPS.",
   "priorites_generales": [
     "Tour 1 : Compulsion (buff self) + Bond vers ennemi si éloigné",
@@ -22,7 +25,9 @@
       "ligne_de_vue": false,
       "degats": "élevés",
       "cooldown": 0,
-      "note": "Sort mélée de base. Corps-à-corps obligatoire. Spammable, bon rendement PA."
+      "note": "Sort mélée de base. Corps-à-corps obligatoire. Spammable, bon rendement PA.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "bond",
@@ -34,7 +39,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Téléportation sur une case ennemie adjacente. Engagement instantané depuis n'importe quelle distance."
+      "note": "Téléportation sur une case ennemie adjacente. Engagement instantané depuis n'importe quelle distance.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "intimidation",
@@ -46,7 +53,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 1,
-      "note": "Repousse la cible en ligne. Utile pour pousser un ennemi contre un mur ou hors de portée d'un allié."
+      "note": "Repousse la cible en ligne. Utile pour pousser un ennemi contre un mur ou hors de portée d'un allié.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "compulsion",
@@ -58,7 +67,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Boost de dégâts AoE pour l'équipe. Lancer tour 1 avant tout engagement pour amplifier les dégâts."
+      "note": "Boost de dégâts AoE pour l'équipe. Lancer tour 1 avant tout engagement pour amplifier les dégâts.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "epee_divine",
@@ -70,7 +81,9 @@
       "ligne_de_vue": false,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Sort air mélée. Dégâts corrects sans cooldown. Alterner avec Pression en mélée."
+      "note": "Sort air mélée. Dégâts corrects sans cooldown. Alterner avec Pression en mélée.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "epee_du_destin",
@@ -82,7 +95,9 @@
       "ligne_de_vue": false,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "Sort feu mélée puissant. Dégâts élevés, cooldown 2 tours. Utiliser en rotation avec Pression."
+      "note": "Sort feu mélée puissant. Dégâts élevés, cooldown 2 tours. Utiliser en rotation avec Pression.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "guide_de_bravoure",
@@ -94,7 +109,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Buff de portée sur les sorts. Permet d'attaquer à légèrement plus grande distance temporairement."
+      "note": "Buff de portée sur les sorts. Permet d'attaquer à légèrement plus grande distance temporairement.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "amplification",
@@ -106,7 +123,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Augmente les dégâts des prochains sorts. Combiner avec Compulsion pour un burst maximal."
+      "note": "Augmente les dégâts des prochains sorts. Combiner avec Compulsion pour un burst maximal.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "epee_destructrice",
@@ -118,7 +137,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "Sort feu à portée courte. Plus flexible que les sorts mélée stricte, peut cibler 1-3 cases."
+      "note": "Sort feu à portée courte. Plus flexible que les sorts mélée stricte, peut cibler 1-3 cases.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "couper",
@@ -130,7 +151,9 @@
       "ligne_de_vue": false,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Sort feu mélée. Retire des PM à la cible. Excellent pour empêcher la fuite d'un ennemi."
+      "note": "Sort feu mélée. Retire des PM à la cible. Excellent pour empêcher la fuite d'un ennemi.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "souffle",
@@ -142,7 +165,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 3,
-      "note": "AoE en ligne. Repousse les cibles touchées. Utile pour désorganiser un groupe ennemi."
+      "note": "AoE en ligne. Repousse les cibles touchées. Utile pour désorganiser un groupe ennemi.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "vitalite",
@@ -154,7 +179,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Augmente temporairement les HP max du Iop. Lancer en anticipation si on va encaisser beaucoup."
+      "note": "Augmente temporairement les HP max du Iop. Lancer en anticipation si on va encaisser beaucoup.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "epee_du_jugement",
@@ -166,7 +193,9 @@
       "ligne_de_vue": false,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "Sort air à portée plus large. Pas de ligne de vue requise. Très polyvalent en positionnement."
+      "note": "Sort air à portée plus large. Pas de ligne de vue requise. Très polyvalent en positionnement.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "puissance",
@@ -178,7 +207,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Boost de force permanent pour ce tour. Lancer systématiquement en début de chaque tour si PA disponibles."
+      "note": "Boost de force permanent pour ce tour. Lancer systématiquement en début de chaque tour si PA disponibles.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "mutilation",
@@ -190,7 +221,9 @@
       "ligne_de_vue": false,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Sort mélée spécial : se coûte des HP au lanceur en bonus de dégâts. Risqué mais puissant en fin de combat."
+      "note": "Sort mélée spécial : se coûte des HP au lanceur en bonus de dégâts. Risqué mais puissant en fin de combat.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "tempete_de_puissance",
@@ -202,7 +235,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 3,
-      "note": "AoE en croix feu. Meilleur sort AoE du Iop. Utiliser sur regroupements ennemis."
+      "note": "AoE en croix feu. Meilleur sort AoE du Iop. Utiliser sur regroupements ennemis.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "epee_celeste",
@@ -214,7 +249,9 @@
       "ligne_de_vue": true,
       "degats": "très élevés",
       "cooldown": 3,
-      "note": "Sort burst air puissant. Dégâts très élevés à courte portée. Réserver pour les cibles prioritaires."
+      "note": "Sort burst air puissant. Dégâts très élevés à courte portée. Réserver pour les cibles prioritaires.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "concentration",
@@ -226,7 +263,9 @@
       "ligne_de_vue": false,
       "degats": "élevés",
       "cooldown": 0,
-      "note": "Sort mélée terre efficace. Remplace Pression à haut niveau. Bon rendement PA en corps-à-corps."
+      "note": "Sort mélée terre efficace. Remplace Pression à haut niveau. Bon rendement PA en corps-à-corps.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "epee_de_iop",
@@ -238,7 +277,9 @@
       "ligne_de_vue": true,
       "degats": "très élevés",
       "cooldown": 3,
-      "note": "AoE en croix terre massive. Sort signature du Iop. Dégâts maximaux sur plusieurs ennemis."
+      "note": "AoE en croix terre massive. Sort signature du Iop. Dégâts maximaux sur plusieurs ennemis.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "colere_de_iop",
@@ -250,7 +291,9 @@
       "ligne_de_vue": false,
       "degats": "très élevés",
       "cooldown": 5,
-      "note": "Sort ultime du Iop. AoE en croix, dégâts dévastateurs. Réserver pour les boss ou regroupements critiques."
+      "note": "Sort ultime du Iop. AoE en croix, dégâts dévastateurs. Réserver pour les boss ou regroupements critiques.",
+      "role": "offensif",
+      "portee_modifiable": true
     }
   ],
   "plan_tour_type": [

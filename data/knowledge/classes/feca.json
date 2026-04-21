@@ -2,7 +2,10 @@
   "class_id": "feca",
   "nom_fr": "Féca",
   "archetype": "tank-support intelligence, glyphes et armures élémentaires",
-  "stats_principales": ["Intelligence", "Vitalité"],
+  "stats_principales": [
+    "Intelligence",
+    "Vitalité"
+  ],
   "philosophie": "Le Féca protège via ses glyphes posés au sol et ses armures élémentaires. Les glyphes infligent des dégâts ou effets aux ennemis qui marchent dessus. Les armures absorbent les dégâts d'un élément spécifique. Renvoi de Sort renvoie le prochain sort ennemi. Immunité en ultime de protection.",
   "priorites_generales": [
     "Tour 1 : Armure de l'élément dominant ennemi + Glyphe Agressif sur position ennemie",
@@ -22,7 +25,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 4,
-      "note": "Glyphe qui explose sur tout ennemi marchant dessus. Placer sur les cases d'approche obligatoires."
+      "note": "Glyphe qui explose sur tout ennemi marchant dessus. Placer sur les cases d'approche obligatoires.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "armure_terrestre",
@@ -34,7 +39,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Absorbe les dégâts terre. Activer contre les Iops, Enutrofs, Sacrieurs force."
+      "note": "Absorbe les dégâts terre. Activer contre les Iops, Enutrofs, Sacrieurs force.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "attaque_naturelle",
@@ -46,7 +53,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Sort de dégâts de base très économique. Finir les tours avec les PA restants."
+      "note": "Sort de dégâts de base très économique. Finir les tours avec les PA restants.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "renvoi_de_sort",
@@ -58,7 +67,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Renvoie le prochain sort ennemi vers son lanceur. Contre majeur contre les casters et AoE ennemies."
+      "note": "Renvoie le prochain sort ennemi vers son lanceur. Contre majeur contre les casters et AoE ennemies.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "aveuglement",
@@ -70,7 +81,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Réduit la précision de la cible pendant 2-3 tours. Excellent contre les archers et DPS distance."
+      "note": "Réduit la précision de la cible pendant 2-3 tours. Excellent contre les archers et DPS distance.",
+      "role": "debuff",
+      "portee_modifiable": true
     },
     {
       "id": "armure_incandescente",
@@ -82,7 +95,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Absorbe les dégâts feu. Activer contre les Xelors intel, Eniripsas feu, et sorts feu ennemis."
+      "note": "Absorbe les dégâts feu. Activer contre les Xelors intel, Eniripsas feu, et sorts feu ennemis.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "attaque_nuageuse",
@@ -94,7 +109,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Sort de dégâts air. Bon rendement PA, aucun cooldown. Rotation DPS de base du Féca intelligence."
+      "note": "Sort de dégâts air. Bon rendement PA, aucun cooldown. Rotation DPS de base du Féca intelligence.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "armure_aqueuse",
@@ -106,7 +123,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Absorbe les dégâts eau. Activer contre les Eniripsas chance, Pandas eau, Enutrofs chance."
+      "note": "Absorbe les dégâts eau. Activer contre les Eniripsas chance, Pandas eau, Enutrofs chance.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "immunite",
@@ -118,7 +137,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 5,
-      "note": "Rend une cible temporairement insensible à tous les dégâts. Sort d'urgence ultime pour protéger un allié."
+      "note": "Rend une cible temporairement insensible à tous les dégâts. Sort d'urgence ultime pour protéger un allié.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "armure_venteuse",
@@ -130,7 +151,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Absorbe les dégâts air. Activer contre les Crâs air, Iops air, Sacrieurs agiles."
+      "note": "Absorbe les dégâts air. Activer contre les Crâs air, Iops air, Sacrieurs agiles.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "bulle",
@@ -142,7 +165,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Bouclier global absorbant une quantité fixe de dégâts. Protection puissante sur un allié fragile."
+      "note": "Bouclier global absorbant une quantité fixe de dégâts. Protection puissante sur un allié fragile.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "treve",
@@ -154,7 +179,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Supprime un envoûtement sur une cible. Retire buffs ennemis ou soigne un allié d'un malus actif."
+      "note": "Supprime un envoûtement sur une cible. Retire buffs ennemis ou soigne un allié d'un malus actif.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "science_du_baton",
@@ -166,7 +193,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "DPS neutre de base. Aucun cooldown. Compléter la rotation quand les armures et glyphes sont posés."
+      "note": "DPS neutre de base. Aucun cooldown. Compléter la rotation quand les armures et glyphes sont posés.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "retour_du_baton",
@@ -178,7 +207,9 @@
       "ligne_de_vue": false,
       "degats": "moyens",
       "cooldown": 1,
-      "note": "Sort sans ligne de vue. Permet d'attaquer depuis derrière un obstacle. Utile dans les configurations de terrain complexes."
+      "note": "Sort sans ligne de vue. Permet d'attaquer depuis derrière un obstacle. Utile dans les configurations de terrain complexes.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "glyphe_d_aveuglement",
@@ -190,7 +221,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Glyphe qui aveugle les ennemis passant dessus. Réduire la précision de tout ennemi dans la zone."
+      "note": "Glyphe qui aveugle les ennemis passant dessus. Réduire la précision de tout ennemi dans la zone.",
+      "role": "debuff",
+      "portee_modifiable": true
     },
     {
       "id": "teleportation",
@@ -202,7 +235,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 2,
-      "note": "Téléportation sur une case cible. Se repositionner rapidement, rejoindre un glyphe ou fuir."
+      "note": "Téléportation sur une case cible. Se repositionner rapidement, rejoindre un glyphe ou fuir.",
+      "role": "deplacement",
+      "portee_modifiable": true
     },
     {
       "id": "glyphe_enflammee",
@@ -214,7 +249,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 4,
-      "note": "Glyphe feu au sol. Inflige des dégâts continus aux ennemis restant dans la zone. Placer sur des cases occupées."
+      "note": "Glyphe feu au sol. Inflige des dégâts continus aux ennemis restant dans la zone. Placer sur des cases occupées.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "bouclier_feca",
@@ -226,7 +263,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Bouclier puissant absorbant les prochaines attaques. Activer sur le tank ou l'allié sous pression."
+      "note": "Bouclier puissant absorbant les prochaines attaques. Activer sur le tank ou l'allié sous pression.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "glyphe_d_immobilisation",
@@ -238,7 +277,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Glyphe qui immobilise (retire PM) les ennemis qui marchent dessus. Bloquer les couloirs d'accès."
+      "note": "Glyphe qui immobilise (retire PM) les ennemis qui marchent dessus. Bloquer les couloirs d'accès.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "glyphe_de_silence",
@@ -250,7 +291,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Glyphe qui empêche les ennemis de lancer des sorts. Placer devant les casters ennemis."
+      "note": "Glyphe qui empêche les ennemis de lancer des sorts. Placer devant les casters ennemis.",
+      "role": "offensif",
+      "portee_modifiable": true
     }
   ],
   "plan_tour_type": [

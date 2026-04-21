@@ -2,7 +2,11 @@
   "class_id": "osamodas",
   "nom_fr": "Osamodas",
   "archetype": "invocateur-support agilité/chance, armée de créatures",
-  "stats_principales": ["Agilité", "Vitalité", "Intelligence"],
+  "stats_principales": [
+    "Agilité",
+    "Vitalité",
+    "Intelligence"
+  ],
   "philosophie": "L'Osamodas construit une armée d'invocations pour submerger les ennemis. Chaque invocation a un rôle précis. Fouet et Griffe Cinglante assurent le DPS direct. Soin Animal maintient les créatures et alliés en vie. La Frappe du Craqueleur est le burst principal direct.",
   "priorites_generales": [
     "Tour 1 : Invocation de Dragonnet ou Invocation de Bouftou selon le contexte",
@@ -22,7 +26,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Invocation aérienne légère. DPS rapide à distance, bon pour harceler les cibles éloignées."
+      "note": "Invocation aérienne légère. DPS rapide à distance, bon pour harceler les cibles éloignées.",
+      "role": "invoc",
+      "portee_modifiable": true
     },
     {
       "id": "cri_de_l_ours",
@@ -34,7 +40,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 3,
-      "note": "AoE en croix puissante. Excellent si plusieurs ennemis regroupés. Meilleure AoE directe de l'Osamodas."
+      "note": "AoE en croix puissante. Excellent si plusieurs ennemis regroupés. Meilleure AoE directe de l'Osamodas.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "griffe_spectrale",
@@ -46,7 +54,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Sort de dégâts distance. Spammable. Base de la rotation DPS de l'Osamodas quand les invocations sont actives."
+      "note": "Sort de dégâts distance. Spammable. Base de la rotation DPS de l'Osamodas quand les invocations sont actives.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "benediction_animale",
@@ -58,7 +68,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Boost les dégâts de toutes les invocations actives. Lancer quand l'armée est déployée pour amplifier l'impact."
+      "note": "Boost les dégâts de toutes les invocations actives. Lancer quand l'armée est déployée pour amplifier l'impact.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "deplacement_felin",
@@ -70,7 +82,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Échange de position avec une invocation alliée. Repositionnement tactique pour se mettre à l'abri."
+      "note": "Échange de position avec une invocation alliée. Repositionnement tactique pour se mettre à l'abri.",
+      "role": "offensif",
+      "portee_modifiable": false
     },
     {
       "id": "invocation_de_bouftou",
@@ -82,7 +96,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Invocation tank résistante. Placer devant soi pour absorber les attaques et bloquer les couloirs."
+      "note": "Invocation tank résistante. Placer devant soi pour absorber les attaques et bloquer les couloirs.",
+      "role": "invoc",
+      "portee_modifiable": true
     },
     {
       "id": "crapaud",
@@ -94,7 +110,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 0,
-      "note": "Sort de dégâts eau/nature. Alternative à Griffe Spectrale selon les résistances de la cible."
+      "note": "Sort de dégâts eau/nature. Alternative à Griffe Spectrale selon les résistances de la cible.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "invocation_de_crapaud",
@@ -106,7 +124,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Invoque un Crapaud qui empoisonne les ennemis adjacents. Bon pour le contrôle de zone en mélée."
+      "note": "Invoque un Crapaud qui empoisonne les ennemis adjacents. Bon pour le contrôle de zone en mélée.",
+      "role": "invoc",
+      "portee_modifiable": true
     },
     {
       "id": "fouet",
@@ -118,7 +138,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Sort mélée d'urgence économique. Finir les tours en corps-à-corps forcé. Coût minimal de 2 PA."
+      "note": "Sort mélée d'urgence économique. Finir les tours en corps-à-corps forcé. Coût minimal de 2 PA.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "piqure_motivante",
@@ -130,7 +152,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Donne des PM aux invocations ou alliés. Repositionner rapidement le Dragonnet ou une créature bloquée."
+      "note": "Donne des PM aux invocations ou alliés. Repositionner rapidement le Dragonnet ou une créature bloquée.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "corbeau",
@@ -142,7 +166,9 @@
       "ligne_de_vue": true,
       "degats": "moyens",
       "cooldown": 2,
-      "note": "AoE en ligne qui peut attirer les cibles. Bon pour regrouper les ennemis ou créer des complications."
+      "note": "AoE en ligne qui peut attirer les cibles. Bon pour regrouper les ennemis ou créer des complications.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "griffe_cinglante",
@@ -154,7 +180,9 @@
       "ligne_de_vue": true,
       "degats": "élevés",
       "cooldown": 1,
-      "note": "Sort DPS direct principal. Bon rapport PA/dégâts. Rotation principale entre deux invocations."
+      "note": "Sort DPS direct principal. Bon rapport PA/dégâts. Rotation principale entre deux invocations.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "soin_animal",
@@ -166,7 +194,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 0,
-      "note": "Soin ciblé sur invocation ou allié. Maintenir les invocations en vie est prioritaire. Spammable."
+      "note": "Soin ciblé sur invocation ou allié. Maintenir les invocations en vie est prioritaire. Spammable.",
+      "role": "soin",
+      "portee_modifiable": true
     },
     {
       "id": "ame_du_panda",
@@ -178,7 +208,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Boost les résistances de l'Osamodas. Défense utile si la créature tank a été tuée et l'Osamodas est exposé."
+      "note": "Boost les résistances de l'Osamodas. Défense utile si la créature tank a été tuée et l'Osamodas est exposé.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "frappe_du_craqueleur",
@@ -190,7 +222,9 @@
       "ligne_de_vue": true,
       "degats": "très élevés",
       "cooldown": 3,
-      "note": "Sort burst puissant terre. Dégâts maximaux de l'Osamodas. Réserver pour boss ou cibles prioritaires."
+      "note": "Sort burst puissant terre. Dégâts maximaux de l'Osamodas. Réserver pour boss ou cibles prioritaires.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "resistance_naturelle",
@@ -202,7 +236,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Augmente les résistances d'un allié ou invocation. Protection permanente sur la créature la plus exposée."
+      "note": "Augmente les résistances d'un allié ou invocation. Protection permanente sur la créature la plus exposée.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "crocs_du_mulou",
@@ -214,7 +250,9 @@
       "ligne_de_vue": false,
       "degats": "élevés",
       "cooldown": 2,
-      "note": "Sort mélée/courte portée sans ligne de vue. Bon DPS en corps-à-corps si l'Osamodas est forcé d'engager."
+      "note": "Sort mélée/courte portée sans ligne de vue. Bon DPS en corps-à-corps si l'Osamodas est forcé d'engager.",
+      "role": "offensif",
+      "portee_modifiable": true
     },
     {
       "id": "ame_du_bwork_mage",
@@ -226,7 +264,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 3,
-      "note": "Boost les dégâts d'une invocation spécifique. Appliquer sur la créature DPS principale pour maximiser l'output."
+      "note": "Boost les dégâts d'une invocation spécifique. Appliquer sur la créature DPS principale pour maximiser l'output.",
+      "role": "buff",
+      "portee_modifiable": true
     },
     {
       "id": "ame_du_craqueleur",
@@ -238,7 +278,9 @@
       "ligne_de_vue": false,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Boost massif des dégâts terre de l'Osamodas et de ses invocations. Lancer avant Frappe du Craqueleur."
+      "note": "Boost massif des dégâts terre de l'Osamodas et de ses invocations. Lancer avant Frappe du Craqueleur.",
+      "role": "buff",
+      "portee_modifiable": false
     },
     {
       "id": "invocation_de_dragonnet",
@@ -250,7 +292,9 @@
       "ligne_de_vue": true,
       "degats": "faibles",
       "cooldown": 4,
-      "note": "Invocation principale de l'Osamodas. DPS/tank équilibré. Priorité absolue tour 1 si le contexte le permet."
+      "note": "Invocation principale de l'Osamodas. DPS/tank équilibré. Priorité absolue tour 1 si le contexte le permet.",
+      "role": "invoc",
+      "portee_modifiable": true
     }
   ],
   "plan_tour_type": [
