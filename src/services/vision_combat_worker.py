@@ -161,6 +161,10 @@ class VisionCombatWorker(QThread):
         self._invalid_cast_streak: int = 0
         # Compteur anti-boucle : combien de fois on a déjà override ce tour
         self._stuck_overrides: int = 0
+        # PA restants ce tour (mis à jour à chaque cast, reset au changement de tour)
+        self._pa_remaining: int = config.starting_pa
+        # Cache coût PA par slot (résolu via knowledge DB)
+        self._spell_cost_cache: dict[str, int] = {}
 
     def request_stop(self) -> None:
         self._stop_requested = True
@@ -480,6 +484,7 @@ class VisionCombatWorker(QThread):
         if phase == "mon_tour" and self._last_phase and self._last_phase != "mon_tour":
             self._cast_history.clear()
             self._stuck_overrides = 0
+            self._pa_remaining = self._config.starting_pa
         self._last_phase = phase
 
         # Override mécanique si le LLM re-cast sur une cible déjà visée (boucle).
@@ -489,6 +494,29 @@ class VisionCombatWorker(QThread):
 
         if self._config.save_debug_images:
             self._save_debug(frame, decision)
+
+    def _get_spell_cost(self, slot: str) -> int:
+        """Résout le coût PA d'un slot via spell_shortcuts + knowledge DB.
+        Fallback à 3 PA si pas trouvé."""
+        if slot in self._spell_cost_cache:
+            return self._spell_cost_cache[slot]
+        cost = 3
+        try:
+            slot_int = int(slot)
+            spell_name = self._config.spell_shortcuts.get(slot_int, "").strip().lower()
+            if spell_name:
+                cls = self._knowledge.get_class(self._config.class_name)
+                if cls:
+                    for s in cls.sorts:
+                        sname = str(s.get("nom", "")).strip().lower()
+                        sid = str(s.get("id", "")).strip().lower()
+                        if sname == spell_name or sid == spell_name:
+                            cost = int(s.get("pa", 3))
+                            break
+        except Exception:
+            pass
+        self._spell_cost_cache[slot] = cost
+        return cost
 
     def _override_if_stuck(self, action: dict, snap) -> dict:
         """Si le LLM re-propose un cast déjà effectué sur la même cible (±50px),
@@ -649,14 +677,36 @@ class VisionCombatWorker(QThread):
                         )
                         break
 
+        # Coût des sorts configurés (aide le LLM à décider s'il peut encore cast)
+        costs_hint = ""
+        if self._config.spell_shortcuts:
+            pieces = []
+            for k in sorted(self._config.spell_shortcuts.keys()):
+                pieces.append(f"slot{k}={self._get_spell_cost(str(k))}PA")
+            costs_hint = f" Coûts: {', '.join(pieces)}."
+
+        pa_rem = self._pa_remaining
+        min_cost = min(
+            (self._get_spell_cost(str(k)) for k in self._config.spell_shortcuts),
+            default=99,
+        )
+        continue_rule = ""
+        if pa_rem >= min_cost:
+            continue_rule = (
+                f" TU AS ENCORE {pa_rem} PA → si un mob est à portée et LoS ok, "
+                f"CONTINUE à cast (ne fais PAS end_turn avec des PA inutilisés)."
+            )
+
         return (
             f"Classe: {self._config.class_name}. "
-            f"Raccourcis: {shortcuts or '(aucun)'}. "
-            f"Max/tour: {self._config.starting_pa} PA, {self._config.starting_pm} PM."
+            f"Raccourcis: {shortcuts or '(aucun)'}.{costs_hint} "
+            f"PA restants: {pa_rem}/{self._config.starting_pa}. "
+            f"PM max: {self._config.starting_pm}."
             f"{po_bonus_line}"
             f"{allowed_block}"
             f"{detections_block}"
-            f"{history_block}\n"
+            f"{history_block}"
+            f"{continue_rule}\n"
             f"Décide 1 action. Réponds en JSON strict (observation/phase/raisonnement/action)."
         )
 
@@ -726,6 +776,7 @@ class VisionCombatWorker(QThread):
             self._stats.actions_taken += 1
             self._cast_history.clear()
             self._stuck_overrides = 0
+            self._pa_remaining = self._config.starting_pa
 
         elif atype == "close_popup":
             self.log_event.emit("→ Ferme popup (Escape)", "info")
@@ -876,6 +927,9 @@ class VisionCombatWorker(QThread):
             self._cast_history.append((str(key), x, y))
             if len(self._cast_history) > 3:
                 self._cast_history.pop(0)
+            # Décrémente les PA restants selon le coût du sort
+            cost = self._get_spell_cost(str(key))
+            self._pa_remaining = max(0, self._pa_remaining - cost)
         except Exception as exc:
             self.log_event.emit(f"⚠ Cast échec : {exc}", "error")
 
