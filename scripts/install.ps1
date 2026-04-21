@@ -453,26 +453,50 @@ if (-not (Test-Path $pythonwExe)) {
     $startMenuPrograms = Join-Path ([Environment]::GetFolderPath("StartMenu")) "Programs"
     $iconArg = if (Test-Path $iconPath) { $iconPath } else { $pythonwExe }
 
-    foreach ($target in @(
+    # Le raccourci pointe vers le .bat Admin (demande UAC au lancement).
+    # Indispensable car Dofus tourne souvent en admin → le bot doit aussi pour envoyer des inputs.
+    $adminBat = Join-Path $projectRoot "Lancer Dofus Bot (Admin).bat"
+    $simpleBat = Join-Path $projectRoot "Lancer Dofus Bot.bat"
+    # Privilegie le .bat Admin s'il existe, sinon fallback sur simple
+    $targetBat = if (Test-Path $adminBat) { $adminBat } else { $simpleBat }
+
+    foreach ($lnkPath in @(
         (Join-Path $desktop "Dofus Bot.lnk"),
         (Join-Path $startMenuPrograms "Dofus Bot.lnk")
     )) {
         try {
             $shell = New-Object -ComObject WScript.Shell
-            $sc = $shell.CreateShortcut($target)
-            $sc.TargetPath = $pythonwExe
-            $sc.Arguments = "-m src.main"
+            $sc = $shell.CreateShortcut($lnkPath)
+            if (Test-Path $targetBat) {
+                # Lance via le .bat (qui demande UAC si pas admin)
+                $sc.TargetPath = "cmd.exe"
+                $sc.Arguments = "/c `"$targetBat`""
+            } else {
+                # Fallback : direct pythonw
+                $sc.TargetPath = $pythonwExe
+                $sc.Arguments = "-m src.main"
+            }
             $sc.WorkingDirectory = $projectRoot
             $sc.IconLocation = $iconArg
-            $sc.Description = "Dofus 2.64 Bot (IA Gemini)"
-            $sc.WindowStyle = 7   # minimise, pas de console
+            $sc.Description = "Dofus 2.64 Bot (IA Gemini) - Admin"
+            $sc.WindowStyle = 7   # minimise
             $sc.Save()
-            Write-OK "Raccourci cree: $target"
+
+            # Active le flag "Run as admin" sur le .lnk (byte 0x15 du header RunWithAdmin)
+            try {
+                $bytes = [System.IO.File]::ReadAllBytes($lnkPath)
+                if ($bytes.Length -gt 0x15) {
+                    $bytes[0x15] = $bytes[0x15] -bor 0x20   # RunAsAdmin flag
+                    [System.IO.File]::WriteAllBytes($lnkPath, $bytes)
+                }
+            } catch {}
+
+            Write-OK "Raccourci cree (admin): $lnkPath"
         } catch {
             Write-Warn ("Creation raccourci echouee : " + $_.Exception.Message)
         }
     }
-    Write-Host "  Double-clic sur le raccourci Bureau -> Dofus Bot demarre (pas de console)" -ForegroundColor Gray
+    Write-Host "  Double-clic sur le raccourci Bureau (confirme UAC) -> Dofus Bot demarre en admin" -ForegroundColor Gray
     Write-Host "  Ou tape 'Dofus Bot' dans la recherche Windows" -ForegroundColor Gray
 }
 
