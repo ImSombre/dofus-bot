@@ -579,8 +579,10 @@ class VisionCombatWorker(QThread):
         try:
             frame = self._vision.capture()
             h, w = frame.shape[:2]
-            if max(h, w) > 2048:
-                img_scale = 2048 / max(h, w)
+            # Doit correspondre à `max_side` dans LLMClient._encode_image_b64
+            MAX_SIDE = 1280
+            if max(h, w) > MAX_SIDE:
+                img_scale = MAX_SIDE / max(h, w)
         except Exception:
             pass
 
