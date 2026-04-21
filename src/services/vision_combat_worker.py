@@ -561,27 +561,40 @@ class VisionCombatWorker(QThread):
             )
             return {"type": "end_turn"}
 
-        # 1er override → calcule une case perpendiculaire pour contourner l'obstacle
+        # 1er override → on doit bouger, mais 2 stratégies selon distance :
+        #   - mob LOIN (>3 cases de mouvement possibles) → s'APPROCHER vers lui
+        #   - mob PROCHE → case PERPENDICULAIRE pour contourner un mur
         perso_xy: tuple[int, int] | None = None
         if snap is not None and snap.perso:
             perso_xy = (snap.perso.x, snap.perso.y)
         else:
-            # fallback : centre écran approx
             perso_xy = (1280, 720)
 
         dx, dy = tx - perso_xy[0], ty - perso_xy[1]
-        # Perpendiculaire (rotation 90°) normalisée × 2 cases (~120px)
         length = max(1.0, (dx * dx + dy * dy) ** 0.5)
-        nx, ny = -dy / length, dx / length
-        OFFSET = 140  # ~2.3 cases Dofus
-        bypass_x = int(perso_xy[0] + nx * OFFSET + (dx / length) * 60)
-        bypass_y = int(perso_xy[1] + ny * OFFSET + (dy / length) * 60)
-        # Clamp à l'écran pour éviter clic hors zone
+        # Distance approx en cases iso (86/43)
+        dist_cases = max(abs(dx) / 86, abs(dy) / 43)
+
+        if dist_cases > 4:
+            # MOB LOIN : on va directement vers lui (avance de ~3 cases)
+            ADVANCE = 220  # ~3 cases Dofus
+            bypass_x = int(perso_xy[0] + (dx / length) * ADVANCE)
+            bypass_y = int(perso_xy[1] + (dy / length) * ADVANCE)
+            strategy = "APPROCHE"
+        else:
+            # MOB PROCHE + re-cast raté = mur → perpendiculaire
+            nx, ny = -dy / length, dx / length
+            OFFSET = 140
+            bypass_x = int(perso_xy[0] + nx * OFFSET + (dx / length) * 60)
+            bypass_y = int(perso_xy[1] + ny * OFFSET + (dy / length) * 60)
+            strategy = "CONTOURNEMENT"
+
         bypass_x = max(50, min(bypass_x, 2500))
         bypass_y = max(50, min(bypass_y, 1400))
 
         self.log_event.emit(
-            f"🚨 Override : re-cast sur ({tx},{ty}) détecté → je contourne vers ({bypass_x},{bypass_y})",
+            f"🚨 Override {strategy} : re-cast sur ({tx},{ty}) détecté "
+            f"(dist={dist_cases:.0f}c) → je bouge vers ({bypass_x},{bypass_y})",
             "warn",
         )
         return {"type": "click_xy", "target_xy": [bypass_x, bypass_y]}
@@ -610,7 +623,7 @@ class VisionCombatWorker(QThread):
             frame = self._vision.capture()
             h, w = frame.shape[:2]
             # Doit correspondre à `max_side` dans LLMClient._encode_image_b64
-            MAX_SIDE = 1280
+            MAX_SIDE = 1024
             if max(h, w) > MAX_SIDE:
                 img_scale = MAX_SIDE / max(h, w)
         except Exception:

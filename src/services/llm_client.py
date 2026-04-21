@@ -632,8 +632,8 @@ class LLMClient:
     @staticmethod
     def _encode_image_b64(
         img_bgr,
-        max_side: int = 1280,
-        quality: int = 72,
+        max_side: int = 1024,
+        quality: int = 70,
         draw_grid: bool = False,
     ) -> tuple[str | None, float, int, int]:
         """Encode une image BGR en JPEG base64, en traçant le scale factor.
