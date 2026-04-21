@@ -307,10 +307,12 @@ class LLMClient:
     # Liste des modèles Gemini à essayer en fallback si le primaire est surchargé (503)
     # ou timeout. Ordre : plus récent/rapide → plus stable → moins sollicité.
     # gemini-2.0-flash retiré (404 no longer available).
+    # Flash-lite est ~2x plus rapide que flash-latest sur des requêtes vision
+    # simples. On privilégie la vitesse en combat (chaque seconde compte).
     _GEMINI_FALLBACK_CHAIN = [
+        "gemini-2.5-flash-lite",   # LE PLUS RAPIDE (priorité v0.3.1)
         "gemini-flash-latest",
         "gemini-2.5-flash",
-        "gemini-2.5-flash-lite",   # plus récent, moins chargé
         "gemini-1.5-flash",        # legacy mais toujours dispo et stable
         "gemini-2.5-pro",          # dernier recours (quota payant plus cher)
     ]

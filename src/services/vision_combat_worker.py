@@ -42,16 +42,16 @@ class VisionCombatConfig:
     spell_shortcuts: dict[int, str] = field(default_factory=dict)
     # Provider LLM : "ollama", "lmstudio", "gemini"
     llm_provider: str = "gemini"         # default : Gemini (cloud gratuit, pas de VRAM)
-    llm_model: str = "gemini-flash-latest"  # alias toujours pointé vers la version stable
+    llm_model: str = "gemini-2.5-flash-lite"  # le plus rapide (v0.3.1 — ~2x flash-latest)
     llm_url: str = ""                    # override optionnel (défaut : selon provider)
     llm_api_key: str = ""                # clé API Gemini (obligatoire pour provider=gemini)
-    # Timings optimisés pour vitesse (v0.1.8) :
-    #   - scan 0.3s entre cycles (avant 1.5s = 80% de temps perdu)
-    #   - post_action 1.0s (avant 2.0s ; animation sort < 1s en général)
-    #   - key_to_click 0.25s (avant 0.45s)
-    scan_interval_sec: float = 0.3
-    post_action_delay_sec: float = 1.0
-    key_to_click_delay_sec: float = 0.25
+    # Timings optimisés pour vitesse (v0.3.1) :
+    #   - scan 0.15s entre cycles (quasi instant, l'essentiel du coût est le LLM)
+    #   - post_action 0.6s (animation courte ; 1.0s était trop conservateur)
+    #   - key_to_click 0.12s (suffisant pour que Dofus affiche la zone de sort)
+    scan_interval_sec: float = 0.15
+    post_action_delay_sec: float = 0.6
+    key_to_click_delay_sec: float = 0.12
     starting_pa: int = 6
     starting_pm: int = 3
     # Bonus de portée (PO) appliqué à tous les sorts "à portée modifiable".
@@ -148,6 +148,9 @@ class VisionCombatWorker(QThread):
         self._last_action_key: str = ""
         self._same_action_count: int = 0
         self._last_phase: str = ""
+        # Historique des 3 derniers casts (pour détecter cible morte / mur / LoS bloquée)
+        #   (slot, target_x, target_y)
+        self._cast_history: list[tuple[str, int, int]] = []
 
     def request_stop(self) -> None:
         self._stop_requested = True
@@ -509,12 +512,40 @@ class VisionCombatWorker(QThread):
                 f"Ex: si un sort a portée 1-5 et +{self._config.po_bonus} PO → "
                 f"portée effective 1-{5 + self._config.po_bonus}.\n"
             )
+
+        # Historique des casts récents + signal anti-boucle (LoS bloquée / mob immobile).
+        history_block = ""
+        if self._cast_history:
+            hist_lines = []
+            for slot, hx, hy in self._cast_history:
+                hist_lines.append(f"  • slot {slot} sur ({hx}, {hy})")
+            history_block = (
+                "\n\n🔁 **CASTS DÉJÀ FAITS CE TOUR** (ordre chronologique) :\n"
+                + "\n".join(hist_lines)
+            )
+            # Détection re-cast sur mob qui n'a pas bougé → signal mur / LoS
+            if snap is not None and snap.ennemis:
+                last_slot, lx, ly = self._cast_history[-1]
+                for e in snap.ennemis:
+                    if abs(e.x - lx) <= 40 and abs(e.y - ly) <= 40:
+                        # écran-space : divise par img_scale pour comparer au cast (qui est en écran)
+                        history_block += (
+                            f"\n\n⚠️ **ALERTE ANTI-BOUCLE** : tu viens de cast slot {last_slot} "
+                            f"sur ({lx}, {ly}) et un MOB est TOUJOURS à cette position écran. "
+                            f"Le sort n'a probablement pas touché → **LIGNE DE VUE BLOQUÉE par un mur/obstacle**. "
+                            f"NE RE-CAST PAS le même sort sur la même cible. "
+                            f"Déplace-toi (click_xy sur une case qui contourne l'obstacle) "
+                            f"OU cast un AUTRE mob visible OU end_turn si tu n'as plus d'options."
+                        )
+                        break
+
         return (
             f"Analyse la capture d'écran fournie. Je joue un **{self._config.class_name}**.\n"
             f"Mes raccourcis clavier sont : {shortcuts or '(aucun configuré)'}.\n"
             f"J'ai au maximum **{self._config.starting_pa} PA** et **{self._config.starting_pm} PM** par tour."
             f"{po_bonus_line}"
-            f"{detections_block}\n\n"
+            f"{detections_block}"
+            f"{history_block}\n\n"
             f"Observe l'image (phase, mon perso entouré d'un rectangle rouge, "
             f"mobs entourés de rectangles bleus avec label 'MOB{{n}} (x,y)', UI, popups) "
             f"puis décide UNE action à exécuter MAINTENANT.\n\n"
@@ -562,11 +593,13 @@ class VisionCombatWorker(QThread):
             except Exception:
                 pass
             self._stats.actions_taken += 1
+            self._cast_history.clear()
 
         elif atype == "close_popup":
             self.log_event.emit("→ Ferme popup (Escape)", "info")
             self._input.press_key("escape")
             self._stats.actions_taken += 1
+            self._cast_history.clear()
 
         elif atype == "wait":
             self.log_event.emit("→ Attente", "info")
@@ -707,6 +740,9 @@ class VisionCombatWorker(QThread):
             self.msleep(int(self._config.key_to_click_delay_sec * 1000))
             self._input.click(x, y, button="left")
             self._stats.actions_taken += 1
+            self._cast_history.append((str(key), x, y))
+            if len(self._cast_history) > 3:
+                self._cast_history.pop(0)
         except Exception as exc:
             self.log_event.emit(f"⚠ Cast échec : {exc}", "error")
 

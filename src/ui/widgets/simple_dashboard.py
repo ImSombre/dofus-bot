@@ -1334,7 +1334,8 @@ class SimpleDashboardWidget(QWidget):
         self._combat_vision_model.setEditable(True)
         self._combat_vision_model.addItems([
             # Gemini (cloud gratuit) — RECOMMANDÉ
-            "gemini-flash-latest",   # ⭐ alias auto vers la dernière version stable
+            "gemini-2.5-flash-lite", # ⭐⭐ LE PLUS RAPIDE (~2x flash-latest, qualité ok combat)
+            "gemini-flash-latest",   # alias auto vers la dernière version stable
             "gemini-2.5-flash",      # GRATUIT, rapide, top qualité (peut être surchargé)
             "gemini-2.5-pro",        # Meilleur raisonnement (quota réduit)
             "gemini-2.0-flash",      # legacy
@@ -1349,7 +1350,7 @@ class SimpleDashboardWidget(QWidget):
             "qwen/qwen2.5-vl-3b-instruct",
             "qwen/qwen2.5-vl-7b-instruct",
         ])
-        self._combat_vision_model.setCurrentText("gemini-flash-latest")
+        self._combat_vision_model.setCurrentText("gemini-2.5-flash-lite")
         self._combat_vision_model.setMinimumWidth(220)
         self._combat_vision_model.setToolTip(
             "⭐ GEMINI (cloud gratuit) — recommandé si PC faible :\n"
@@ -1613,7 +1614,7 @@ class SimpleDashboardWidget(QWidget):
         elif provider == "lmstudio":
             self._combat_vision_model.setCurrentText("qwen/qwen2.5-vl-3b-instruct")
         elif provider == "gemini":
-            self._combat_vision_model.setCurrentText("gemini-flash-latest")
+            self._combat_vision_model.setCurrentText("gemini-2.5-flash-lite")
         # Affiche le champ clé API seulement pour gemini
         if hasattr(self, "_gemini_key_container"):
             self._gemini_key_container.setVisible(provider == "gemini")

@@ -72,6 +72,39 @@ Quand tu engages un mob, le combat commence **directement en phase `mon_tour`**.
 - **Tacle** : un ennemi adjacent peut réduire les PM/PA si on fuit. Surveillance cruciale pour mélée
 - **Critiques** : +X% dégâts, souvent liés à la Chance ou à un buff
 
+### ⚠️ LIGNE DE VUE (LoS) — RÈGLE CRITIQUE
+La plupart des sorts à distance (portée >1) **NÉCESSITENT la ligne de vue**. Un obstacle physique entre le perso et la cible bloque le sort. Regarde l'image :
+
+**Obstacles qui bloquent LoS :**
+- Murs en pierre (blocs de briques, remparts)
+- Colonnes, piliers, statues
+- Rochers, gros arbres, montagnes
+- Changements de niveau marqués (cases surélevées ≠ cases basses)
+- Certains décors (caisses, meubles, tonneaux)
+
+**N'EST PAS un obstacle :** cases d'eau, cases d'herbe, cases de terre, zones de couleur différente mais à plat.
+
+**COMMENT DÉCIDER si LoS est bloquée** (depuis l'image) :
+1. Trace mentalement une ligne droite de ton perso (rectangle rouge) vers le MOB (rectangle bleu)
+2. Si un **mur / colonne / rocher** coupe cette ligne → **LoS BLOQUÉE**
+3. Si la ligne passe librement sur des cases de sol → LoS OK
+
+**SI LoS BLOQUÉE** : tu NE PEUX PAS cast un sort à distance, même si la portée est suffisante. Tu DOIS :
+- Te déplacer (`click_xy` sur une case qui contourne l'obstacle, généralement sur le côté du mur)
+- OU utiliser un sort qui ignore la ligne de vue (rare, vérifie la description du sort)
+
+### ⚠️ ANTI-BOUCLE — RÈGLE CRITIQUE
+Je vais t'envoyer dans le prompt utilisateur le **dernier cast effectué** (slot + cible). Si tu vois que :
+- Tu as cast slot X sur coord (A,B) au tour précédent
+- ET le même MOB est toujours à la même position sur l'image
+
+Ça signifie **UNE DE CES 3 CHOSES** :
+1. Le sort a raté (ligne de vue bloquée par un mur) → **DÉPLACE-TOI** pour contourner
+2. Le mob n'est pas encore mort mais tu as plus de PA → continue à cast (cas normal)
+3. Le HSV a détecté un autre mob à la même position → cast sur un mob DIFFÉRENT si visible
+
+**NE REPETE JAMAIS la même action 2x sur la même cible si rien ne change.** C'est un signal que quelque chose bloque. Dans le doute, bouge ou termine le tour.
+
 ### Stratégies par archétype
 - **Mélée (Iop, Ecaflip)** : s'engager tour 1 (Bond / PM), puis spam sorts à portée 1
 - **Distance (Crâ, Enu)** : maintenir 5+ cases avec l'ennemi, lignes de vue, sorts AoE
@@ -171,6 +204,28 @@ Capture : cases vertes numérotées visibles, mob à 5 cases.
   "phase": "mon_tour",
   "raisonnement": "Je clique sur la case verte la plus proche du mob pour me déplacer (ça consomme mes PM).",
   "action": { "type": "click_xy", "target_xy": [1200, 600] }
+}
+```
+
+### Exemple 8 — Ligne de vue bloquée par un mur → contourner
+Capture : mon Pandawa à gauche sur des cases bleues (eau), 2 mobs à droite sur de l'herbe, un GROS MUR DE PIERRE entre nous. Dernier cast : slot 2 sur (1545, 1056) — le mob n'a pas bougé et est toujours vivant.
+```json
+{
+  "observation": "Mon tour. Perso à gauche, 2 mobs à droite séparés par un mur en pierre. Dernier sort n'a pas touché (LoS bloquée).",
+  "phase": "mon_tour",
+  "raisonnement": "Le mur bloque ma ligne de vue. Je dois contourner. Je me déplace vers une case verte qui m'amène sur l'herbe, de l'autre côté du mur.",
+  "action": { "type": "click_xy", "target_xy": [1100, 720] }
+}
+```
+
+### Exemple 9 — Même cast 2x de suite sans changement → STOP
+Capture : mob encore au même endroit, toujours plein HP. Dernier cast = slot 2 sur (1545, 1056). Le HSV redétecte MOB1 = (1545, 1057).
+```json
+{
+  "observation": "J'ai déjà cast slot 2 sur (1545, 1056) au tour précédent et le MOB1 est toujours à (1545, 1057). Le sort n'a pas touché (probable mur).",
+  "phase": "mon_tour",
+  "raisonnement": "Inutile de re-cast le même sort sur la même cible : quelque chose bloque. Je bouge pour avoir une vraie ligne de vue.",
+  "action": { "type": "click_xy", "target_xy": [1200, 780] }
 }
 ```
 
