@@ -34,6 +34,7 @@ from src.services.combat_decision_engine import (
 )
 from src.services.combat_knowledge import CombatKnowledge
 from src.services.combat_state_reader import CombatStateReader
+from src.services.combat_stats_tracker import get_tracker
 from src.services.input_service import InputService
 from src.services.llm_client import LLMClient
 from src.services.phase_detector import detect_phase
@@ -192,6 +193,12 @@ class VisionCombatWorker(QThread):
         self._turn_number: int = 1
         # Buffs déjà cast ce combat (reset au nouveau combat)
         self._buffs_cast: set[int] = set()
+        # Tracker stats (singleton partagé)
+        self._stats_tracker = get_tracker()
+        # Track si le tracker a démarré un combat pour éviter double start
+        self._combat_tracked: bool = False
+        # Nb d'ennemis détectés au tick précédent (pour compter les kills approximatifs)
+        self._prev_enemy_count: int = 0
 
     def request_stop(self) -> None:
         self._stop_requested = True
@@ -422,12 +429,37 @@ class VisionCombatWorker(QThread):
         # Détection phase rapide par analyse d'image (~10ms)
         # Court-circuite le LLM si popup victoire/défaite détectée
         phase_result = detect_phase(raw_frame)
+
+        # Tracking : démarre un combat si on détecte le début
+        if not self._combat_tracked and snap is not None and snap.ennemis:
+            self._stats_tracker.on_combat_start(self._config.class_name)
+            self._combat_tracked = True
+
+        # Tracking : compte les kills (diminution du nb ennemis entre 2 ticks)
+        current_enemy_count = len(snap.ennemis) if snap else 0
+        if current_enemy_count < self._prev_enemy_count:
+            for _ in range(self._prev_enemy_count - current_enemy_count):
+                self._stats_tracker.on_kill()
+        self._prev_enemy_count = current_enemy_count
+
         if (phase_result.phase == "popup_victoire"
                 and phase_result.confidence > 0.5
                 and self._config.decision_mode in ("hybrid", "rules")):
             self.log_event.emit(
                 f"🏆 Popup détectée → close ({phase_result.reason})", "info",
             )
+            # Finalise le combat (victoire)
+            if self._combat_tracked:
+                snapshot = self._stats_tracker.on_combat_end("victory")
+                self.log_event.emit(
+                    f"📊 Combat #{self._stats_tracker.get_global_stats().total_combats} terminé : "
+                    f"{snapshot.get('kills_estimated', 0)} kills, "
+                    f"{snapshot.get('turns_played', 0)} tours, "
+                    f"{snapshot.get('duration_sec', 0):.0f}s",
+                    "info",
+                )
+                self._combat_tracked = False
+                self._prev_enemy_count = 0
             self._execute_action({"type": "close_popup"}, "popup_victoire")
             return
 
@@ -455,6 +487,10 @@ class VisionCombatWorker(QThread):
                 # Track les buffs cast pour ne pas les refaire
                 if "_buff_slot" in rule_action:
                     self._buffs_cast.add(rule_action["_buff_slot"])
+                # Stats
+                self._stats_tracker.on_decision("rules", latency_ms=0.1)
+                if rtype in ("cast_spell", "spell"):
+                    self._stats_tracker.on_cast(str(rule_action.get("spell_key", "?")))
                 self._execute_action(rule_action, "mon_tour")
                 return
 
@@ -484,6 +520,8 @@ class VisionCombatWorker(QThread):
         )
         elapsed = time.time() - t0
         self._stats.llm_calls += 1
+        # Stats session
+        self._stats_tracker.on_decision("llm", latency_ms=elapsed * 1000)
 
         # Check stop juste après l'appel LLM (peut être long, l'utilisateur a pu demander stop entre temps)
         if self._stop_requested:
