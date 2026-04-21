@@ -430,6 +430,14 @@ class VisionCombatWorker(QThread):
         # Reset compteur d'erreurs après succès
         self._consecutive_errors = 0
 
+        # Si l'API a renvoyé une erreur, l'afficher clairement
+        if decision.get("_error"):
+            err = decision.get("_error", "")
+            self.log_event.emit(
+                f"❌ ERREUR API LLM : {err[:300]}",
+                "error",
+            )
+
         phase = decision.get("phase", "?")
         observation = decision.get("observation") or decision.get("situation", "")
         reasoning = decision.get("raisonnement") or decision.get("reasoning", "")

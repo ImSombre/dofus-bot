@@ -196,6 +196,8 @@ class LLMClient:
         if not response.success:
             logger.warning("LLM ask échec : {}", response.error)
             out = dict(fallback or {})
+            out["_error"] = response.error or "Erreur LLM inconnue"
+            out["_raw_text"] = response.text or ""
             out["_image_scale"] = response.image_scale
             out["_image_width"] = response.image_width
             out["_image_height"] = response.image_height
