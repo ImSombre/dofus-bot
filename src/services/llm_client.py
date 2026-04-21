@@ -452,10 +452,40 @@ class LLMClient:
         )
 
     @staticmethod
+    def _draw_coord_grid(img_bgr, step: int = 200) -> None:
+        """Dessine une grille de coordonnées sur l'image (in-place).
+
+        Aide le LLM à donner des coords précises : il lit les labels au lieu
+        de deviner à partir des proportions.
+        """
+        if not _HAS_CV2 or img_bgr is None:
+            return
+        try:
+            import cv2 as _cv2  # noqa: PLC0415
+            h, w = img_bgr.shape[:2]
+            color_grid = (0, 255, 255)   # jaune
+            color_text = (0, 255, 255)
+            for x in range(0, w, step):
+                _cv2.line(img_bgr, (x, 0), (x, h), color_grid, 1, _cv2.LINE_AA)
+                _cv2.putText(
+                    img_bgr, str(x), (x + 2, 14),
+                    _cv2.FONT_HERSHEY_SIMPLEX, 0.4, color_text, 1, _cv2.LINE_AA,
+                )
+            for y in range(0, h, step):
+                _cv2.line(img_bgr, (0, y), (w, y), color_grid, 1, _cv2.LINE_AA)
+                _cv2.putText(
+                    img_bgr, str(y), (2, y + 14),
+                    _cv2.FONT_HERSHEY_SIMPLEX, 0.4, color_text, 1, _cv2.LINE_AA,
+                )
+        except Exception:
+            pass
+
+    @staticmethod
     def _encode_image_b64(
         img_bgr,
         max_side: int = 2048,
         quality: int = 80,
+        draw_grid: bool = True,
     ) -> tuple[str | None, float, int, int]:
         """Encode une image BGR en JPEG base64, en traçant le scale factor.
 
@@ -468,6 +498,8 @@ class LLMClient:
         if not _HAS_CV2 or img_bgr is None:
             return (None, 1.0, 0, 0)
         try:
+            # Copie pour ne pas modifier l'image source
+            img_bgr = img_bgr.copy()
             h, w = img_bgr.shape[:2]
             scale = 1.0
             if max(h, w) > max_side:
@@ -478,6 +510,9 @@ class LLMClient:
                     img_bgr, (new_w, new_h), interpolation=cv2.INTER_AREA,
                 )
                 h, w = new_h, new_w
+            # Dessine une grille de coords APRÈS resize (donc coords dans l'espace image envoyé)
+            if draw_grid:
+                LLMClient._draw_coord_grid(img_bgr, step=100)
             ok, buf = cv2.imencode(".jpg", img_bgr, [cv2.IMWRITE_JPEG_QUALITY, quality])
             if not ok:
                 return (None, scale, 0, 0)
