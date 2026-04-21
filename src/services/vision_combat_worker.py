@@ -29,6 +29,7 @@ from pathlib import Path
 from loguru import logger
 from PyQt6.QtCore import QThread, pyqtSignal
 
+from src.services.combat_decision_engine import CombatDecisionEngine, EngineConfig
 from src.services.combat_knowledge import CombatKnowledge
 from src.services.combat_state_reader import CombatStateReader
 from src.services.input_service import InputService
@@ -65,6 +66,11 @@ class VisionCombatConfig:
     # Timeout réduit : 20s max par requête LLM (avant : 90s = blocage en cas de surcharge).
     # Anthropic Haiku répond typiquement en 1-2s, on a donc 10× de marge.
     request_timeout_sec: float = 20.0
+    # Mode de décision :
+    #   - "hybrid" (défaut v0.5.0) : moteur règles d'abord, LLM seulement si ambigu
+    #   - "llm"    : tout au LLM (comportement v0.4.x)
+    #   - "rules"  : tout aux règles (pas d'appel LLM, gratuit mais moins adaptatif)
+    decision_mode: str = "hybrid"
     dofus_window_title: str | None = None
     # Sauvegarder chaque capture envoyée au LLM (debug)
     save_debug_images: bool = False
@@ -151,6 +157,17 @@ class VisionCombatWorker(QThread):
         self._consecutive_errors = 0
         self._max_consecutive_errors = 5
         self._latencies: list[float] = []
+        # Moteur de décision déterministe (règles avant LLM)
+        self._engine = CombatDecisionEngine(
+            EngineConfig(
+                class_name=config.class_name,
+                spell_shortcuts=dict(config.spell_shortcuts),
+                starting_pa=config.starting_pa,
+                starting_pm=config.starting_pm,
+                po_bonus=config.po_bonus,
+            ),
+            self._knowledge,
+        )
         # Anti-boucle : détecte si le LLM répète la même action sans changement
         self._last_action_key: str = ""
         self._same_action_count: int = 0
@@ -376,7 +393,7 @@ class VisionCombatWorker(QThread):
             return frame, None
 
     def _tick(self) -> None:
-        """Un cycle : capture → annotation HSV → LLM → action."""
+        """Un cycle : capture → HSV → moteur règles → LLM si nécessaire → action."""
         try:
             raw_frame = self._vision.capture()
         except Exception as exc:
@@ -391,6 +408,40 @@ class VisionCombatWorker(QThread):
                 f"MOB{i}=({e.x},{e.y})" for i, e in enumerate(snap.ennemis, 1)
             )
             self.log_event.emit(f"🔍 Détections HSV : {detections_summary}", "info")
+
+        # Essai moteur déterministe (si pas en mode "llm" pur)
+        if self._config.decision_mode in ("hybrid", "rules"):
+            rule_action = self._engine.decide(
+                snap=snap,
+                pa_remaining=self._pa_remaining,
+                cast_history=list(self._cast_history),
+                stuck_overrides=self._stuck_overrides,
+            )
+            rtype = str(rule_action.get("type", "")).lower()
+            rreason = rule_action.get("reason", "")
+
+            # Le moteur donne une action déterministe → on l'exécute direct
+            if rtype != "defer_to_llm":
+                self.log_event.emit(
+                    f"⚙ Moteur règles : {rtype} — {rreason}",
+                    "info",
+                )
+                self._execute_action(rule_action, "mon_tour")
+                return
+
+            # Sinon, si mode rules strict, on fait wait (pas de LLM)
+            if self._config.decision_mode == "rules":
+                self.log_event.emit(
+                    f"⚙ Règles incertaines ({rreason}) — wait (mode rules)",
+                    "info",
+                )
+                self._execute_action({"type": "wait"}, "inconnu")
+                return
+            # Sinon (mode hybrid), on continue vers le LLM
+            self.log_event.emit(
+                f"🤔 Règles ambiguës ({rreason}) → recours au LLM",
+                "info",
+            )
 
         user_prompt = self._build_user_prompt(snap)
         self.log_event.emit("👁 → LLM (analyse image)...", "info")
