@@ -258,34 +258,69 @@ class VisionCombatWorker(QThread):
         return out
 
     def _ensure_dofus_focus(self) -> None:
-        """Active la fenêtre Dofus AVANT chaque action pour que keys/clics arrivent bien.
+        """Force la fenêtre Dofus au premier plan via Win32 (contournement anti-stealing).
 
-        Sans ça, press_key('2') envoie la touche à la fenêtre active (PowerShell, IDE...)
-        au lieu de Dofus → le sort n'est jamais lancé.
+        Windows bloque `SetForegroundWindow` depuis un process qui n'a pas l'input focus
+        (anti-vol de focus). Contournement : `AttachThreadInput` + `SetForegroundWindow`.
         """
-        try:
-            import pygetwindow as gw  # noqa: PLC0415
-        except ImportError:
-            return
+        import ctypes  # noqa: PLC0415
+        from ctypes import wintypes  # noqa: PLC0415
+
         title_substring = (self._config.dofus_window_title or "dofus").lower()
+
+        # 1. Trouve le HWND Dofus
+        user32 = ctypes.windll.user32
+        hwnd_dofus = None
+
+        @ctypes.WINFUNCTYPE(ctypes.c_bool, wintypes.HWND, wintypes.LPARAM)
+        def _enum_cb(hwnd, _lparam):
+            nonlocal hwnd_dofus
+            if not user32.IsWindowVisible(hwnd):
+                return True
+            length = user32.GetWindowTextLengthW(hwnd)
+            if length == 0:
+                return True
+            buff = ctypes.create_unicode_buffer(length + 1)
+            user32.GetWindowTextW(hwnd, buff, length + 1)
+            if title_substring in buff.value.lower():
+                hwnd_dofus = hwnd
+                return False   # stop enum
+            return True
+
+        user32.EnumWindows(_enum_cb, 0)
+        if not hwnd_dofus:
+            return
+
+        # 2. Force foreground via AttachThreadInput (bypass l'anti-vol de focus)
         try:
-            for w in gw.getAllWindows():
-                if not w.title:
-                    continue
-                if title_substring in w.title.lower():
-                    if not w.isActive:
+            current_thread = ctypes.windll.kernel32.GetCurrentThreadId()
+            target_thread = user32.GetWindowThreadProcessId(hwnd_dofus, None)
+            if current_thread != target_thread:
+                user32.AttachThreadInput(current_thread, target_thread, True)
+            # Si minimise, restore
+            if user32.IsIconic(hwnd_dofus):
+                SW_RESTORE = 9
+                user32.ShowWindow(hwnd_dofus, SW_RESTORE)
+            user32.BringWindowToTop(hwnd_dofus)
+            user32.SetForegroundWindow(hwnd_dofus)
+            user32.SetFocus(hwnd_dofus)
+            if current_thread != target_thread:
+                user32.AttachThreadInput(current_thread, target_thread, False)
+        except Exception as exc:
+            logger.debug("Focus Dofus Win32 échec : {}", exc)
+            # Fallback pygetwindow
+            try:
+                import pygetwindow as gw  # noqa: PLC0415
+                for w in gw.getAllWindows():
+                    if w.title and title_substring in w.title.lower():
                         try:
                             w.activate()
                         except Exception:
-                            # Windows parfois refuse activate → minimize/restore
-                            try:
-                                w.minimize()
-                                w.restore()
-                            except Exception:
-                                pass
-                    return
-        except Exception:
-            pass
+                            w.minimize()
+                            w.restore()
+                        return
+            except Exception:
+                pass
 
     def _tick(self) -> None:
         """Un cycle : capture → LLM → action."""
