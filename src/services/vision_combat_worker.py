@@ -465,22 +465,36 @@ class VisionCombatWorker(QThread):
 
         detections_block = ""
         if snap is not None:
+            # Une "case" Dofus fait ~60px à la résolution standard.
+            CASE_PX = 60
             lines = []
+            perso_screen = None
             if snap.perso:
                 px = int(snap.perso.x * img_scale)
                 py = int(snap.perso.y * img_scale)
+                perso_screen = (snap.perso.x, snap.perso.y)
                 lines.append(f"  • PERSO (toi, {self._config.class_name}) : ({px}, {py})")
             for i, e in enumerate(snap.ennemis, 1):
                 ex = int(e.x * img_scale)
                 ey = int(e.y * img_scale)
-                lines.append(f"  • MOB{i} (ennemi à CIBLER) : ({ex}, {ey})")
+                line = f"  • MOB{i} (ennemi) : ({ex}, {ey})"
+                if perso_screen:
+                    dist_px = int(((e.x - perso_screen[0])**2 + (e.y - perso_screen[1])**2)**0.5)
+                    dist_cases = max(1, dist_px // CASE_PX)
+                    line += f" — distance perso : ~{dist_cases} cases ({dist_px}px)"
+                lines.append(line)
             if lines:
                 detections_block = (
                     "\n\n⭐ COORDONNÉES DANS L'IMAGE QUE TU RECOIS "
                     "(utilise DIRECTEMENT ces valeurs, pas de devinette) :\n"
                     + "\n".join(lines)
-                    + "\n\n**Pour cibler un MOB avec cast_spell, recopie EXACTEMENT ses coords dans target_xy.** "
-                    + "Ex: pour cibler MOB1, fais `target_xy: [x1, y1]` avec les valeurs exactes ci-dessus."
+                    + "\n\n**RÈGLE IMPORTANTE — VÉRIFIER LA PORTÉE** :\n"
+                    + "1. Compare la distance du MOB (en cases) avec la portée MAX de ton sort\n"
+                    + "2. Si distance > portée_max → tu DOIS d'abord te déplacer via `click_xy` "
+                    + "sur une case intermédiaire (en direction du mob) AVANT de cast\n"
+                    + "3. Si distance ≤ portée_max → cast direct avec `cast_spell` + target_xy = coords du MOB\n\n"
+                    + "Exemple : si MOB1 à 8 cases et ton sort a portée 5 → bouge d'abord (click_xy vers MOB1, "
+                    + "à 3-4 cases dans sa direction), puis cast au tour suivant ou quand re-scan."
                 )
         return (
             f"Analyse la capture d'écran fournie. Je joue un **{self._config.class_name}**.\n"
