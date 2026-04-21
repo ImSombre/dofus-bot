@@ -44,15 +44,33 @@ class HsvRange:
     label: str = "obstacle"
 
 
+def _load_obstacle_ranges() -> tuple[HsvRange, ...]:
+    """Charge les ranges obstacle depuis hsv_calibration.json + fallback défauts."""
+    defaults = (
+        HsvRange(h_min=10, h_max=30, s_min=25, s_max=110, v_min=140, v_max=215,
+                 label="pierre_claire"),
+        HsvRange(h_min=0, h_max=30, s_min=0, s_max=50, v_min=70, v_max=150,
+                 label="pierre_sombre"),
+    )
+    try:
+        from src.services.hsv_calibrator import CalibrationData  # noqa: PLC0415
+        data = CalibrationData.load()
+        ranges = []
+        for cat_name in ("obstacle_stone_light", "obstacle_stone_dark"):
+            low, high = data.get_range(cat_name)
+            ranges.append(HsvRange(
+                h_min=low[0], h_max=high[0],
+                s_min=low[1], s_max=high[1],
+                v_min=low[2], v_max=high[2],
+                label=cat_name,
+            ))
+        return tuple(ranges) if ranges else defaults
+    except Exception:
+        return defaults
+
+
 # Ranges HSV en espace OpenCV (H: 0-179, S/V: 0-255)
-OBSTACLE_HSV_RANGES: tuple[HsvRange, ...] = (
-    # Pierre claire / mur : beige-gris chaud
-    HsvRange(h_min=10, h_max=30, s_min=25, s_max=110, v_min=140, v_max=215,
-             label="pierre_claire"),
-    # Pierre sombre / colonne : gris neutre
-    HsvRange(h_min=0, h_max=30, s_min=0, s_max=50, v_min=70, v_max=150,
-             label="pierre_sombre"),
-)
+OBSTACLE_HSV_RANGES: tuple[HsvRange, ...] = _load_obstacle_ranges()
 
 
 @dataclass

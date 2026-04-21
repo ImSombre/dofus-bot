@@ -389,6 +389,17 @@ class SimpleDashboardWidget(QWidget):
         btn_debug.setToolTip("Lance le mode debug pour tester la détection visuelle")
         footer_lay.addWidget(btn_debug)
 
+        btn_calibrate = QPushButton("🎨 Calibrer HSV")
+        btn_calibrate.setStyleSheet(_footer_btn_style)
+        btn_calibrate.setCursor(Qt.CursorShape.PointingHandCursor)
+        btn_calibrate.setToolTip(
+            "Outil de calibration des couleurs pour ton Dofus.\n"
+            "Utile si la détection des cases PM / murs ne fonctionne pas bien.\n"
+            "Fait une capture live puis clique sur les pixels à calibrer."
+        )
+        btn_calibrate.clicked.connect(self._launch_hsv_calibrator)
+        footer_lay.addWidget(btn_calibrate)
+
         btn_settings = QPushButton("Paramètres")
         btn_settings.setStyleSheet(_footer_btn_style)
         btn_settings.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -756,6 +767,33 @@ class SimpleDashboardWidget(QWidget):
             webbrowser.open(url)
         except Exception:
             pass
+
+    def _launch_hsv_calibrator(self) -> None:
+        """Lance l'outil de calibration HSV avec une capture live de l'écran."""
+        try:
+            import cv2  # noqa: PLC0415
+            import numpy as np  # noqa: PLC0415
+
+            from src.services.hsv_calibrator import HsvCalibratorApp  # noqa: PLC0415
+
+            frame = self._vision.capture()
+            if frame is None or frame.size == 0:
+                QMessageBox.warning(
+                    self, "Calibrator",
+                    "Impossible de capturer l'écran Dofus. Vérifie la fenêtre sélectionnée.",
+                )
+                return
+
+            cal = HsvCalibratorApp()
+            cal.current_frame = frame
+            cal.run()
+        except Exception as exc:
+            import traceback  # noqa: PLC0415
+            traceback.print_exc()
+            QMessageBox.critical(
+                self, "Erreur Calibrator",
+                f"Impossible de lancer le calibrator :\n{exc}",
+            )
 
     # ---------------------------------------------------------------------
     # Page 1 : Wizard Farm

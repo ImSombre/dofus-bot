@@ -23,12 +23,25 @@ import numpy as np
 from loguru import logger
 
 
-# Range HSV pour le vert PM Dofus. Calibré empiriquement :
-#   - H: 45-85 (vert pur à vert-bleu)
-#   - S: 100-255 (saturé, pas le gris)
-#   - V: 120-255 (suffisamment lumineux)
-PM_GREEN_HSV_LOW = np.array([45, 100, 120], dtype=np.uint8)
-PM_GREEN_HSV_HIGH = np.array([85, 255, 255], dtype=np.uint8)
+def _load_calibrated_ranges() -> tuple[np.ndarray, np.ndarray]:
+    """Charge les ranges HSV depuis hsv_calibration.json si dispo,
+    sinon retourne les défauts."""
+    default_low = np.array([45, 100, 120], dtype=np.uint8)
+    default_high = np.array([85, 255, 255], dtype=np.uint8)
+    try:
+        from src.services.hsv_calibrator import CalibrationData  # noqa: PLC0415
+        data = CalibrationData.load()
+        low, high = data.get_range("pm_cell")
+        return (
+            np.array(low, dtype=np.uint8),
+            np.array(high, dtype=np.uint8),
+        )
+    except Exception:
+        return (default_low, default_high)
+
+
+# Range HSV pour le vert PM Dofus (chargé depuis la calibration user si dispo)
+PM_GREEN_HSV_LOW, PM_GREEN_HSV_HIGH = _load_calibrated_ranges()
 
 # Taille minimale/maximale d'une case de PM détectée (en pixels carrés)
 MIN_CELL_AREA = 500    # trop petit = bruit

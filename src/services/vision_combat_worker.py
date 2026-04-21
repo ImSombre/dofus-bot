@@ -35,9 +35,11 @@ from src.services.combat_decision_engine import (
 from src.services.combat_knowledge import CombatKnowledge
 from src.services.combat_state_reader import CombatStateReader
 from src.services.combat_stats_tracker import get_tracker
+from src.services.debug_visualizer import DebugSnapshot, save_debug_image
 from src.services.input_service import InputService
 from src.services.llm_client import LLMClient
 from src.services.phase_detector import detect_phase
+from src.services.pm_cell_detector import detect_pm_cells
 from src.services.vision import MssVisionService
 
 
@@ -494,6 +496,9 @@ class VisionCombatWorker(QThread):
                 self._stats_tracker.on_decision("rules", latency_ms=0.1)
                 if rtype in ("cast_spell", "spell"):
                     self._stats_tracker.on_cast(str(rule_action.get("spell_key", "?")))
+                # Debug visual si activé
+                if self._config.save_debug_images:
+                    self._save_decision_debug(raw_frame, snap, rule_action, phase_result.phase)
                 self._execute_action(rule_action, "mon_tour")
                 return
 
@@ -1082,6 +1087,55 @@ class VisionCombatWorker(QThread):
             except Exception as exc:
                 logger.debug("human_click échec, fallback classic : {}", exc)
         self._input.click(x, y, button=button)
+
+    def _save_decision_debug(
+        self, frame, snap, action: dict, phase: str,
+    ) -> None:
+        """Sauve une image annotée montrant ce que le bot a vu et décidé."""
+        try:
+            pm_centers = []
+            try:
+                cells = detect_pm_cells(frame)
+                pm_centers = [(c.x, c.y) for c in cells]
+            except Exception:
+                pass
+
+            enemies = []
+            chosen_target_xy = None
+            if snap and snap.ennemis:
+                for e in snap.ennemis:
+                    enemies.append({
+                        "x": e.x, "y": e.y,
+                        "hp_pct": e.hp_pct,
+                    })
+                # Cible = la première triée par score (approximation : plus proche)
+                if action.get("target_xy"):
+                    chosen_target_xy = tuple(action["target_xy"])
+
+            perso_xy = None
+            if snap and snap.perso:
+                perso_xy = (snap.perso.x, snap.perso.y)
+
+            movement_xy = None
+            if action.get("type") in ("click_xy",):
+                movement_xy = tuple(action.get("target_xy", [0, 0]))
+
+            dbg = DebugSnapshot(
+                frame_bgr=frame,
+                perso_xy=perso_xy,
+                enemies=enemies,
+                pm_cells=pm_centers,
+                chosen_target_xy=chosen_target_xy,
+                movement_target_xy=movement_xy,
+                action_type=str(action.get("type", "")),
+                action_reason=str(action.get("reason", "")),
+                turn_number=self._turn_number,
+                pa_remaining=self._pa_remaining,
+                phase=phase,
+            )
+            save_debug_image(dbg, self._debug_dir)
+        except Exception as exc:
+            logger.debug("save_decision_debug échec : {}", exc)
 
     def _save_debug(self, frame, decision: dict) -> None:
         try:
