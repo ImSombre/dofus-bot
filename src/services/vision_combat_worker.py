@@ -138,8 +138,10 @@ class VisionCombatWorker(QThread):
             model=config.llm_model,
             base_url=config.llm_url or None,
             api_key=config.llm_api_key or None,
-            temperature=0.2,
-            max_tokens=2000,   # élevé pour permettre observation+raisonnement+JSON complet
+            temperature=0.1,
+            # 400 suffit largement : observation(80) + phase(10) + raisonnement(80) + action(40) ≈ 250
+            # max_tokens haut = Claude génère plus lentement (v0.4.6 : +60% vitesse).
+            max_tokens=400,
             timeout_sec=config.request_timeout_sec,
         )
         self._stats = VisionCombatStats()
@@ -562,16 +564,16 @@ class VisionCombatWorker(QThread):
             for k, name in sorted(self._config.spell_shortcuts.items())
         )
         allowed_slots = sorted(self._config.spell_shortcuts.keys())
-        allowed_block = (
-            f"\n\n🚫 **TOUCHES AUTORISÉES POUR cast_spell — LISTE FERMÉE** : {allowed_slots}\n"
-            f"Tous les autres slots (1-9) sont VIDES, il n'y a AUCUN sort dessus. "
-            f"Si tu renvoies `cast_spell` avec `spell_key` hors de cette liste, "
-            f"l'action sera IGNORÉE et le bot passera son tour.\n"
-            f"→ Si aucun de tes sorts autorisés ne convient, utilise `end_turn` ou `click_xy` (déplacement)."
-        ) if allowed_slots else (
-            "\n\n🚫 **AUCUN SORT CONFIGURÉ** : la liste de raccourcis est vide. "
-            "Tu ne peux PAS utiliser cast_spell. Utilise uniquement click_xy / end_turn / wait."
-        )
+        if allowed_slots:
+            allowed_block = (
+                f"\nSLOTS UTILISABLES (liste fermée) : {allowed_slots}. "
+                f"Tout autre slot est VIDE."
+            )
+        else:
+            allowed_block = (
+                "\nAUCUN SORT CONFIGURÉ → cast_spell interdit. "
+                "Utilise click_xy / end_turn / wait."
+            )
         # Précalcul du scale qui sera appliqué à l'image envoyée au LLM.
         # Le LLM verra une image redimensionnée à max 2048px → on lui donne
         # les coords HSV dans CET espace image (pour qu'il copie sans calcul).
@@ -588,86 +590,67 @@ class VisionCombatWorker(QThread):
 
         detections_block = ""
         if snap is not None:
-            # Une "case" Dofus fait ~60px à la résolution standard.
-            CASE_PX = 60
+            # Dofus isométrique : 1 case ≈ 86px horizontal, 43px vertical.
+            # Distance en cases ≈ max(|dx|/86, |dy|/43) — c'est l'approximation la
+            # plus juste pour juger la portée d'un sort.
+            CELL_X, CELL_Y = 86, 43
             lines = []
-            perso_screen = None
+            perso_px = None
             if snap.perso:
-                px = int(snap.perso.x * img_scale)
-                py = int(snap.perso.y * img_scale)
-                perso_screen = (snap.perso.x, snap.perso.y)
-                lines.append(f"  • PERSO (toi, {self._config.class_name}) : ({px}, {py})")
+                px_img = int(snap.perso.x * img_scale)
+                py_img = int(snap.perso.y * img_scale)
+                perso_px = (snap.perso.x, snap.perso.y)
+                lines.append(f"  PERSO (toi) image=({px_img},{py_img}) ecran=({snap.perso.x},{snap.perso.y})")
             for i, e in enumerate(snap.ennemis, 1):
-                ex = int(e.x * img_scale)
-                ey = int(e.y * img_scale)
-                line = f"  • MOB{i} (ennemi) : ({ex}, {ey})"
-                if perso_screen:
-                    dist_px = int(((e.x - perso_screen[0])**2 + (e.y - perso_screen[1])**2)**0.5)
-                    dist_cases = max(1, dist_px // CASE_PX)
-                    line += f" — distance perso : ~{dist_cases} cases ({dist_px}px)"
+                ex_img = int(e.x * img_scale)
+                ey_img = int(e.y * img_scale)
+                line = f"  MOB{i} image=({ex_img},{ey_img}) ecran=({e.x},{e.y})"
+                if perso_px:
+                    dist_cases = max(
+                        abs(e.x - perso_px[0]) / CELL_X,
+                        abs(e.y - perso_px[1]) / CELL_Y,
+                    )
+                    line += f" dist={dist_cases:.0f}cases"
                 lines.append(line)
             if lines:
                 detections_block = (
-                    "\n\n⭐ COORDONNÉES DANS L'IMAGE QUE TU RECOIS "
-                    "(utilise DIRECTEMENT ces valeurs, pas de devinette) :\n"
+                    "\nPositions détectées (coords image ET ecran fournis) :\n"
                     + "\n".join(lines)
-                    + "\n\n**RÈGLE IMPORTANTE — VÉRIFIER LA PORTÉE** :\n"
-                    + "1. Compare la distance du MOB (en cases) avec la portée MAX de ton sort\n"
-                    + "2. Si distance > portée_max → tu DOIS d'abord te déplacer via `click_xy` "
-                    + "sur une case intermédiaire (en direction du mob) AVANT de cast\n"
-                    + "3. Si distance ≤ portée_max → cast direct avec `cast_spell` + target_xy = coords du MOB\n\n"
-                    + "Exemple : si MOB1 à 8 cases et ton sort a portée 5 → bouge d'abord (click_xy vers MOB1, "
-                    + "à 3-4 cases dans sa direction), puis cast au tour suivant ou quand re-scan."
+                    + "\n→ Pour cast_spell ou click_xy : utilise les coords ECRAN."
                 )
         po_bonus_line = ""
         if self._config.po_bonus > 0:
             po_bonus_line = (
-                f"\n**⚡ BONUS PORTÉE : +{self._config.po_bonus} PO** (stuff/buff). "
-                f"Ajoute ce bonus à la portée_max de chaque sort 'à portée modifiable' "
-                f"(la plupart sauf certains sorts fixes). "
-                f"Ex: si un sort a portée 1-5 et +{self._config.po_bonus} PO → "
-                f"portée effective 1-{5 + self._config.po_bonus}.\n"
+                f"\nBonus portée stuff : +{self._config.po_bonus} PO "
+                f"(ajoute à la portée_max des sorts modifiables, ex: 1-5 devient 1-{5 + self._config.po_bonus})."
             )
 
         # Historique des casts récents + signal anti-boucle (LoS bloquée / mob immobile).
         history_block = ""
         if self._cast_history:
-            hist_lines = []
-            for slot, hx, hy in self._cast_history:
-                hist_lines.append(f"  • slot {slot} sur ({hx}, {hy})")
-            history_block = (
-                "\n\n🔁 **CASTS DÉJÀ FAITS CE TOUR** (ordre chronologique) :\n"
-                + "\n".join(hist_lines)
+            hist_str = " ; ".join(
+                f"slot{s}→({hx},{hy})" for s, hx, hy in self._cast_history
             )
-            # Détection re-cast sur mob qui n'a pas bougé → signal mur / LoS
+            history_block = f"\nCasts ce tour : {hist_str}"
             if snap is not None and snap.ennemis:
                 last_slot, lx, ly = self._cast_history[-1]
                 for e in snap.ennemis:
                     if abs(e.x - lx) <= 40 and abs(e.y - ly) <= 40:
-                        # écran-space : divise par img_scale pour comparer au cast (qui est en écran)
                         history_block += (
-                            f"\n\n⚠️ **ALERTE ANTI-BOUCLE** : tu viens de cast slot {last_slot} "
-                            f"sur ({lx}, {ly}) et un MOB est TOUJOURS à cette position écran. "
-                            f"Le sort n'a probablement pas touché → **LIGNE DE VUE BLOQUÉE par un mur/obstacle**. "
-                            f"NE RE-CAST PAS le même sort sur la même cible. "
-                            f"Déplace-toi (click_xy sur une case qui contourne l'obstacle) "
-                            f"OU cast un AUTRE mob visible OU end_turn si tu n'as plus d'options."
+                            f" ⚠ ALERTE : MOB toujours à ({lx},{ly}) après slot {last_slot} "
+                            f"→ LoS BLOQUÉE, ne re-cast PAS, bouge ou change de cible."
                         )
                         break
 
         return (
-            f"Analyse la capture d'écran fournie. Je joue un **{self._config.class_name}**.\n"
-            f"Mes raccourcis clavier sont : {shortcuts or '(aucun configuré)'}.\n"
-            f"J'ai au maximum **{self._config.starting_pa} PA** et **{self._config.starting_pm} PM** par tour."
+            f"Classe: {self._config.class_name}. "
+            f"Raccourcis: {shortcuts or '(aucun)'}. "
+            f"Max/tour: {self._config.starting_pa} PA, {self._config.starting_pm} PM."
             f"{po_bonus_line}"
             f"{allowed_block}"
             f"{detections_block}"
-            f"{history_block}\n\n"
-            f"Observe l'image (phase, mon perso entouré d'un rectangle rouge, "
-            f"mobs entourés de rectangles bleus avec label 'MOB{{n}} (x,y)', UI, popups) "
-            f"puis décide UNE action à exécuter MAINTENANT.\n\n"
-            f"Réponds UNIQUEMENT en JSON valide avec les champs "
-            f"observation/phase/raisonnement/action. Aucun texte avant ou après."
+            f"{history_block}\n"
+            f"Décide 1 action. Réponds en JSON strict (observation/phase/raisonnement/action)."
         )
 
     def _execute_action(self, action: dict, phase: str) -> None:
