@@ -179,6 +179,29 @@ def main(argv: list[str] | None = None) -> int:
     for directory in (settings.log_dir, settings.screenshots_dir, Path(settings.db_path).parent):
         Path(directory).mkdir(parents=True, exist_ok=True)
 
+    # Check Tesseract au démarrage et lance install auto si absent (pour la FM)
+    try:
+        from src.services.tesseract_installer import ensure_tesseract_installed  # noqa: PLC0415
+
+        def _tesseract_cb(result: str) -> None:
+            if result == "ok":
+                logger.info("🎉 Tesseract installé automatiquement (FM disponible)")
+            else:
+                logger.warning(
+                    "⚠ Tesseract n'a pas pu s'installer automatiquement. "
+                    "Installe-le via https://github.com/UB-Mannheim/tesseract/wiki"
+                )
+
+        status = ensure_tesseract_installed(callback=_tesseract_cb)
+        if status == "ok":
+            logger.info("✓ Tesseract OCR disponible")
+        elif status == "installing":
+            logger.info("⏳ Tesseract manquant → installation en arrière-plan (~30s)")
+        elif status == "unsupported":
+            logger.info("ℹ Tesseract non installable auto (OS non Windows ou winget absent)")
+    except Exception as exc:
+        logger.debug("Check Tesseract échec : {}", exc)
+
     if args.headless:
         logger.error("Headless mode not implemented yet — aborting.")
         return 2

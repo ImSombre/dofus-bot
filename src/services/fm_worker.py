@@ -126,11 +126,28 @@ class FmWorker(QThread):
 
         if not is_available():
             self.log_event.emit(
-                "⚠ Tesseract OCR non installé. Installe-le via :\n"
-                "   https://github.com/UB-Mannheim/tesseract/wiki\n"
-                "   puis ajoute au PATH Windows.",
-                "error",
+                "⚠ Tesseract OCR non détecté — tentative d'installation auto via winget…",
+                "warn",
             )
+            try:
+                from src.services.tesseract_installer import (  # noqa: PLC0415
+                    ensure_tesseract_installed,
+                )
+                status = ensure_tesseract_installed()
+                if status == "installing":
+                    self.log_event.emit(
+                        "⏳ Installation Tesseract en cours en arrière-plan "
+                        "(~30s-2min). Relance le FM quand c'est fini.",
+                        "warn",
+                    )
+                elif status == "unsupported":
+                    self.log_event.emit(
+                        "⚠ Install auto impossible (pas Windows / winget absent). "
+                        "Install manuel : https://github.com/UB-Mannheim/tesseract/wiki",
+                        "error",
+                    )
+            except Exception as exc:
+                self.log_event.emit(f"⚠ Install Tesseract échec : {exc}", "error")
             self._stop_requested = True
 
         if not self._config.rune_apply_position:

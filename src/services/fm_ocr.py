@@ -75,17 +75,43 @@ def _normalize(name: str) -> str:
     return name.lower().translate(_ACCENT_MAP).strip()
 
 
+# Chemins standards Windows où Tesseract s'installe
+_TESSERACT_STANDARD_PATHS = [
+    r"C:\Program Files\Tesseract-OCR\tesseract.exe",
+    r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe",
+    r"C:\Tesseract-OCR\tesseract.exe",
+]
+
+
+def _find_tesseract_binary() -> str | None:
+    """Cherche tesseract.exe dans PATH + chemins standards Windows."""
+    # 1. PATH système
+    import shutil  # noqa: PLC0415
+    in_path = shutil.which("tesseract")
+    if in_path:
+        return in_path
+    # 2. Chemins standards (souvent installé sans PATH)
+    from pathlib import Path  # noqa: PLC0415
+    for candidate in _TESSERACT_STANDARD_PATHS:
+        if Path(candidate).exists():
+            return candidate
+    return None
+
+
 def _tesseract_available() -> bool:
     try:
-        import pytesseract  # noqa: F401, PLC0415
-        # Check if binary is reachable
-        import pytesseract as pt  # noqa: PLC0415
-        try:
-            pt.get_tesseract_version()
-            return True
-        except Exception:
-            return False
+        import pytesseract  # noqa: PLC0415
     except ImportError:
+        return False
+    try:
+        # Si Tesseract n'est pas dans PATH, on le configure explicitement
+        binary = _find_tesseract_binary()
+        if binary:
+            pytesseract.pytesseract.tesseract_cmd = binary
+        pytesseract.get_tesseract_version()
+        return True
+    except Exception as exc:
+        logger.debug("Tesseract non dispo : {}", exc)
         return False
 
 
