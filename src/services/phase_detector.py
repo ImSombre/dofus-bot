@@ -53,6 +53,10 @@ INITIATIVE_REGION = (0.80, 0.02, 0.99, 0.20)
 BTN_ACTIVE_HSV = ((25, 80, 160), (70, 255, 255))
 BTN_GRAY_HSV = ((0, 0, 80), (179, 50, 180))
 
+# Bordure or/brune des popups Dofus victoire/défaite (couleur caractéristique)
+# On exige cette couleur en plus des pixels sombres pour éviter les faux positifs
+POPUP_BORDER_HSV = ((10, 80, 100), (30, 255, 220))
+
 
 def _crop_by_ratio(frame: np.ndarray, rect: tuple[float, float, float, float]) -> np.ndarray:
     h, w = frame.shape[:2]
@@ -99,21 +103,26 @@ def detect_phase(frame_bgr: np.ndarray) -> PhaseDetectionResult:
         variance = float(gray.var())
         in_combat = variance > 600  # empirique
 
-    # 3. Popup modal : grosse zone sombre rectangulaire au centre
+    # 3. Popup modal : grosse zone sombre + BORDURE OR caractéristique Dofus.
+    # Le check "pixels sombres" seul = trop de faux positifs (donjons, cavernes).
+    # Dofus popup a toujours une bordure dorée → on exige les 2 conditions.
     popup_crop = _crop_by_ratio(frame_bgr, POPUP_REGION)
     dark_popup_ratio = 0.0
+    gold_border_ratio = 0.0
     if popup_crop.size > 0:
         gray_center = cv2.cvtColor(popup_crop, cv2.COLOR_BGR2GRAY)
-        # Popup = bande horizontale de pixels très sombres
-        dark_popup_ratio = (gray_center < 50).sum() / max(1, gray_center.size)
+        # Popup = bande horizontale de pixels TRÈS sombres (<35, pas <50)
+        dark_popup_ratio = (gray_center < 35).sum() / max(1, gray_center.size)
+        # Check bordure or Dofus
+        gold_border_ratio = _mask_in_range(popup_crop, *POPUP_BORDER_HSV)
 
     # --- Décision ---
-    # Popup dominant → popup_victoire (on ne distingue pas victoire/défaite
-    # sans OCR, mais la plupart des popups ferment avec close_popup de toute façon)
-    if dark_popup_ratio > 0.30:
+    # Popup CONFIRMÉ : >55% pixels très sombres ET >3% bordure or présente
+    # Seuils stricts pour éviter les faux positifs sur maps sombres / donjons.
+    if dark_popup_ratio > 0.55 and gold_border_ratio > 0.03:
         return PhaseDetectionResult(
-            "popup_victoire", min(1.0, dark_popup_ratio * 2),
-            f"popup sombre central ({dark_popup_ratio:.0%})",
+            "popup_victoire", min(1.0, dark_popup_ratio),
+            f"popup confirmé (sombre {dark_popup_ratio:.0%} + bordure or {gold_border_ratio:.1%})",
         )
 
     # Bouton TERMINER actif = mon_tour

@@ -22,13 +22,37 @@ def test_empty_frame():
 
 
 def test_dark_popup_detected():
+    """Popup Dofus = zone très sombre + bordure or dans la zone centrale."""
     frame = _make_frame()
-    # Crée une popup sombre au centre (zone 30%-70% x, 20%-60% y)
-    # En BGR, tout noir = popup dominant
-    # Les zones extérieures restent noires aussi, pour ne pas trigger mon_tour
+    h, w = frame.shape[:2]
+    # Remplit la zone popup de pixels très sombres
+    px1, py1 = int(0.30 * w), int(0.20 * h)
+    px2, py2 = int(0.70 * w), int(0.60 * h)
+    frame[py1:py2, px1:px2] = (15, 15, 20)  # très sombre
+    # Ajoute une bordure or (couleur Dofus typique)
+    # BGR (30, 140, 200) ~= couleur dorée chaude
+    border_thickness = 20
+    frame[py1:py1 + border_thickness, px1:px2] = (30, 140, 200)  # top
+    frame[py2 - border_thickness:py2, px1:px2] = (30, 140, 200)  # bottom
+    frame[py1:py2, px1:px1 + border_thickness] = (30, 140, 200)  # left
+    frame[py1:py2, px2 - border_thickness:px2] = (30, 140, 200)  # right
     result = detect_phase(frame)
-    # Frame tout noir → popup_victoire (dark_popup_ratio > 30%)
-    assert result.phase == "popup_victoire"
+    assert result.phase == "popup_victoire", (
+        f"Popup sombre + bordure or doit être détectée, got {result.phase} ({result.reason})"
+    )
+
+
+def test_dark_scene_without_gold_border_NOT_detected_as_popup():
+    """Scène sombre (donjon) sans bordure or = PAS popup (anti-faux positif)."""
+    frame = _make_frame()
+    h, w = frame.shape[:2]
+    # Tout noir (simulation donjon très sombre)
+    frame[:, :] = (10, 10, 15)
+    result = detect_phase(frame)
+    # Ne doit PAS être détecté comme popup
+    assert result.phase != "popup_victoire", (
+        f"Frame sombre sans bordure or ne doit pas être détectée popup, got {result.phase}"
+    )
 
 
 def test_mon_tour_when_button_yellow_green():
