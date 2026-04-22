@@ -206,6 +206,8 @@ class VisionCombatWorker(QThread):
         self._turn_number: int = 1
         # Buffs déjà cast ce combat (reset au nouveau combat)
         self._buffs_cast: set[int] = set()
+        # Compteur d'actions dans le tour courant (pour éviter spam infini)
+        self._actions_this_turn: int = 0
         # Tracker stats (singleton partagé)
         self._stats_tracker = get_tracker()
         # Track si le tracker a démarré un combat pour éviter double start
@@ -477,6 +479,16 @@ class VisionCombatWorker(QThread):
             self._execute_action({"type": "close_popup"}, "popup_victoire")
             return
 
+        # v0.9.4 : anti-spam — force end_turn si trop d'actions dans le tour
+        # (le LLM peut cast 10 fois sans effet si l'HSV rate certains ennemis)
+        if phase_result.phase == "mon_tour" and self._actions_this_turn >= self._config.max_actions_per_turn:
+            self.log_event.emit(
+                f"🚫 Limite {self._config.max_actions_per_turn} actions/tour atteinte → FIN DE TOUR FORCÉE",
+                "warn",
+            )
+            self._execute_action({"type": "end_turn"}, "mon_tour")
+            return
+
         # Essai moteur déterministe v0.6.0 (LoS pixel + targeting + playbooks)
         if self._config.decision_mode in ("hybrid", "rules"):
             ctx = DecisionContext(
@@ -621,6 +633,7 @@ class VisionCombatWorker(QThread):
             self._stuck_overrides = 0
             self._pa_remaining = self._config.starting_pa
             self._turn_number += 1
+            self._actions_this_turn = 0
         # Reset complet à chaque popup victoire/défaite (fin du combat)
         if phase in ("popup_victoire", "popup_defaite"):
             self._turn_number = 1
@@ -867,6 +880,11 @@ class VisionCombatWorker(QThread):
         atype = str(action.get("type", "")).lower()
         self.state_changed.emit("playing")
 
+        # Incrémente le compteur d'actions du tour pour les actions "coûteuses"
+        # (pas wait ou end_turn). Permet au worker de forcer end_turn après N actions.
+        if atype in ("cast_spell", "spell", "click_xy", "press_key", "close_popup"):
+            self._actions_this_turn += 1
+
         # Active la fenêtre Dofus avant TOUTE action (sinon keys/clics partent ailleurs)
         if atype in ("cast_spell", "spell", "click_xy", "press_key", "end_turn", "close_popup"):
             self._ensure_dofus_focus()
@@ -930,6 +948,7 @@ class VisionCombatWorker(QThread):
             self._cast_history.clear()
             self._stuck_overrides = 0
             self._pa_remaining = self._config.starting_pa
+            self._actions_this_turn = 0
 
         elif atype == "close_popup":
             self.log_event.emit("→ Ferme popup (Escape)", "info")
