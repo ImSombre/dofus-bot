@@ -400,6 +400,19 @@ class SimpleDashboardWidget(QWidget):
         btn_calibrate.clicked.connect(self._launch_hsv_calibrator)
         footer_lay.addWidget(btn_calibrate)
 
+        btn_learn = QPushButton("🧠 Apprendre à jouer")
+        btn_learn.setStyleSheet(_footer_btn_style)
+        btn_learn.setCursor(Qt.CursorShape.PointingHandCursor)
+        btn_learn.setToolTip(
+            "Enregistre ta partie pour que le bot apprenne ton style.\n"
+            "1. Clique 'Démarrer enregistrement'\n"
+            "2. Joue normalement pendant 5-20 combats\n"
+            "3. Clique 'Stop' puis 'Générer profil'\n"
+            "4. Sélectionne le profil généré dans l'onglet Combattre"
+        )
+        btn_learn.clicked.connect(self._open_learning_dialog)
+        footer_lay.addWidget(btn_learn)
+
         btn_settings = QPushButton("Paramètres")
         btn_settings.setStyleSheet(_footer_btn_style)
         btn_settings.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -866,6 +879,153 @@ class SimpleDashboardWidget(QWidget):
             )
         except Exception as exc:
             QMessageBox.critical(self, "Erreur", f"Sauvegarde échec : {exc}")
+
+    def _open_learning_dialog(self) -> None:
+        """Ouvre le dialogue d'apprentissage : record + stop + générer profil."""
+        try:
+            from PyQt6.QtCore import Qt  # noqa: PLC0415
+            from PyQt6.QtWidgets import (  # noqa: PLC0415
+                QDialog, QHBoxLayout, QLabel, QListWidget,
+                QMessageBox, QPushButton, QVBoxLayout,
+            )
+
+            from src.services.replay_recorder import (  # noqa: PLC0415
+                ReplayRecorder, list_replays,
+            )
+            from src.services.rule_generator import (  # noqa: PLC0415
+                generate_profile_from_replay,
+            )
+
+            dialog = QDialog(self)
+            dialog.setWindowTitle("🧠 Apprendre à jouer au bot")
+            dialog.setMinimumSize(650, 480)
+            layout = QVBoxLayout(dialog)
+
+            info = QLabel(
+                "<b>Principe :</b> le bot te regarde jouer, enregistre tes actions,\n"
+                "puis génère un profil combat qui imite ton style.\n\n"
+                "<b>Étapes :</b>\n"
+                "1. Clique 'Démarrer enregistrement'\n"
+                "2. Lance Dofus et joue normalement ~5-20 combats\n"
+                "3. Reviens ici et clique 'Stop'\n"
+                "4. Sélectionne un replay → 'Générer profil'\n"
+                "5. Le profil apparaîtra dans l'onglet Combattre"
+            )
+            info.setWordWrap(True)
+            layout.addWidget(info)
+
+            # Boutons record/stop
+            rec_row = QHBoxLayout()
+            btn_start = QPushButton("🔴 Démarrer enregistrement")
+            btn_stop = QPushButton("⏹ Stop")
+            btn_stop.setEnabled(False)
+            rec_row.addWidget(btn_start)
+            rec_row.addWidget(btn_stop)
+            layout.addLayout(rec_row)
+
+            status_lbl = QLabel("Aucun enregistrement en cours.")
+            status_lbl.setStyleSheet("color: #aaa;")
+            layout.addWidget(status_lbl)
+
+            # Liste des replays
+            layout.addWidget(QLabel("<b>Replays disponibles :</b>"))
+            list_widget = QListWidget()
+            for replay in list_replays():
+                size_kb = replay.stat().st_size / 1024
+                list_widget.addItem(f"{replay.name} ({size_kb:.0f} KB)")
+            layout.addWidget(list_widget)
+
+            # Boutons générer
+            gen_row = QHBoxLayout()
+            btn_generate = QPushButton("🤖 Générer profil depuis replay")
+            btn_close = QPushButton("Fermer")
+            gen_row.addWidget(btn_generate)
+            gen_row.addWidget(btn_close)
+            layout.addLayout(gen_row)
+
+            # État recorder
+            recorder_state = {"instance": None}
+
+            def _on_start():
+                if recorder_state["instance"]:
+                    return
+                rec = ReplayRecorder(self._vision)
+
+                def on_log(msg, lvl):
+                    status_lbl.setText(msg)
+
+                def on_stats(s):
+                    status_lbl.setText(
+                        f"🔴 En cours : {s.frames_captured} frames, "
+                        f"{s.keys_captured} touches, {s.clicks_captured} clics"
+                    )
+
+                def on_stopped():
+                    btn_start.setEnabled(True)
+                    btn_stop.setEnabled(False)
+                    recorder_state["instance"] = None
+                    # Refresh liste
+                    list_widget.clear()
+                    for r in list_replays():
+                        kb = r.stat().st_size / 1024
+                        list_widget.addItem(f"{r.name} ({kb:.0f} KB)")
+
+                rec.log_event.connect(on_log)
+                rec.stats_updated.connect(on_stats)
+                rec.stopped.connect(on_stopped)
+                rec.start()
+                recorder_state["instance"] = rec
+                btn_start.setEnabled(False)
+                btn_stop.setEnabled(True)
+
+            def _on_stop():
+                rec = recorder_state["instance"]
+                if rec:
+                    rec.request_stop()
+
+            def _on_generate():
+                selected = list_widget.currentItem()
+                if not selected:
+                    QMessageBox.warning(dialog, "Générer", "Sélectionne un replay d'abord.")
+                    return
+                # Extrait le nom de fichier (avant le ' (')
+                filename = selected.text().split(" (")[0]
+                from src.services.replay_recorder import REPLAY_DIR  # noqa: PLC0415
+                replay_path = REPLAY_DIR / filename
+                shortcuts = self._collect_spell_shortcuts() if self._combat_selected_class else {}
+                class_name = self._combat_selected_class or "ecaflip"
+                profile = generate_profile_from_replay(
+                    replay_path,
+                    class_name=class_name,
+                    spell_shortcuts=shortcuts,
+                    profile_name=f"Appris {filename.replace('.jsonl', '')}",
+                )
+                if profile and profile.rules:
+                    saved = profile.save()
+                    QMessageBox.information(
+                        dialog, "Profil généré",
+                        f"{len(profile.rules)} règles extraites → sauvegardé :\n{saved}\n\n"
+                        f"Redémarre l'onglet Combat pour voir le profil dans le dropdown.",
+                    )
+                else:
+                    QMessageBox.warning(
+                        dialog, "Génération échouée",
+                        "Aucune règle extraite. Le replay est peut-être trop court "
+                        "ou ne contient pas assez d'actions.",
+                    )
+
+            btn_start.clicked.connect(_on_start)
+            btn_stop.clicked.connect(_on_stop)
+            btn_generate.clicked.connect(_on_generate)
+            btn_close.clicked.connect(dialog.accept)
+
+            dialog.exec()
+        except Exception as exc:
+            import traceback  # noqa: PLC0415
+            traceback.print_exc()
+            QMessageBox.critical(
+                self, "Erreur", f"Impossible d'ouvrir l'apprentissage :\n{exc}",
+            )
 
     def _launch_hsv_calibrator(self) -> None:
         """Lance l'outil de calibration HSV avec une capture live de l'écran."""
