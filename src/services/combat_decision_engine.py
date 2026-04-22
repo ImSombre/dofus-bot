@@ -365,13 +365,40 @@ class CombatDecisionEngine:
         spell_choice = self._best_offensive_spell(dist, ctx.pa_remaining)
 
         if spell_choice is None:
-            # Portée min trop grande (CaC ennemi trop proche) ou autre anomalie
-            # → approche d'1 case pour changer les conditions
+            # Aucun sort compatible avec la distance actuelle.
+            # Détermine s'il faut s'approcher (sorts CaC disponibles) ou s'éloigner
+            # (sorts distance nécessitent po_min supérieur à dist actuelle).
+            all_spells = self._all_spells()
+            min_po_min = min(
+                (s[1].get("po_min", 1) for s in all_spells
+                 if s[1].get("pa", 99) <= ctx.pa_remaining),
+                default=1,
+            )
+            max_po_max = max(
+                (self._effective_max_range(s[1]) for s in all_spells
+                 if s[1].get("pa", 99) <= ctx.pa_remaining),
+                default=5,
+            )
+            # Si dist < min_po_min → on est TROP PRÈS (sorts distance) → ÉLOIGNE
+            # Si dist > max_po_max → on est TROP LOIN → APPROCHE
+            if dist < min_po_min:
+                # Recul d'1 case vers direction opposée au mob
+                flee_xy = self._flee_from_target(perso_xy, target_xy, distance_cases=1)
+                return {
+                    "type": "click_xy",
+                    "target_xy": list(flee_xy),
+                    "reason": (
+                        f"trop proche (dist {dist:.0f}c < po_min {min_po_min}c) → recule 1c"
+                    ),
+                }
+            # Sinon on approche (cas standard)
             approach_xy = self._approach_target(perso_xy, target_xy, distance_cases=1)
             return {
                 "type": "click_xy",
                 "target_xy": list(approach_xy),
-                "reason": f"aucun sort utilisable à dist {dist:.0f}c → rapproche 1c",
+                "reason": (
+                    f"hors portée sorts dispo (dist {dist:.0f}c, max_range={max_po_max}c) → approche 1c"
+                ),
             }
 
         slot, spell_info = spell_choice

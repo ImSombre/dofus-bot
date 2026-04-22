@@ -1679,6 +1679,16 @@ class SimpleDashboardWidget(QWidget):
             "+200ms par clic mais indistinguable d'un humain."
         )
         mode_row.addWidget(self._chk_humanize)
+
+        self._chk_auto_close_popup = QCheckBox("Auto-close popups")
+        self._chk_auto_close_popup.setChecked(False)
+        self._chk_auto_close_popup.setToolTip(
+            "Désactivé par défaut depuis v0.9.3 (faux positifs sur maps sombres).\n"
+            "Si activé, le bot détecte popup via HSV (zone sombre + bordure or).\n"
+            "Sinon, le LLM/moteur décide.\n"
+            "N'active QUE si les faux positifs ne te gênent pas."
+        )
+        mode_row.addWidget(self._chk_auto_close_popup)
         mode_row.addStretch()
         grp_ai_lay.addLayout(mode_row)
 
@@ -2335,6 +2345,7 @@ class SimpleDashboardWidget(QWidget):
                 decision_mode=self._combo_decision_mode.currentData() or "hybrid",
                 use_pixel_los=self._chk_pixel_los.isChecked(),
                 humanize_input=self._chk_humanize.isChecked(),
+                auto_close_popups=self._chk_auto_close_popup.isChecked(),
                 custom_rules=list(getattr(self, "_active_profile_rules", [])),
             )
             worker = VisionCombatWorker(

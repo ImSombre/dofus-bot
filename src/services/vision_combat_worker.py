@@ -82,6 +82,10 @@ class VisionCombatConfig:
     # Humanise les mouvements souris (Bézier + jitter + délais log-normal).
     # Moins détectable mais ~200ms plus lent par clic. Recommandé.
     humanize_input: bool = True
+    # Auto-close des popups via phase_detector. v0.9.3 : OFF par défaut car
+    # trop de faux positifs sans calibration utilisateur. Utilise le LLM
+    # pour close les popups quand il en voit (plus fiable).
+    auto_close_popups: bool = False
     # Règles custom utilisateur (profil combat_profiles / combat_rules)
     # Si fournies, elles sont évaluées AVANT la logique hardcoded du moteur.
     custom_rules: list[dict] = field(default_factory=list)
@@ -451,7 +455,8 @@ class VisionCombatWorker(QThread):
                 self._stats_tracker.on_kill()
         self._prev_enemy_count = current_enemy_count
 
-        if (phase_result.phase == "popup_victoire"
+        if (self._config.auto_close_popups
+                and phase_result.phase == "popup_victoire"
                 and phase_result.confidence > 0.5
                 and self._config.decision_mode in ("hybrid", "rules")):
             self.log_event.emit(
