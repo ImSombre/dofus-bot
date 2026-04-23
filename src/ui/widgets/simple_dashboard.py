@@ -872,13 +872,39 @@ class SimpleDashboardWidget(QWidget):
                 author="user",
             )
             path = profile.save()
+            # Refresh le dropdown pour voir immédiatement le nouveau profil
+            self._reload_profiles_dropdown()
             QMessageBox.information(
                 self, "Profil sauvé",
                 f"Profil '{profile.name}' sauvegardé dans :\n{path}\n\n"
-                f"Recharge le dropdown pour le voir apparaître.",
+                f"Il est maintenant disponible dans le dropdown.",
             )
         except Exception as exc:
-            QMessageBox.critical(self, "Erreur", f"Sauvegarde échec : {exc}")
+            import traceback  # noqa: PLC0415
+            traceback.print_exc()
+            QMessageBox.critical(self, "Erreur sauvegarde", f"Échec : {exc}")
+
+    def _reload_profiles_dropdown(self) -> None:
+        """Recharge la liste des profils dans le dropdown (après sauvegarde)."""
+        if not hasattr(self, "_combo_combat_profile"):
+            return
+        try:
+            from src.services.combat_profiles import list_available_profiles  # noqa: PLC0415
+            current_data = self._combo_combat_profile.currentData()
+            self._combo_combat_profile.blockSignals(True)
+            self._combo_combat_profile.clear()
+            self._combo_combat_profile.addItem("— Aucun (défauts du moteur) —", "")
+            for p in list_available_profiles():
+                label = f"{p.name} ({p.class_name})"
+                self._combo_combat_profile.addItem(label, p.name)
+            # Restaure la sélection si possible
+            if current_data:
+                idx = self._combo_combat_profile.findData(current_data)
+                if idx >= 0:
+                    self._combo_combat_profile.setCurrentIndex(idx)
+            self._combo_combat_profile.blockSignals(False)
+        except Exception:
+            pass
 
     def _open_learning_dialog(self) -> None:
         """Ouvre le dialogue d'apprentissage : record + stop + générer profil."""
