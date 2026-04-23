@@ -207,6 +207,9 @@ class SimpleCombatWorker(QThread):
         )
         target_xy = (target.x, target.y)
         dist = self._dist_cases(perso_xy, target_xy)
+        # Dofus fonctionne en cases entières : un mob adjacent = portée 1.
+        # Round au plus proche entier (min 1 si mob visible).
+        dist_int = max(1, round(dist))
 
         # 6. Pour chaque slot, check si cast possible (ordre = slot 1 d'abord)
         for slot in sorted(self._config.spell_shortcuts.keys()):
@@ -220,7 +223,8 @@ class SimpleCombatWorker(QThread):
                 continue
             max_r = self._effective_max_range(info)
             min_r = info.get("po_min", 1)
-            if not (min_r <= dist <= max_r):
+            # Use dist_int (entier cases Dofus) pour la compat portée
+            if not (min_r <= dist_int <= max_r):
                 continue
 
             # Anti-boucle : si on a déjà cast ce slot sur cette cible au tick
@@ -245,30 +249,58 @@ class SimpleCombatWorker(QThread):
             self._stats.spells_cast += 1
             return  # une action par tick, on laisse le jeu respirer
 
-        # 7. Aucun sort utilisable à cette distance → bouge vers le mob
-        # (ou end_turn si on a déjà beaucoup bougé)
-        if self._actions_this_turn >= 3:
+        # 7. Aucun sort utilisable à cette distance.
+        # Cas 1 : mob au CaC (dist <= 1) et tous nos sorts ont po_min > 1
+        #   → impossible de s'approcher, on doit reculer.
+        # Cas 2 : mob trop loin → approche.
+        # Cas 3 : trop d'actions sans effet → end_turn pour pas boucler.
+        if self._actions_this_turn >= 2:
+            # Après 2 tentatives, si rien ne marche, on termine le tour
+            # (évite de boucler à cliquer sur des pixels non-walkable)
             self.log_event.emit(
-                f"🏁 Plus de sort utile + déjà {self._actions_this_turn} actions → end_turn",
+                f"🏁 {self._actions_this_turn} actions inutiles à dist {dist:.1f}c → end_turn",
                 "info",
             )
             self._end_turn()
             return
 
-        # Approche d'1-2 cases vers le mob
         dx = target_xy[0] - perso_xy[0]
         dy = target_xy[1] - perso_xy[1]
         length = max(1.0, (dx * dx + dy * dy) ** 0.5)
-        step_px = 1.5 * CELL_PX_X
-        approach_xy = (
-            int(perso_xy[0] + (dx / length) * step_px),
-            int(perso_xy[1] + (dy / length) * step_px),
+
+        # Direction : approche ou recul selon portée MIN de nos sorts
+        min_po_min = min(
+            (self._get_spell_info(s).get("po_min", 1)
+             for s in self._config.spell_shortcuts
+             if self._get_spell_info(s)),
+            default=1,
         )
-        self.log_event.emit(
-            f"🚶 Pas de sort à dist {dist:.0f}c → approche vers ({approach_xy[0]},{approach_xy[1]})",
-            "info",
-        )
-        self._click(approach_xy[0], approach_xy[1])
+
+        if dist_int < min_po_min:
+            # Trop proche → recule (direction OPPOSÉE au mob)
+            step_px = 1.5 * CELL_PX_X
+            move_xy = (
+                int(perso_xy[0] - (dx / length) * step_px),
+                int(perso_xy[1] - (dy / length) * step_px),
+            )
+            self.log_event.emit(
+                f"⬅ Trop proche (dist {dist:.1f}c, min_po_min={min_po_min}) → recule vers "
+                f"({move_xy[0]},{move_xy[1]})",
+                "info",
+            )
+        else:
+            # Trop loin → approche (direction VERS le mob)
+            step_px = 2 * CELL_PX_X
+            move_xy = (
+                int(perso_xy[0] + (dx / length) * step_px),
+                int(perso_xy[1] + (dy / length) * step_px),
+            )
+            self.log_event.emit(
+                f"🚶 Mob à dist {dist:.1f}c → approche vers ({move_xy[0]},{move_xy[1]})",
+                "info",
+            )
+
+        self._click(move_xy[0], move_xy[1])
         self._actions_this_turn += 1
         self.msleep(int(self._config.post_action_delay_sec * 1000))
 
