@@ -108,9 +108,16 @@ class ReplayRecorder(QThread):
                     logger.debug("write_event échec : {}", exc)
 
     # ---------- pynput callbacks ----------
+    # Note : pynput récent passe un paramètre `injected` (bool) en plus pour
+    # détecter les inputs synthétiques. *args capte les paramètres supplémentaires
+    # pour compatibilité cross-version.
 
-    def _on_key_press(self, key) -> None:
+    def _on_key_press(self, key, *args) -> None:
         try:
+            injected = args[0] if args else False
+            # Ignore les inputs simulés (pour éviter de capturer nos propres clics bot)
+            if injected:
+                return
             try:
                 name = key.char if hasattr(key, "char") and key.char else str(key)
             except Exception:
@@ -124,10 +131,13 @@ class ReplayRecorder(QThread):
         except Exception as exc:
             logger.debug("on_key_press échec : {}", exc)
 
-    def _on_click(self, x, y, button, pressed) -> None:
+    def _on_click(self, x, y, button, pressed, *args) -> None:
         if not pressed:
             return  # on capture que les press
         try:
+            injected = args[0] if args else False
+            if injected:
+                return  # ignore les clics simulés
             btn_name = str(button).replace("Button.", "")
             self._stats.clicks_captured += 1
             self._write_event({

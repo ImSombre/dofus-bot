@@ -377,13 +377,26 @@ class LLMClient:
                 {"role": "assistant", "content": "{"},
             ],
         }
+        # Prompt caching Anthropic (v1.2.0) : le system prompt est identique
+        # d'un appel à l'autre, on le marque cache_control=ephemeral pour que
+        # Anthropic le garde en cache 5 min → économie 90% sur coût input.
+        # Doc : https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching
         if system:
-            payload["system"] = system
+            payload["system"] = [
+                {
+                    "type": "text",
+                    "text": system,
+                    "cache_control": {"type": "ephemeral"},
+                },
+            ]
 
         headers = {
             "x-api-key": self.api_key,
             "anthropic-version": "2023-06-01",
             "content-type": "application/json",
+            # Active le prompt caching (GA depuis late-2024, pas besoin du beta
+            # header récent, mais on le met par sécurité pour les anciennes régions).
+            "anthropic-beta": "prompt-caching-2024-07-31",
         }
 
         models_to_try = [self.model]
