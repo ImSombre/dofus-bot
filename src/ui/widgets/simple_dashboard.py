@@ -26,6 +26,7 @@ from PyQt6.QtWidgets import (
     QScrollArea,
     QSpinBox,
     QStackedWidget,
+    QTextEdit,
     QVBoxLayout,
     QWidget,
 )
@@ -169,11 +170,13 @@ class SimpleDashboardWidget(QWidget):
         self._page_farm = self._build_farm_wizard()
         self._page_combat = self._build_combat_wizard()
         self._page_running = self._build_running()
+        self._page_dungeon = self._build_dungeon_wizard()
 
         self._stack.addWidget(self._page_home)     # 0
         self._stack.addWidget(self._page_farm)     # 1
         self._stack.addWidget(self._page_combat)   # 2
-        self._stack.addWidget(self._page_running)  # 3
+        self._stack.addWidget(self._page_running)  # 3 (interne)
+        self._stack.addWidget(self._page_dungeon)  # 4 (donjon)
 
         self._auto_detect_window()
 
@@ -308,13 +311,13 @@ class SimpleDashboardWidget(QWidget):
         self._card_combat.clicked.connect(lambda: self._go_to(2))
         cards_row.addWidget(self._card_combat)
 
-        self._card_craft = _make_card_button(
-            "🔨", "Crafter",
-            "Bientôt disponible\n(calibration en cours)",
-            disabled=True,
+        self._card_dungeon = _make_card_button(
+            "🏰", "Donjons",
+            "Enchaîne les salles + boss\n(Incarnam, Bouftous…)"
         )
-        self._card_craft.setMinimumSize(240, 180)
-        cards_row.addWidget(self._card_craft)
+        self._card_dungeon.setMinimumSize(240, 180)
+        self._card_dungeon.clicked.connect(lambda: self._go_to(4))
+        cards_row.addWidget(self._card_dungeon)
 
         body_lay.addLayout(cards_row)
 
@@ -1831,10 +1834,13 @@ class SimpleDashboardWidget(QWidget):
         mode_row.addWidget(QLabel("Mode décision :"))
         self._combo_decision_mode = QComboBox()
         self._combo_decision_mode.addItem(
-            "Hybride ⭐ (règles + LLM fallback) — recommandé", "hybrid",
+            "⚡ Simple (rule-based pur, recommandé)", "simple",
         )
         self._combo_decision_mode.addItem(
-            "Règles only (gratuit, 0 appel LLM)", "rules",
+            "Hybride (règles + LLM fallback)", "hybrid",
+        )
+        self._combo_decision_mode.addItem(
+            "Règles only (moteur enrichi, pas de LLM)", "rules",
         )
         self._combo_decision_mode.addItem(
             "LLM only (tout au LLM, plus coûteux)", "llm",
@@ -2516,31 +2522,56 @@ class SimpleDashboardWidget(QWidget):
                 except Exception as exc:
                     logger.debug("Save anthropic key échec : {}", exc)
 
-            vcfg = VisionCombatConfig(
-                class_name=self._combat_selected_class,
-                spell_shortcuts=spell_shortcuts,
-                llm_provider=provider,
-                llm_model=self._combat_vision_model.currentText().strip() or "claude-haiku-4-5-20251001",
-                llm_url=llm_url,
-                llm_api_key=llm_api_key,
-                dofus_window_title=self._selected_window.title,
-                starting_pa=self._spin_combat_pa.value(),
-                starting_pm=self._spin_combat_pm.value(),
-                po_bonus=self._spin_combat_po_bonus.value(),
-                save_debug_images=self._chk_save_debug.isChecked(),
-                decision_mode=self._combo_decision_mode.currentData() or "hybrid",
-                use_pixel_los=self._chk_pixel_los.isChecked(),
-                humanize_input=self._chk_humanize.isChecked(),
-                auto_close_popups=self._chk_auto_close_popup.isChecked(),
-                custom_rules=list(getattr(self, "_active_profile_rules", [])),
-            )
-            worker = VisionCombatWorker(
-                vision=self._vision, input_svc=self._input, config=vcfg,
-            )
-            self._on_farm_log(
-                f"🧠 IA Vision activée ({provider}) — le LLM voit l'écran et joue",
-                "info",
-            )
+            decision_mode = self._combo_decision_mode.currentData() or "simple"
+
+            # Mode SIMPLE : worker rule-based pur, pas de LLM
+            if decision_mode == "simple":
+                from src.services.simple_combat_worker import (  # noqa: PLC0415
+                    SimpleCombatConfig, SimpleCombatWorker,
+                )
+                scfg = SimpleCombatConfig(
+                    class_name=self._combat_selected_class,
+                    spell_shortcuts=spell_shortcuts,
+                    starting_pa=self._spin_combat_pa.value(),
+                    starting_pm=self._spin_combat_pm.value(),
+                    po_bonus=self._spin_combat_po_bonus.value(),
+                    dofus_window_title=self._selected_window.title,
+                )
+                worker = SimpleCombatWorker(
+                    vision=self._vision, input_svc=self._input, config=scfg,
+                )
+                self._on_farm_log(
+                    f"⚡ Mode SIMPLE activé — moteur rule-based, "
+                    f"{len(spell_shortcuts)} sorts configurés",
+                    "info",
+                )
+            else:
+                vcfg = VisionCombatConfig(
+                    class_name=self._combat_selected_class,
+                    spell_shortcuts=spell_shortcuts,
+                    llm_provider=provider,
+                    llm_model=self._combat_vision_model.currentText().strip() or "claude-haiku-4-5-20251001",
+                    llm_url=llm_url,
+                    llm_api_key=llm_api_key,
+                    dofus_window_title=self._selected_window.title,
+                    starting_pa=self._spin_combat_pa.value(),
+                    starting_pm=self._spin_combat_pm.value(),
+                    po_bonus=self._spin_combat_po_bonus.value(),
+                    save_debug_images=self._chk_save_debug.isChecked(),
+                    decision_mode=decision_mode,
+                    use_pixel_los=self._chk_pixel_los.isChecked(),
+                    humanize_input=self._chk_humanize.isChecked(),
+                    auto_close_popups=self._chk_auto_close_popup.isChecked(),
+                    custom_rules=list(getattr(self, "_active_profile_rules", [])),
+                )
+                worker = VisionCombatWorker(
+                    vision=self._vision, input_svc=self._input, config=vcfg,
+                )
+                self._on_farm_log(
+                    f"🧠 IA Vision activée ({provider}, mode={decision_mode}) — "
+                    f"le LLM voit l'écran et joue",
+                    "info",
+                )
         else:
             from src.services.combat_runner_worker import CombatConfig, CombatRunnerWorker  # noqa: PLC0415
             cfg = CombatConfig(
@@ -2643,6 +2674,212 @@ class SimpleDashboardWidget(QWidget):
     # ---------------------------------------------------------------------
     # Page 3 : En cours
     # ---------------------------------------------------------------------
+
+    def _build_dungeon_wizard(self) -> QWidget:
+        """Page Donjon : sélection + lancement enchaînement salles."""
+        page = QWidget()
+        page.setStyleSheet("background-color: #1e1e2e;")
+        root = QVBoxLayout(page)
+        root.setContentsMargins(24, 20, 24, 20)
+        root.setSpacing(14)
+
+        # Header retour
+        top = QHBoxLayout()
+        back = QPushButton("← Retour")
+        back.setFlat(True)
+        back.setCursor(Qt.CursorShape.PointingHandCursor)
+        back.setStyleSheet("color: #b0b0b0; padding: 4px 8px;")
+        back.clicked.connect(lambda: self._go_to(0))
+        top.addWidget(back)
+        top.addStretch()
+        root.addLayout(top)
+
+        title = QLabel("🏰  Mode Donjon — enchaîne les salles automatiquement")
+        title.setFont(QFont("Segoe UI", 18, QFont.Weight.Bold))
+        title.setStyleSheet("color: #e8e8f0;")
+        root.addWidget(title)
+
+        info = QLabel(
+            "Le bot détecte les mobs dans chaque salle, lance le combat, "
+            "puis passe à la salle suivante jusqu'au boss final. "
+            "Utilise le profil combat que tu as configuré dans l'onglet Combat."
+        )
+        info.setWordWrap(True)
+        info.setStyleSheet("color: #a0a0b0;")
+        root.addWidget(info)
+
+        # Sélection donjon
+        grp_dungeon = QGroupBox("1️⃣  Choisis un donjon")
+        grp_dungeon.setStyleSheet(_GROUPBOX_STYLE)
+        grp_dungeon_lay = QVBoxLayout(grp_dungeon)
+
+        self._dungeon_list = QComboBox()
+        try:
+            from src.services.dungeon_runner_worker import list_available_dungeons  # noqa: PLC0415
+            for d in list_available_dungeons():
+                label = f"{d.nom} — niv {d.niveau_min}-{d.niveau_max} — {d.nb_rooms} salles"
+                self._dungeon_list.addItem(label, d.id)
+        except Exception:
+            pass
+        self._dungeon_list.setFixedHeight(36)
+        grp_dungeon_lay.addWidget(self._dungeon_list)
+
+        self._dungeon_info_label = QLabel("")
+        self._dungeon_info_label.setWordWrap(True)
+        self._dungeon_info_label.setStyleSheet("color: #a0a0b0; font-size: 10pt;")
+        grp_dungeon_lay.addWidget(self._dungeon_info_label)
+
+        self._dungeon_list.currentIndexChanged.connect(self._on_dungeon_selected)
+        root.addWidget(grp_dungeon)
+
+        # Sélection classe/profil (réutilise la config combat)
+        grp_setup = QGroupBox("2️⃣  Configuration")
+        grp_setup.setStyleSheet(_GROUPBOX_STYLE)
+        grp_setup_lay = QVBoxLayout(grp_setup)
+        self._dungeon_setup_label = QLabel(
+            "Avant de lancer : va dans l'onglet <b>Combattre</b> et configure "
+            "ta classe + tes sorts + le profil. Ce setup sera utilisé pour les combats."
+        )
+        self._dungeon_setup_label.setWordWrap(True)
+        self._dungeon_setup_label.setStyleSheet("color: #e0e0e0;")
+        grp_setup_lay.addWidget(self._dungeon_setup_label)
+        root.addWidget(grp_setup)
+
+        # Bouton lancer
+        self._btn_start_dungeon = QPushButton("🏰  LANCER LE DONJON")
+        self._btn_start_dungeon.setMinimumHeight(54)
+        self._btn_start_dungeon.setStyleSheet(
+            "QPushButton { background: #388e3c; color: white; font-size: 14pt; "
+            "font-weight: bold; border-radius: 8px; }"
+            "QPushButton:hover { background: #4caf50; }"
+        )
+        self._btn_start_dungeon.clicked.connect(self._start_dungeon)
+        root.addWidget(self._btn_start_dungeon)
+
+        # Log
+        self._dungeon_log = QTextEdit()
+        self._dungeon_log.setReadOnly(True)
+        self._dungeon_log.setStyleSheet(
+            "background: #16162a; color: #c0c0d8; font-family: Consolas; font-size: 9pt;"
+        )
+        self._dungeon_log.setFixedHeight(200)
+        root.addWidget(self._dungeon_log)
+
+        self._dungeon_worker = None
+        self._dungeon_combat_worker = None
+
+        # Init label
+        if self._dungeon_list.count() > 0:
+            self._on_dungeon_selected(0)
+
+        return page
+
+    def _on_dungeon_selected(self, _idx: int) -> None:
+        if not hasattr(self, "_dungeon_list") or not hasattr(self, "_dungeon_info_label"):
+            return
+        dungeon_id = self._dungeon_list.currentData()
+        if not dungeon_id:
+            self._dungeon_info_label.setText("")
+            return
+        try:
+            from src.services.dungeon_runner_worker import list_available_dungeons  # noqa: PLC0415
+            d = next((x for x in list_available_dungeons() if x.id == dungeon_id), None)
+            if d:
+                self._dungeon_info_label.setText(
+                    f"<b>{d.nom}</b> — niv {d.niveau_min}-{d.niveau_max}, "
+                    f"{d.nb_rooms} salles, boss : {d.boss_name or 'N/A'}"
+                )
+        except Exception:
+            pass
+
+    def _start_dungeon(self) -> None:
+        """Lance le DungeonRunnerWorker avec combat intégré."""
+        if not self._combat_selected_class:
+            QMessageBox.warning(
+                self, "Classe non configurée",
+                "Va dans l'onglet Combattre et sélectionne ta classe + tes sorts avant.",
+            )
+            return
+        dungeon_id = self._dungeon_list.currentData()
+        if not dungeon_id:
+            QMessageBox.warning(self, "Donjon", "Sélectionne un donjon.")
+            return
+        if not self._selected_window or not self._selected_window.title:
+            QMessageBox.warning(self, "Fenêtre Dofus", "Sélectionne la fenêtre Dofus d'abord.")
+            return
+        try:
+            from src.services.dungeon_runner_worker import (  # noqa: PLC0415
+                DungeonConfig, DungeonRunnerConfig, DungeonRunnerWorker,
+                list_available_dungeons,
+            )
+            from src.services.simple_combat_worker import (  # noqa: PLC0415
+                SimpleCombatConfig, SimpleCombatWorker,
+            )
+
+            dungeon = next(
+                (d for d in list_available_dungeons() if d.id == dungeon_id),
+                None,
+            )
+            if not dungeon:
+                QMessageBox.warning(self, "Donjon", f"Donjon '{dungeon_id}' introuvable.")
+                return
+
+            shortcuts = self._collect_spell_shortcuts()
+
+            def _make_combat_worker():
+                scfg = SimpleCombatConfig(
+                    class_name=self._combat_selected_class,
+                    spell_shortcuts=shortcuts,
+                    starting_pa=self._spin_combat_pa.value(),
+                    starting_pm=self._spin_combat_pm.value(),
+                    po_bonus=self._spin_combat_po_bonus.value(),
+                    dofus_window_title=self._selected_window.title,
+                )
+                return SimpleCombatWorker(
+                    vision=self._vision, input_svc=self._input, config=scfg,
+                )
+
+            runner_cfg = DungeonRunnerConfig(
+                dungeon=dungeon,
+                combat_worker_factory=_make_combat_worker,
+            )
+            self._dungeon_worker = DungeonRunnerWorker(
+                vision=self._vision, input_svc=self._input, config=runner_cfg,
+            )
+
+            def _on_log(msg: str, level: str) -> None:
+                color = {"info": "#c0c0d8", "warn": "#fb8c00", "error": "#e53935"}.get(level, "#c0c0d8")
+                self._dungeon_log.append(f"<span style='color:{color}'>{msg}</span>")
+
+            def _on_stopped() -> None:
+                self._btn_start_dungeon.setText("🏰  LANCER LE DONJON")
+                self._btn_start_dungeon.setEnabled(True)
+                self._dungeon_worker = None
+
+            self._dungeon_worker.log_event.connect(_on_log)
+            self._dungeon_worker.stopped.connect(_on_stopped)
+            self._dungeon_worker.start()
+
+            self._btn_start_dungeon.setText("⏹ STOP")
+            self._btn_start_dungeon.clicked.disconnect()
+            self._btn_start_dungeon.clicked.connect(self._stop_dungeon)
+            self._dungeon_log.append(
+                f"<span style='color:#66bb6a'>🏰 Démarrage donjon {dungeon.nom}</span>"
+            )
+        except Exception as exc:
+            import traceback  # noqa: PLC0415
+            traceback.print_exc()
+            QMessageBox.critical(self, "Erreur donjon", f"Échec lancement : {exc}")
+
+    def _stop_dungeon(self) -> None:
+        if self._dungeon_worker:
+            try:
+                self._dungeon_worker.request_stop()
+            except Exception:
+                pass
+        self._btn_start_dungeon.setText("🏰  LANCER LE DONJON")
+        self._btn_start_dungeon.clicked.disconnect()
+        self._btn_start_dungeon.clicked.connect(self._start_dungeon)
 
     def _build_running(self) -> QWidget:
         from PyQt6.QtWidgets import QPlainTextEdit  # noqa: PLC0415
