@@ -149,9 +149,9 @@ class ReplayRecorder(QThread):
         )
         self.state_changed.emit("recording")
 
-        # Ouvre le fichier en mode append
+        # Ouvre le fichier en mode write (nouvelle session = fichier fresh)
         try:
-            self._file = open(self._output_path, "a", encoding="utf-8", buffering=1)
+            self._file = open(self._output_path, "w", encoding="utf-8", buffering=1)
         except Exception as exc:
             self.log_event.emit(f"⚠ Impossible d'ouvrir replay : {exc}", "error")
             self.stopped.emit()
@@ -173,34 +173,38 @@ class ReplayRecorder(QThread):
         except Exception as exc:
             self.log_event.emit(f"⚠ pynput listener échec : {exc}", "error")
 
-        # Boucle de capture
-        while not self._stop_requested:
-            try:
-                snap = self._state_reader.read()
-                event: dict[str, Any] = {"type": "frame"}
-                if snap.perso:
-                    event["perso_xy"] = [snap.perso.x, snap.perso.y]
-                if snap.ennemis:
-                    event["enemies"] = [[e.x, e.y] for e in snap.ennemis]
-                # Stats OCR si disponibles (champ déjà dans snap)
-                if snap.pa_restants is not None:
-                    event["pa_visible"] = snap.pa_restants
-                if snap.pm_restants is not None:
-                    event["pm_visible"] = snap.pm_restants
-                if snap.hp_perso is not None and snap.hp_perso_max:
-                    event["hp_pct_self"] = round(
-                        100 * snap.hp_perso / max(1, snap.hp_perso_max), 1,
-                    )
+        # Boucle de capture protégée : garantit cleanup des listeners même si crash
+        try:
+            while not self._stop_requested:
+                try:
+                    snap = self._state_reader.read()
+                    event: dict[str, Any] = {"type": "frame"}
+                    if snap.perso:
+                        event["perso_xy"] = [snap.perso.x, snap.perso.y]
+                    if snap.ennemis:
+                        event["enemies"] = [[e.x, e.y] for e in snap.ennemis]
+                    # Stats OCR si disponibles (champ déjà dans snap)
+                    if snap.pa_restants is not None:
+                        event["pa_visible"] = snap.pa_restants
+                    if snap.pm_restants is not None:
+                        event["pm_visible"] = snap.pm_restants
+                    if snap.hp_perso is not None and snap.hp_perso_max:
+                        event["hp_pct_self"] = round(
+                            100 * snap.hp_perso / max(1, snap.hp_perso_max), 1,
+                        )
 
-                self._write_event(event)
-                self._stats.frames_captured += 1
-            except Exception as exc:
-                logger.debug("capture frame échec : {}", exc)
+                    self._write_event(event)
+                    self._stats.frames_captured += 1
+                except Exception as exc:
+                    logger.debug("capture frame échec : {}", exc)
 
-            self.stats_updated.emit(self._stats)
-            self.msleep(int(self._capture_interval * 1000))
+                self.stats_updated.emit(self._stats)
+                self.msleep(int(self._capture_interval * 1000))
+        except Exception as exc:
+            logger.exception("Recorder run crash")
+            self.log_event.emit(f"⚠ Recorder crash : {exc}", "error")
 
-        # Cleanup
+        # Cleanup — GARANTI même si crash dans la boucle
         self._stats.duration_sec = time.time() - self._t0
         self._write_event({
             "type": "session_end",

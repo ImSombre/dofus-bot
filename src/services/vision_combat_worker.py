@@ -68,7 +68,9 @@ class VisionCombatConfig:
     # Ex: stuff/buff donnant +3 PO → po_bonus = 3, tous les sorts concernés
     # ont leur portée_max augmentée d'autant dans le prompt LLM.
     po_bonus: int = 0
-    max_actions_per_turn: int = 6
+    # Limite d'actions par tour (anti-spam LLM) — 10 pour couvrir les gros
+    # tours Ecaflip/Cra (10 PA + sorts à 2-3 PA = 4-5 casts + déplacements).
+    max_actions_per_turn: int = 10
     # Timeout réduit : 20s max par requête LLM (avant : 90s = blocage en cas de surcharge).
     # Anthropic Haiku répond typiquement en 1-2s, on a donc 10× de marge.
     request_timeout_sec: float = 20.0
@@ -880,9 +882,9 @@ class VisionCombatWorker(QThread):
         atype = str(action.get("type", "")).lower()
         self.state_changed.emit("playing")
 
-        # Incrémente le compteur d'actions du tour pour les actions "coûteuses"
-        # (pas wait ou end_turn). Permet au worker de forcer end_turn après N actions.
-        if atype in ("cast_spell", "spell", "click_xy", "press_key", "close_popup"):
+        # Incrémente le compteur d'actions du tour UNIQUEMENT en mon_tour
+        # (les actions hors tour ne doivent pas compter pour l'anti-spam).
+        if phase == "mon_tour" and atype in ("cast_spell", "spell", "click_xy"):
             self._actions_this_turn += 1
 
         # Active la fenêtre Dofus avant TOUTE action (sinon keys/clics partent ailleurs)
