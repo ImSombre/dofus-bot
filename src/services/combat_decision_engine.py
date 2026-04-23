@@ -388,7 +388,7 @@ class CombatDecisionEngine:
                     "type": "click_xy",
                     "target_xy": list(flee_xy),
                     "reason": (
-                        f"trop proche (dist {dist:.0f}c < po_min {min_po_min}c) → recule 1c"
+                        f"trop proche (dist {dist:.1f}c < po_min {min_po_min}c) → recule 1c"
                     ),
                 }
             # Sinon on approche (cas standard)
@@ -397,7 +397,7 @@ class CombatDecisionEngine:
                 "type": "click_xy",
                 "target_xy": list(approach_xy),
                 "reason": (
-                    f"hors portée sorts dispo (dist {dist:.0f}c, max_range={max_po_max}c) → approche 1c"
+                    f"hors portée sorts dispo (dist {dist:.1f}c, max_range={max_po_max}c) → approche 1c"
                 ),
             }
 

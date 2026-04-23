@@ -459,9 +459,15 @@ class VisionCombatWorker(QThread):
                 self._stats_tracker.on_kill()
         self._prev_enemy_count = current_enemy_count
 
+        # Anti-faux-positif : si HSV détecte des mobs, on NE PEUT PAS être
+        # en popup (la popup cacherait l'écran entier). Si plus de 2 mobs
+        # détectés → popup detection forcément erronée → on ignore.
+        has_visible_mobs = snap is not None and len(snap.ennemis or []) >= 2
+
         if (self._config.auto_close_popups
                 and phase_result.phase == "popup_victoire"
                 and phase_result.confidence > 0.5
+                and not has_visible_mobs
                 and self._config.decision_mode in ("hybrid", "rules")):
             self.log_event.emit(
                 f"🏆 Popup détectée → close ({phase_result.reason})", "info",
